@@ -1,0 +1,23 @@
+name: React CI
+
+on:
+  push:
+    paths:
+    - 'client/**'
+    branches:
+    - main
+  pull_request:
+    paths:
+    - 'client/**'
+    branches:
+    - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: cd client && npm install

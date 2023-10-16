@@ -1,0 +1,23 @@
+name: Api platform CI
+
+on:
+  push:
+    paths:
+    - 'server/**'
+    branches:
+    - main
+  pull_request:
+    paths:
+    - 'server/**'
+    branches:
+    - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: cd server && composer install
