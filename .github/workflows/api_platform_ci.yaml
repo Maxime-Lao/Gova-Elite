@@ -19,5 +19,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Setup .env
+      run: |
+        echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> server/.env
+        echo "APP_ENV=${{ secrets.APP_ENV }}" >> server/.env
+
     - name: Install dependencies
       run: cd server && composer install
