@@ -26,3 +26,6 @@ jobs:
 
     - name: Install dependencies
       run: cd server && composer install
+      
+    - name : Start docker-compose
+      run : docker-compose up -d 
