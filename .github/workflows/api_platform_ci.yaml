@@ -28,4 +28,4 @@ jobs:
       run: cd server && composer install
       
     - name : Start docker-compose
-      run : docker-compose up -d 
+      run : cd server && docker-compose up -d 
