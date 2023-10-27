@@ -1,5 +1,16 @@
-controllers:
-    resource:
-        path: ../src/Controller/
-        namespace: App\Controller
+controllers_front:
+    resource: ../src/Controller/Front
     type: attribute
+    name_prefix: front_
+
+controllers_back:
+    resource: ../src/Controller/Back
+    type: attribute
+    name_prefix: back_
+    prefix: /admin/
+
+controllers_provider:
+    resource: ../src/Controller/Provider
+    type: attribute
+    name_prefix: provider_
+    prefix: /provider/
