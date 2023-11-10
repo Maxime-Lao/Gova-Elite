@@ -15,7 +15,7 @@ const Navbar = () => {
             <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: '1em' }}>
                 <ul style={{ listStyleType: 'none', display: 'flex', gap: '1em' }}>
                     <li><a href="#"><Button startIcon={<CarRentalIcon />}>Louer mon véhicule</Button></a></li>
-                    <li><a href="#"><Button variant="contained">S&apos;inscrire</Button></a></li>
+                    <li><a href="/register"><Button variant="contained">S&apos;inscrire</Button></a></li>
                     <li><a href="#"><Button variant="outlined">Se connecter</Button></a></li>
                     <li><a href="#"><Button>FR | EN</Button></a></li>
                 </ul>
