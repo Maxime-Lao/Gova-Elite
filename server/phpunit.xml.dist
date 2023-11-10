@@ -19,6 +19,11 @@
         <!-- ###+ nelmio/cors-bundle ### -->
         <env name="CORS_ALLOW_ORIGIN" value="'^https?://(localhost|127\.0\.0\.1)(:[0-9]+)?$'"/>
         <!-- ###- nelmio/cors-bundle ### -->
+
+        <!-- ###+ symfony/sendinblue-mailer ### -->
+        <!-- MAILER_DSN=sendinblue+api://KEY@default -->
+        <!-- MAILER_DSN=sendinblue+smtp://USERNAME:PASSWORD@default -->
+        <!-- ###- symfony/sendinblue-mailer ### -->
     </php>
 
     <testsuites>
