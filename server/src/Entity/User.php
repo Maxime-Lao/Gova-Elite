@@ -4,84 +4,62 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\UserRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\Regex;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-#[ApiResource]
-class User
+#[ApiResource()]
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Id, ORM\GeneratedValue, ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 100)]
-    private ?string $firstname = null;
-
-    #[ORM\Column(length: 100)]
-    private ?string $lastname = null;
-
-    #[ORM\Column(length: 100)]
+    #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $password = null;
+    #[ORM\Column]
+    private array $roles = [];
 
-    #[ORM\Column(length: 15)]
-    private ?string $phone = null;
+    /**
+     * @var string The hashed password
+     */
+    #[ORM\Column]
+    #[Length(min: 8)]
+    #[Regex(pattern: '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/')]
+    private ?string $password = null;
 
     #[ORM\Column(nullable: true)]
     private ?bool $isVerified = null;
 
-    #[ORM\OneToMany(mappedBy: 'userr', targetEntity: Notice::class)]
-    private Collection $notices;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $firstname = null;
 
-    #[ORM\ManyToOne(inversedBy: 'users')]
-    private ?Role $role = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $lastname = null;
 
-    #[ORM\OneToMany(mappedBy: 'userr', targetEntity: Notification::class)]
-    private Collection $notification;
+    //phone
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $phone = null;
 
-    #[ORM\OneToMany(mappedBy: 'userr', targetEntity: Media::class)]
-    private Collection $media;
-
-    public function __construct()
+    public function getPhone(): ?string
     {
-        $this->notices = new ArrayCollection();
-        $this->notification = new ArrayCollection();
-        $this->media = new ArrayCollection();
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): static
+    {
+        $this->phone = $phone;
+
+        return $this;
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getFirstname(): ?string
-    {
-        return $this->firstname;
-    }
-
-    public function setFirstname(string $firstname): static
-    {
-        $this->firstname = $firstname;
-
-        return $this;
-    }
-
-    public function getLastname(): ?string
-    {
-        return $this->lastname;
-    }
-
-    public function setLastname(string $lastname): static
-    {
-        $this->lastname = $lastname;
-
-        return $this;
     }
 
     public function getEmail(): ?string
@@ -96,7 +74,39 @@ class User
         return $this;
     }
 
-    public function getPassword(): ?string
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -108,128 +118,47 @@ class User
         return $this;
     }
 
-    public function getPhone(): ?string
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
     {
-        return $this->phone;
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
     }
 
-    public function setPhone(string $phone): static
-    {
-        $this->phone = $phone;
-
-        return $this;
-    }
-
-    public function isIsVerified(): ?bool
+    public function getIsVerified(): ?bool
     {
         return $this->isVerified;
     }
 
-    public function setIsVerified(?bool $isVerified): static
+    public function setIsVerified(bool $isVerified): static
     {
         $this->isVerified = $isVerified;
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, Notice>
-     */
-    public function getNotices(): Collection
+    public function getFirstname(): ?string
     {
-        return $this->notices;
+        return $this->firstname;
     }
 
-    public function addNotice(Notice $notice): static
+    public function setFirstname(?string $firstname): static
     {
-        if (!$this->notices->contains($notice)) {
-            $this->notices->add($notice);
-            $notice->setUserr($this);
-        }
+        $this->firstname = $firstname;
 
         return $this;
     }
 
-    public function removeNotice(Notice $notice): static
+    public function getLastname(): ?string
     {
-        if ($this->notices->removeElement($notice)) {
-            // set the owning side to null (unless already changed)
-            if ($notice->getUserr() === $this) {
-                $notice->setUserr(null);
-            }
-        }
-
-        return $this;
+        return $this->lastname;
     }
 
-    public function getRole(): ?Role
+    public function setLastname(?string $lastname): static
     {
-        return $this->role;
-    }
-
-    public function setRole(?Role $role): static
-    {
-        $this->role = $role;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Notification>
-     */
-    public function getNotification(): Collection
-    {
-        return $this->notification;
-    }
-
-    public function addNotification(Notification $notification): static
-    {
-        if (!$this->notification->contains($notification)) {
-            $this->notification->add($notification);
-            $notification->setUserr($this);
-        }
-
-        return $this;
-    }
-
-    public function removeNotification(Notification $notification): static
-    {
-        if ($this->notification->removeElement($notification)) {
-            // set the owning side to null (unless already changed)
-            if ($notification->getUserr() === $this) {
-                $notification->setUserr(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Media>
-     */
-    public function getMedia(): Collection
-    {
-        return $this->media;
-    }
-
-    public function addMedium(Media $medium): static
-    {
-        if (!$this->media->contains($medium)) {
-            $this->media->add($medium);
-            $medium->setUserr($this);
-        }
-
-        return $this;
-    }
-
-    public function removeMedium(Media $medium): static
-    {
-        if ($this->media->removeElement($medium)) {
-            // set the owning side to null (unless already changed)
-            if ($medium->getUserr() === $this) {
-                $medium->setUserr(null);
-            }
-        }
+        $this->lastname = $lastname;
 
         return $this;
     }
