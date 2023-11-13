@@ -3,62 +3,77 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 use App\Repository\CarRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CarRepository::class)]
-#[ApiResource]
+#[ApiResource(normalizationContext: ['groups' => ['car:read']])]
 class Car
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups('car:read')]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups('car:read')]
     private ?int $year = null;
 
     #[ORM\Column]
+    #[Groups('car:read')]
     private ?int $horses = null;
 
     #[ORM\Column]
+    #[Groups('car:read')]
     private ?int $nbSeats = null;
 
     #[ORM\Column]
+    #[Groups('car:read')]
     private ?int $nbDoors = null;
 
     #[ORM\Column]
+    #[Groups('car:read')]
     private ?float $price = null;
 
     #[ORM\Column]
+    #[Groups('car:read')]
     private ?int $mileage = null;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups('car:read')]
     private ?Gear $gear = null;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
+    #[Groups('car:read')]
     private ?Model $model = null;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
-    private ?Rent $rent = null;
-
-    #[ORM\ManyToOne(inversedBy: 'cars')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups('car:read')]
     private ?Energy $energy = null;
 
     #[ORM\OneToMany(mappedBy: 'car', targetEntity: Media::class)]
+    #[Groups('car:read')]
     private Collection $media;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups('car:read')]
     private ?Companie $companie = null;
+
+    #[ORM\OneToMany(mappedBy: 'car', targetEntity: Rent::class)]
+    #[Groups('car:read')]
+    private Collection $rents;
 
     public function __construct()
     {
         $this->media = new ArrayCollection();
+        $this->rents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -162,18 +177,6 @@ class Car
         return $this;
     }
 
-    public function getRent(): ?Rent
-    {
-        return $this->rent;
-    }
-
-    public function setRent(?Rent $rent): static
-    {
-        $this->rent = $rent;
-
-        return $this;
-    }
-
     public function getEnergy(): ?Energy
     {
         return $this->energy;
@@ -224,6 +227,36 @@ class Car
     public function setCompanie(?Companie $companie): static
     {
         $this->companie = $companie;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Rent>
+     */
+    public function getRents(): Collection
+    {
+        return $this->rents;
+    }
+
+    public function addRent(Rent $rent): static
+    {
+        if (!$this->rents->contains($rent)) {
+            $this->rents->add($rent);
+            $rent->setCar($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRent(Rent $rent): static
+    {
+        if ($this->rents->removeElement($rent)) {
+            // set the owning side to null (unless already changed)
+            if ($rent->getCar() === $this) {
+                $rent->setCar(null);
+            }
+        }
 
         return $this;
     }

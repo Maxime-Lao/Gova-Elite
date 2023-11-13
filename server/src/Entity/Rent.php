@@ -7,6 +7,7 @@ use App\Repository\RentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RentRepository::class)]
@@ -18,22 +19,19 @@ class Rent
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+    #[Groups('car:read')]
     private ?\DateTimeImmutable $dateStart = null;
 
-    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+    #[Groups('car:read')]
     private ?\DateTimeImmutable $dateEnd = null;
 
     #[ORM\Column]
     private ?int $totalPrice = null;
 
-    #[ORM\OneToMany(mappedBy: 'rent', targetEntity: Car::class)]
-    private Collection $cars;
-
-    public function __construct()
-    {
-        $this->cars = new ArrayCollection();
-    }
+    #[ORM\ManyToOne(inversedBy: 'rents')]
+    private ?Car $car = null;
 
     public function getId(): ?int
     {
@@ -76,32 +74,14 @@ class Rent
         return $this;
     }
 
-    /**
-     * @return Collection<int, Car>
-     */
-    public function getCars(): Collection
+    public function getCar(): ?Car
     {
-        return $this->cars;
+        return $this->car;
     }
 
-    public function addCar(Car $car): static
+    public function setCar(?Car $car): static
     {
-        if (!$this->cars->contains($car)) {
-            $this->cars->add($car);
-            $car->setRent($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCar(Car $car): static
-    {
-        if ($this->cars->removeElement($car)) {
-            // set the owning side to null (unless already changed)
-            if ($car->getRent() === $this) {
-                $car->setRent(null);
-            }
-        }
+        $this->car = $car;
 
         return $this;
     }
