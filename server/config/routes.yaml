@@ -14,3 +14,9 @@ controllers_provider:
     type: attribute
     name_prefix: provider_
     prefix: /provider/
+
+controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: App\Controller
+    type: attribute
