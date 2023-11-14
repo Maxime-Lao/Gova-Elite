@@ -8,13 +8,15 @@ import RegisterPage from "./pages/Register.jsx";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/cars/:id" element={<CarDetails />} />
-        <Route path="/register" element={<RegisterPage />} />
-      </Routes>
-    </Router>
+    <ThemeProvider theme={myTheme}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/cars/:id" element={<CarDetails />} />
+          <Route path="/register" element={<RegisterPage />} />
+        </Routes>
+      </Router>
+    </ThemeProvider>
   );
 }
 
