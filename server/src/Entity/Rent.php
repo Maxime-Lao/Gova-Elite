@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RentRepository::class)]
 #[ApiResource]
@@ -17,22 +18,37 @@ class Rent
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['user:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    #[Groups('car:read')]
+    #[Assert\NotBlank(message: 'La date de début de la réservation ne peut pas être vide')]
+    #[Groups(['car:read', 'user:read'])]
     private ?\DateTimeImmutable $dateStart = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-    #[Groups('car:read')]
+    #[Assert\NotBlank(message: 'La date de fin de la réservation ne peut pas être vide')]
+    #[Groups(['car:read', 'user:read'])]
     private ?\DateTimeImmutable $dateEnd = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'Le prix total ne peut pas être vide')]
     private ?int $totalPrice = null;
 
     #[ORM\ManyToOne(inversedBy: 'rents')]
+    #[Groups('user:read')]
     private ?Car $car = null;
 
+    #[ORM\ManyToOne(inversedBy: 'rents')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
+    
     public function getId(): ?int
     {
         return $this->id;
@@ -82,6 +98,42 @@ class Rent
     public function setCar(?Car $car): static
     {
         $this->car = $car;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
