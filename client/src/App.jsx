@@ -6,6 +6,7 @@ import { ThemeProvider } from '@mui/material';
 import myTheme from './theme';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import RegisterPage from "./pages/Register.jsx";
+import Login from "./pages/Login.jsx";
 
 function App() {
   return (
@@ -15,6 +16,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/cars/:id" element={<CarDetails />} />
           <Route path="/bookings" element={<Bookings />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegisterPage />} />
         </Routes>
       </Router>

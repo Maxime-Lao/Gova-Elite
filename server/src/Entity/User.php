@@ -64,7 +64,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:read', 'comment:read', 'car:read'])]
     private ?string $lastname = null;
 
-    //phone
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\Regex(
         pattern: '/^\+?[0-9]+$/',
@@ -92,6 +91,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->comments = new ArrayCollection();
     }
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $token = null;
+
     public function getPhone(): ?string
     {
         return $this->phone;
@@ -100,6 +102,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPhone(?string $phone): static
     {
         $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
+
+    public function setToken(string $token): static
+    {
+        $this->token = $token;
 
         return $this;
     }

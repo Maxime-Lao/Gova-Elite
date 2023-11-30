@@ -16,7 +16,7 @@ const Navbar = () => {
                 <ul style={{ listStyleType: 'none', display: 'flex', gap: '1em' }}>
                     <li><a href="#"><Button startIcon={<CarRentalIcon />}>Louer mon véhicule</Button></a></li>
                     <li><a href="/register"><Button variant="contained">S&apos;inscrire</Button></a></li>
-                    <li><a href="#"><Button variant="outlined">Se connecter</Button></a></li>
+                    <li><a href="/login"><Button variant="outlined">Se connecter</Button></a></li>
                     <li><a href="#"><Button>FR | EN</Button></a></li>
                 </ul>
             </Box>

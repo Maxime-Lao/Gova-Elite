@@ -10,6 +10,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import {RequiredField} from "../components/form/RequiredField.jsx";
+import Link from "@mui/material/Link";
 
 function validatePassword(password) {
     const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -222,9 +223,7 @@ const Register = () => {
                 </form>
             </Paper>
             <Box mt={2} textAlign="center">
-                <Typography variant="body2" color="textSecondary">
-                    Your additional content or links here
-                </Typography>
+                <Link href="/login">Vous avez déjà un compte? Connectez-vous!</Link>
             </Box>
         </Container>
     );
