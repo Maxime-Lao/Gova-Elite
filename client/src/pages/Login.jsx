@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
@@ -48,8 +47,12 @@ const Login = () => {
 
         if (validateForm()) {
             try {
-                const response = await axios.post('http://localhost:8000/api/login', {
-                    ...formData,
+                const response = await fetch('http://localhost:8000/api/login', {
+                    method: 'POST',
+                    headers: {
+                    'Content-Type': 'application/ld+json',
+                    },
+                    body: JSON.stringify(formData),
                 });
 
                 console.log(response);
