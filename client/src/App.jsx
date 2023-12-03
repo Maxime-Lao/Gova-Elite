@@ -7,6 +7,7 @@ import myTheme from './theme';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import RegisterPage from "./pages/Register.jsx";
 import Login from "./pages/Login.jsx";
+import CreateCompanie from "./pages/CreateCompanie.jsx";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/createCompanie" element={<CreateCompanie />} />
         </Routes>
       </Router>
     </ThemeProvider>
