@@ -1,7 +1,6 @@
 version: '3'
 
 services:
-###> doctrine/doctrine-bundle ###
   database:
     image: postgres:15.4-alpine
     environment:
@@ -12,8 +11,7 @@ services:
       - database_data:/var/lib/postgresql/data:rw
     ports:
       - "5432:5432"
-
 volumes:
-###> doctrine/doctrine-bundle ###
   database_data:
-###< doctrine/doctrine-bundle ###
+
+
