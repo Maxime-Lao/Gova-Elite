@@ -1,3 +1,0 @@
-App\Entity\Auth\User:
-  user_{1..10}:
-    name: '<firstname()>'
