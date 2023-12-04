@@ -1,128 +1,76 @@
-import React, { useState } from 'react';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
-import Link from '@mui/material/Link';
+import React, { useState } from "react";
+import { TextField, Button, Grid ,Box, Link } from "@mui/material";
+import sendRequest from "../services/axiosRequestFunction";
+import { useNavigate } from 'react-router-dom';
 
-const Login = () => {
-    const initialState = {
-        email: '',
-        password: '',
-    };
-
-    const [formData, setFormData] = useState(initialState);
-    const [errors, setErrors] = useState({});
-    const [successMessage, setSuccessMessage] = useState('');
-
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
-    };
-
-    const validateForm = () => {
-        let isValid = true;
-        const newErrors = {};
-
-        // Validation générique pour tous les champs
-        Object.keys(formData).forEach((fieldName) => {
-            if (!formData[fieldName]) {
-                newErrors[fieldName] = 'Ce champ est obligatoire.';
-                isValid = false;
-            } else {
-                newErrors[fieldName] = '';
-            }
-        });
-
-        setErrors(newErrors);
-        return isValid;
-    };
+export default function Login() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        if (validateForm()) {
-            try {
-                const response = await fetch('http://localhost:8000/api/login', {
-                    method: 'POST',
-                    headers: {
-                    'Content-Type': 'application/ld+json',
-                    },
-                    body: JSON.stringify(formData),
-                });
-
-                console.log(response);
-
-                if (response.data.error) {
-                    setSuccessMessage('');
-                    setErrors({ email: 'Échec de la connexion. Veuillez vérifier vos informations.' });
-                } else {
-                    setSuccessMessage('Connexion réussie ! Redirection...');
-
-                    // Ajoutez ici une redirection vers la page d'accueil ou toute autre page nécessaire
-                    // Exemple : window.location.href = '/';
-                }
-            } catch (error) {
-                console.error("Une erreur s'est produite : ", error);
-                setSuccessMessage('Échec de la connexion. Veuillez vérifier vos informations.');
-            }
-        }
+        sendRequest(
+            '/auth',
+            'post',
+            {
+                email: email,
+                password: password,
+            },
+            false
+        ).then((response) => {
+            localStorage.setItem('token', response.token);
+            localStorage.setItem('refresh_token', response.refresh_token);
+            navigate('/');
+        });
     };
 
-
     return (
-        <Container component="main" maxWidth="xs">
-            <Paper elevation={3} style={{ padding: 20, marginTop: 20 }}>
-                <Typography variant="h5" component="div" align="center" fontWeight="bold">
-                    Login
-                </Typography>
-                {successMessage && (
-                    <Typography variant="body1" color="primary" align="center" gutterBottom>
-                        {successMessage}
-                    </Typography>
-                )}
+        <Grid
+            container
+            spacing={2}
+            direction="column"
+            alignItems="center"
+            justify="center"
+            style={{ minHeight: '100vh' }}
+        >
+            <Grid item xs={12} sm={6}>
+                <Box mt={2} textAlign="center">
+                    <h2>Connectez-vous !</h2>
+                </Box>
                 <form onSubmit={handleSubmit}>
-                    <Box mt={2}>
-                        <TextField
-                            label="Email"
-                            variant="outlined"
-                            fullWidth
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                        />
-                        <div>{errors.email}</div>
-                    </Box>
-                    <Box mt={2}>
-                        <TextField
-                            label="Password"
-                            variant="outlined"
-                            type="password"
-                            fullWidth
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                        />
-                        <div>{errors.password}</div>
-                    </Box>
-                    <Box mt={2} mb={2}>
-                        <Button type="submit" variant="contained" color="primary" fullWidth>
-                            Login
-                        </Button>
-                    </Box>
+                    <TextField
+                        label="Email"
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                    <TextField
+                        label="Mot de passe"
+                        type="password"
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        size="large"
+                        style={{ marginTop: '1rem' }}
+                    >
+                        Se connecter
+                    </Button>
                 </form>
-            </Paper>
+            </Grid>
             <Box mt={2} textAlign="center">
                 <Link href="/register">Vous n'avez pas de compte? Inscrivez-vous!</Link>
             </Box>
-        </Container>
+        </Grid>
     );
-};
-
-export default Login;
+}

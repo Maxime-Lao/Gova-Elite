@@ -288,7 +288,6 @@ class Car
             $this->rents->add($rent);
             $rent->setCar($this);
         }
-
         return $this;
     }
 
@@ -300,7 +299,6 @@ class Car
                 $rent->setCar(null);
             }
         }
-
         return $this;
     }
 
