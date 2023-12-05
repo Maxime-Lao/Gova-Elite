@@ -21,6 +21,23 @@ final class UserPasswordHasher implements ProcessorInterface
         $this->mailer = $mailer;
         $this->router = $router;
     }
+
+    private function sendWelcomeEmail(User $user)
+    {
+        $verificationUrl = $this->router->generate(
+            'user_verify',
+            ['token' =>  $user->getToken()],
+            UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $currentEmail = (new Email())
+            ->from('bedda.ayman.sio@gmail.com')
+            ->to($user->getEmail())
+            ->subject('Time for Symfony Mailer!')
+            ->text('Sending emails is fun again!')
+            ->html("<p>Please verify your account by clicking <a href=\"{$verificationUrl}\">here</a>.</p>");
+
+        $this->mailer->send($currentEmail);
+    }
     public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
     {
 
@@ -38,22 +55,4 @@ final class UserPasswordHasher implements ProcessorInterface
         return $this->processor->process($data, $operation, $uriVariables, $context);
     }
 
-
-    private function sendWelcomeEmail(User $user)
-    {
-        $verificationUrl = $this->router->generate(
-            'user_verify',
-            ['token' =>  $user->getToken()],
-            UrlGeneratorInterface::ABSOLUTE_URL);
-
-
-        $currentEmail = (new Email())
-            ->from('bedda.ayman.sio@gmail.com')
-            ->to($user->getEmail())
-            ->subject('Time for Symfony Mailer!')
-            ->text('Sending emails is fun again!')
-            ->html("<p>Please verify your account by clicking <a href=\"{$verificationUrl}\">here</a>.</p>");
-
-        $this->mailer->send($currentEmail);
-    }
 }

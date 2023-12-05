@@ -25,7 +25,6 @@ class VerifyUserController extends AbstractController
             $user->setVerified(true);
             $em->flush();
 
-
             return new RedirectResponse($_ENV['FRONT_SERVER']);
         }
 
