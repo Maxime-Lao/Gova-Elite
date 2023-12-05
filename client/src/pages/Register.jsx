@@ -21,6 +21,8 @@ const Register = () => {
     const [showKbis, setShowKbis] = useState(false);
     const [phone, setPhone] = useState('');
     const navigate = useNavigate();
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -37,10 +39,13 @@ const Register = () => {
                 password: password,
             },
             false
-        ).then(response =>
-            navigate("/login"))
-            .catch(error => console.error("Erreur lors de l'inscription:", error));
-    };
+        ).then(response => navigate("/login"))
+            .catch(error => {
+                console.error("Erreur lors de l'inscription:", error);
+                setError(error.response.data['hydra:description']);
+                //setError(error.response.data.message);
+            });
+    }
 
     const handleRoleChange = (e) => {
         setRole(e.target.value);
@@ -58,6 +63,13 @@ const Register = () => {
                 <Box mt={2} textAlign="center">
                     <h2>Inscrivez-vous !</h2>
                 </Box>
+                {
+                    success.length ? (
+                        <Box mt={2} textAlign="center">
+                            <p style={{color: 'green'}}>{success}</p>
+                        </Box>
+                    ) : null
+                }
                 <form onSubmit={handleSubmit}>
                     <TextField
                         label="Nom"
@@ -65,6 +77,7 @@ const Register = () => {
                         onChange={(e) => setFirstname(e.target.value)}
                         fullWidth
                         margin="normal"
+                        required
                     />
                     <TextField
                         label="Prénom"
@@ -72,6 +85,7 @@ const Register = () => {
                         onChange={(e) => setLastname(e.target.value)}
                         fullWidth
                         margin="normal"
+                        required
                     />
                     <TextField
                         label="Email"
@@ -80,6 +94,7 @@ const Register = () => {
                         onChange={(e) => setEmail(e.target.value)}
                         fullWidth
                         margin="normal"
+                        required
                     />
                     <TextField
                         label="Mot de passe"
@@ -88,6 +103,7 @@ const Register = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         fullWidth
                         margin="normal"
+                        required
                     />
                     <TextField
                         label="Téléphone"
@@ -95,13 +111,15 @@ const Register = () => {
                         onChange={(e) => setPhone(e.target.value)}
                         fullWidth
                         margin="normal"
+                        required
                     />
                     <FormControl fullWidth margin="normal">
-                        <InputLabel id="role-label">Rôle</InputLabel>
+                        <InputLabel id="role-label">Rôle *</InputLabel>
                         <Select
                             labelId="role-label"
                             value={role}
                             onChange={handleRoleChange}
+                            required
                         >
                             <MenuItem value="particulier">Particulier</MenuItem>
                             <MenuItem value="professionnel">Professionnel</MenuItem>
@@ -118,6 +136,13 @@ const Register = () => {
                             />
                         </FormControl>
                     )}
+                    {
+                        error.length ? (
+                            <Box mt={2} textAlign="center">
+                                <p style={{color: 'red'}}>{error}</p>
+                            </Box>
+                        ) : null
+                    }
                     <Button
                         type="submit"
                         variant="contained"
