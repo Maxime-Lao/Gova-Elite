@@ -124,6 +124,10 @@ class AppFixtures extends Fixture
             $car->setEnergy($faker->randomElement($energies));
             $car->setCompanie($faker->randomElement($companies));
             $car->setCreatedAt(\DateTimeImmutable::createFromMutable($faker->dateTime()));
+            
+            $category = $manager->find(Category::class, $faker->numberBetween(1, count($categories)));
+            $car->setCategory($category);
+
             $manager->persist($car);
             $cars[] = $car;
         }
@@ -132,9 +136,10 @@ class AppFixtures extends Fixture
             $media = new Media();
             $media->setName('Image Voiture ' . ($i + 1));
             $media->setData('/img/' . ($i + 1) . '.jpeg');
-            $media->setCar($cars[$i]);
-            $media->setUserr($users[array_rand($users)]);
             $media->setCreatedAt(\DateTimeImmutable::createFromMutable($faker->dateTime()));
+            
+            $car = $manager->find(Car::class, $faker->numberBetween(1, 50));
+            $media->setCar($car);
             $manager->persist($media);
         }
 

@@ -26,11 +26,11 @@ class Media
     private ?string $data = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Car $car = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?User $user = null;
 
     #[ORM\Column]

@@ -125,6 +125,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups('user:read', 'comment:read')]
     private Collection $comments;
 
+    #[ORM\OneToOne(mappedBy: 'user', targetEntity: Media::class, cascade: ['persist', 'remove'])]
+    #[Groups(['user:read', 'user:create', 'user:update'])]
+    private ?Media $media = null;
+
     public function getPhone(): ?string
     {
         return $this->phone;
@@ -336,6 +340,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->isVerified = $isVerified;
 
+        return $this;
+    }
+
+    public function getMedia(): ?Media {
+        return $this->media;
+    }
+    
+    public function setMedia(?Media $media): self {
+        if ($media === null && $this->media !== null) {
+            $this->media->setUser(null);
+        }
+    
+        if ($media !== null && $media->getUser() !== $this) {
+            $media->setUser($this);
+        }
+    
+        $this->media = $media;
+    
         return $this;
     }
 }
