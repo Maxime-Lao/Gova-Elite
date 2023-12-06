@@ -19,7 +19,7 @@ class Model
     private ?int $id = null;
 
     #[ORM\Column(length: 100, nullable: true)]
-    #[Groups('car:read')]
+    #[Groups(['car:read', 'car_search:read'])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'model', targetEntity: Car::class)]
@@ -27,6 +27,7 @@ class Model
 
     #[ORM\ManyToOne(inversedBy: 'models')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['car:read', 'car_search:read'])]
     private ?Brand $brand = null;
 
     public function __construct()

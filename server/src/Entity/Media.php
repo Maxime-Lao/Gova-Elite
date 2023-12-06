@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\MediaRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
 #[ApiResource]
@@ -19,6 +20,7 @@ class Media
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['car:read', 'car_search:read'])]
     private ?string $data = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]

@@ -2,28 +2,68 @@
 
 namespace App\Dto;
 
-use App\Entity\Car;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Get;
 use App\Controller\CarSearchController;
+use App\Entity\Car;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     operations: [
         new Get(
-            name: 'CarSearch',
             uriTemplate: '/cars/search',
             controller: CarSearchController::class,
-            output: Car::class,
+            read: false,
+            openapiContext: [
+                'summary' => 'Search for available cars',
+                'description' => 'Search for available cars for a given date range and location',
+                'parameters' => [
+                    [
+                        'name' => 'startDate',
+                        'in' => 'query',
+                        'required' => true,
+                        'schema' => [
+                            'type' => 'string',
+                            'format' => 'date',
+                        ],
+                    ],
+                    [
+                        'name' => 'endDate',
+                        'in' => 'query',
+                        'required' => true,
+                        'schema' => [
+                            'type' => 'string',
+                            'format' => 'date',
+                        ],
+                    ],
+                    [
+                        'name' => 'location',
+                        'in' => 'query',
+                        'required' => true,
+                        'schema' => [
+                            'type' => 'string',
+                        ],
+                    ],
+                ],
+            ],
+            output: [
+                'class' => Car::class,
+                'collection' => true,
+            ],
         ),
-    ],
+    ]
 )]
+
 class CarSearch
 {
     #[Assert\NotBlank]
+    #[Assert\DateTime(format: 'd/m/Y')]
     public string $startDate = '';
 
     #[Assert\NotBlank]
+    #[Assert\GreaterThan(propertyPath: 'startDate')]
+    #[Assert\DateTime(format: 'd/m/Y')]
     public string $endDate = '';
 
     #[Assert\NotBlank]
@@ -59,8 +99,3 @@ class CarSearch
         $this->location = $location;
     }
 }
-
-
-
-
-

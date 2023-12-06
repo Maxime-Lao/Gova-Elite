@@ -19,16 +19,19 @@ class Companie
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups('car:read')]
+    #[Groups(['car_search:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['car_search:read'])]
     private ?string $address = null;
 
     #[ORM\Column]
-    private ?int $zipCode = null;
+    #[Groups(['car_search:read'])]
+    private ?string $zipCode = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['car_search:read'])]
     private ?string $city = null;
 
     #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Car::class)]
@@ -72,12 +75,12 @@ class Companie
         return $this;
     }
 
-    public function getZipCode(): ?int
+    public function getZipCode(): ?string
     {
         return $this->zipCode;
     }
 
-    public function setZipCode(int $zipCode): static
+    public function setZipCode(string $zipCode): static
     {
         $this->zipCode = $zipCode;
 

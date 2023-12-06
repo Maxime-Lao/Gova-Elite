@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use App\Repository\RentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -12,6 +14,13 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: RentRepository::class)]
 #[ApiResource]
+#[ApiResource(
+    uriTemplate: '/cars/{carId}/rents',
+    uriVariables: [
+        'carId' => new Link(fromClass: Car::class, toProperty: 'car'),
+    ],
+    operations: [new GetCollection()]
+)]
 class Rent
 {
     #[ORM\Id]
