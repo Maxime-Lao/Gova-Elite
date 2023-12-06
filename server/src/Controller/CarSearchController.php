@@ -35,35 +35,40 @@ class CarSearchController extends AbstractController
         $dto->startDate = $request->query->get('startDate', '');
         $dto->endDate = $request->query->get('endDate', '');
         $dto->location = $request->query->get('location', '');
-
+    
         // Validate the DTO
         $errors = $this->validator->validate($dto);
-
+    
         if (count($errors) > 0) {
             return $this->json(['error' => 'Validation failed', 'details' => $errors], 400);
         }
-
-        // Retrieve the company ID based on the provided location
-        $company = $this->companieRepository->findOneBy(['city' => $dto->getLocation()]);
-
-        if (!$company) {
-            return $this->json(['error' => 'Company not found'], 404);
+    
+        // Retrieve all companies based on the provided location
+        $companies = $this->companieRepository->findBy(['city' => $dto->getLocation()]);
+    
+        if (empty($companies)) {
+            return $this->json(['error' => 'No companies found for the provided location'], 404);
         }
-        
-        $companyId = $company->getId();
-        // Retrieve all cars for the given company
-        $cars = $this->carRepository->findBy(['companie' => $companyId]);
-
+    
         // Create an empty array to store the available cars
         $availableCars = [];
-
-        // Check if the car is available for the given date range
-        foreach ($cars as $car) {
-            if ($this->isCarAvailable($car, $dto->getStartDate(), $dto->getEndDate())) {
-                $availableCars[] = $car;
+    
+        // Iterate through each company
+        foreach ($companies as $company) {
+            // Retrieve the company ID
+            $companyId = $company->getId();
+    
+            // Retrieve all cars for the given company
+            $cars = $this->carRepository->findBy(['companie' => $companyId]);
+    
+            // Check if the car is available for the given date range
+            foreach ($cars as $car) {
+                if ($this->isCarAvailable($car, $dto->getStartDate(), $dto->getEndDate())) {
+                    $availableCars[] = $car;
+                }
             }
         }
-
+    
         // Return the available cars
         return $this->json($availableCars, 200, [], ['groups' => ['car_search:read']]);
     }
