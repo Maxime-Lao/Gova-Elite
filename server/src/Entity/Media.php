@@ -22,7 +22,7 @@ class Media
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups('car:read')]
+    #[Groups(['car:read', 'car_search:read'])]
     private ?string $data = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]

@@ -21,11 +21,12 @@ class Companie
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: 'Le nom de la companie ne peut pas être vide')]
-    #[Groups(['car:read', 'user:read', 'comment:read'])]
+    #[Groups(['car:read', 'car_search:read', 'user:read', 'comment:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'L\'adresse ne peut pas être vide')]
+    #[Groups(['car_search:read'])]
     private ?string $address = null;
 
     #[ORM\Column]
@@ -36,9 +37,11 @@ class Companie
         minMessage: 'Le code postal doit avoir au moins 5 chiffres',
         maxMessage: 'Le code postal ne peut pas dépasser 10 chiffres'
     )]
-    private ?int $zipCode = null;
+    #[Groups(['car_search:read'])]
+    private ?string $zipCode = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['car_search:read'])]
     private ?string $city = null;
 
     #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Car::class)]
@@ -88,12 +91,12 @@ class Companie
         return $this;
     }
 
-    public function getZipCode(): ?int
+    public function getZipCode(): ?string
     {
         return $this->zipCode;
     }
 
-    public function setZipCode(int $zipCode): static
+    public function setZipCode(string $zipCode): static
     {
         $this->zipCode = $zipCode;
 

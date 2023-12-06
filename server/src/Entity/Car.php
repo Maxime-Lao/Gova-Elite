@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use Symfony\Component\Serializer\Annotation\Groups;
 use App\Repository\CarRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -12,14 +14,24 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CarRepository::class)]
-#[ApiResource(normalizationContext: ['groups' => ['car:read']])]
-
+#[ApiResource(
+    normalizationContext: ['groups' => ['car:read']],
+    denormalizationContext: ['groups' => ['car:write']],
+)]
+#[ApiResource(
+    uriTemplate: '/companies/{companyId}/cars',
+    uriVariables: [
+        'companyId' => new Link(fromClass: Companie::class, toProperty: 'companie'),
+    ],
+    operations: [new GetCollection()],
+    normalizationContext: ['groups' => ['car_search:read']],
+)]
 class Car
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['car:read', 'user:read', 'comment:read'])]
+    #[Groups(['car:read', 'user:read', 'comment:read', 'car_search:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
@@ -54,7 +66,7 @@ class Car
     #[ORM\Column]
     #[Assert\NotBlank]
     #[Assert\Positive]
-    #[Groups(['car:read', 'user:read'])]
+    #[Groups(['car:read', 'user:read', 'car_search:read'])]
     private ?float $price = null;
 
     #[ORM\Column]
@@ -69,7 +81,7 @@ class Car
     private ?Gear $gear = null;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
-    #[Groups(['car:read', 'user:read', 'comment:read'])]
+    #[Groups(['car:read', 'user:read', 'comment:read', 'car_search:read'])]
     private ?Model $model = null;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
@@ -83,12 +95,12 @@ class Car
     private ?Category $category = null;
 
     #[ORM\OneToMany(mappedBy: 'car', targetEntity: Media::class)]
-    #[Groups(['car:read', 'user:read'])]
+    #[Groups(['car:read', 'user:read', 'car_search:read'])]
     private Collection $media;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['car:read', 'user:read', 'comment:read'])]
+    #[Groups(['car:read', 'user:read', 'comment:read', 'car_search:read'])]
     private ?Companie $companie = null;
 
     #[ORM\OneToMany(mappedBy: 'car', targetEntity: Rent::class)]
@@ -255,17 +267,17 @@ class Car
         return $this->media;
     }
 
-    public function addMedium(Media $medium): static
+    public function addMedia(Media $media): static
     {
-        if (!$this->media->contains($medium)) {
-            $this->media->add($medium);
-            $medium->setCar($this);
+        if (!$this->media->contains($media)) {
+            $this->media->add($media);
+            $media->setCar($this);
         }
 
         return $this;
     }
 
-    public function removeMedium(Media $medium): static
+    public function removeMedia(Media $media): static
     {
         if ($this->media->removeElement($medium)) {
             if ($medium->getCar() === $this) {
