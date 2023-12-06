@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: GearRepository::class)]
 #[ApiResource]
@@ -19,11 +20,18 @@ class Gear
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups('car:read')]
+    #[Assert\NotBlank(message: "Le nom de la boîte ne peut pas être vide")]
+    #[Groups(['car:read', 'user:read'])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'gear', targetEntity: Car::class)]
     private Collection $cars;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     public function __construct()
     {
@@ -73,6 +81,30 @@ class Gear
                 $car->setGear(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

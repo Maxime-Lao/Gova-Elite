@@ -18,12 +18,18 @@
     "@mui/lab": "^5.0.0-alpha.148",
     "@mui/material": "^5.14.13",
     "@mui/x-date-pickers": "^6.17.0",
+    "axios": "^1.6.2",
+    "@stripe/react-stripe-js": "^2.4.0",
+    "@stripe/stripe-js": "^2.2.0",
+    "date-fns": "^2.30.0",
     "@react-google-maps/api": "^2.19.2",
     "dayjs": "^1.11.10",
+    "jwt-decode": "^4.0.0",
     "react": "^18.2.0",
     "react-datepicker": "^4.21.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.17.0"
+    "react-router-dom": "^6.17.0",
+    "recharts": "^2.10.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",

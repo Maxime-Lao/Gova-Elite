@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CompanieRepository::class)]
 #[ApiResource]
@@ -19,14 +20,23 @@ class Companie
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['car_search:read'])]
+    #[Assert\NotBlank(message: 'Le nom de la companie ne peut pas être vide')]
+    #[Groups(['car:read', 'car_search:read', 'user:read', 'comment:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'L\'adresse ne peut pas être vide')]
     #[Groups(['car_search:read'])]
     private ?string $address = null;
 
     #[ORM\Column]
+    #[Assert\Type(type: 'integer', message: 'Le code postal doit être un nombre entier')]
+    #[Assert\Length(
+        min: 5,
+        max: 10,
+        minMessage: 'Le code postal doit avoir au moins 5 chiffres',
+        maxMessage: 'Le code postal ne peut pas dépasser 10 chiffres'
+    )]
     #[Groups(['car_search:read'])]
     private ?string $zipCode = null;
 
@@ -39,6 +49,12 @@ class Companie
 
     #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Notice::class)]
     private Collection $notices;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     public function __construct()
     {
@@ -155,6 +171,30 @@ class Companie
                 $notice->setCompanie(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

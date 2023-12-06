@@ -24,6 +24,12 @@
         <!-- MAILER_DSN=sendinblue+api://KEY@default -->
         <!-- MAILER_DSN=sendinblue+smtp://USERNAME:PASSWORD@default -->
         <!-- ###- symfony/sendinblue-mailer ### -->
+
+        <!-- ###+ lexik/jwt-authentication-bundle ### -->
+        <env name="JWT_SECRET_KEY" value="%kernel.project_dir%/config/jwt/private.pem"/>
+        <env name="JWT_PUBLIC_KEY" value="%kernel.project_dir%/config/jwt/public.pem"/>
+        <env name="JWT_PASSPHRASE" value="440b5ea986b104ad0f1125350340f48537ea8e2041c694de74a38afc5ab74b60"/>
+        <!-- ###- lexik/jwt-authentication-bundle ### -->
     </php>
 
     <testsuites>
