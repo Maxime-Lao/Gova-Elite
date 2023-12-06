@@ -77,6 +77,11 @@ class Car
     #[Groups(['car:read', 'user:read'])]
     private ?Energy $energy = null;
 
+    #[ORM\ManyToOne(inversedBy: 'cars')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['car:read', 'user:read'])]
+    private ?Category $category = null;
+
     #[ORM\OneToMany(mappedBy: 'car', targetEntity: Media::class)]
     #[Groups(['car:read', 'user:read'])]
     private Collection $media;
@@ -232,6 +237,16 @@ class Car
         return $this;
     }
 
+    public function getCategory(): ?Category {
+        return $this->category;
+    }
+    
+    public function setCategory(?Category $category): static {
+        $this->category = $category;
+    
+        return $this;
+    }
+
     /**
      * @return Collection<int, Media>
      */
@@ -253,7 +268,6 @@ class Car
     public function removeMedium(Media $medium): static
     {
         if ($this->media->removeElement($medium)) {
-            // set the owning side to null (unless already changed)
             if ($medium->getCar() === $this) {
                 $medium->setCar(null);
             }
