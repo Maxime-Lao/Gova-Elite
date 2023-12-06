@@ -82,7 +82,17 @@ function SearchBar() {
     return (
         <form onSubmit={handleSubmit}>
             <Grid spacing={2} container>
-                <Box sx={{ background: 'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) )', borderRadius: '5px', padding: '1em', display: 'flex', gap: '1em' }}>
+                <Box sx={{ 
+                    background: 'linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) )', 
+                    borderRadius: '5px', 
+                    padding: '1em', 
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginBottom: '1em',
+                    flexDirection: { xs: 'column', sm: 'row'}
+                    }}
+                >
                     <Grid item xs={12} sm={4}>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DatePicker sx={{ backgroundColor: 'white' }}
