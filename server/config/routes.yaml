@@ -1,5 +1,24 @@
+controllers_back:
+    resource: ../src/Controller/Back
+    type: attribute
+    name_prefix: back_
+    prefix: /admin/
+
+controllers_provider:
+    resource: ../src/Controller/Provider
+    type: attribute
+    name_prefix: provider_
+    prefix: /provider/
+
 controllers:
     resource:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+auth:
+    path: /auth
+    methods: ['POST']
+
+api_refresh_token:
+    path: /api/token/refresh

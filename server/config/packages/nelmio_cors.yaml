@@ -1,15 +1,19 @@
 nelmio_cors:
     defaults:
         origin_regex: true
-        allow_origin: ['%env(CORS_ALLOW_ORIGIN)%']
+        allow_origin: ['^http://localhost:5173$']
         allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
         allow_headers: ['Content-Type', 'Authorization']
         expose_headers: ['Link']
         max_age: 3600
     paths:
+<<<<<<< HEAD
         '^/api/':
             origin_regex: true
             allow_origin: ['http://195.35.29.110:3000'] # Votre domaine front-end
             allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
             allow_headers: ['Content-Type', 'Authorization']
             max_age: 3600
+=======
+        '^/api/': ~
+>>>>>>> develop

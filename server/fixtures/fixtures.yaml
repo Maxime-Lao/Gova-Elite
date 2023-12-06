@@ -1,3 +1,57 @@
-App\Entity\Auth\User:
+App\Entity\Energy:
+  energy_{1..10}:
+    name: '<randomElement(["Diesel", "Essence", "Hybride", "Electrique"])>'
+
+App\Entity\Brand:
+  brand_{1..10}:
+    name: '<randomElement(["Renault", "Peugeot", "Citroen", "Fiat", "Ford", "Opel", "Volkswagen", "Audi", "BMW", "Mercedes"])>'
+
+App\Entity\Gear:
+  gear_{1..10}:
+    name: '<randomElement(["Manual", "Automatic"])>'
+
+App\Entity\Model:
+  model_{1..10}:
+    name: '<randomElement(["Clio", "Megane", "Twingo", "Captur", "Kadjar", "Talisman", "Scenic", "Zoe", "Kangoo", "Espace"])>'
+    brand: '@brand_*'
+
+App\Entity\Category:
+  category_{1..10}:
+    libelle: '<randomElement(["Berline", "Citadine", "SUV", "Monospace", "Cabriolet", "Coupé", "Utilitaire", "4x4", "Pickup", "Break"])>'
+
+App\Entity\Companie:
+  companie_{1..10}:
+    name: '<randomElement(["Hertz", "Avis", "Europcar", "Sixt", "Enterprise", "Budget", "Thrifty", "Alamo", "Dollar", "National"])>'
+    address: '<address()>'
+    zip_code: '<postcode()>'
+    city: '<city()>'
+
+App\Entity\Role:
+  role_{1..10}:
+    name: '<randomElement(["ROLE_CLIENT", "ROLE_PRESTATAIRE", "ROLE_ADMIN"])>'
+
+App\Entity\User:
   user_{1..10}:
-    name: '<firstname()>'
+    email: '<email()>'
+    roles: '<randomElements(["ROLE_CLIENT", "ROLE_PRESTATAIRE", "ROLE_ADMIN"], 1)>'
+    password: '<password()>'
+    isVerified: '<boolean()>'
+    firstname: '<firstName()>'
+    lastname: '<lastName()>'
+    phone: '<phoneNumber()>'
+
+App\Entity\Car:
+  car_{1..10}:
+    year: '<numberBetween(2000, 2020)>'
+    horses: '<numberBetween(50, 500)>'
+    nbSeats: '<numberBetween(2, 7)>'
+    nbDoors: '<numberBetween(2, 5)>'
+    price: '<numberBetween(10, 1000)>'
+    mileage: '<numberBetween(1000, 100000)>'
+    gear: '@gear_*'
+    energy: '@energy_*'
+    model: '@model_*'
+    companie: '@companie_*'
+
+
+    

@@ -5,9 +5,17 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\NoticeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Metadata\Link;
 
 #[ORM\Entity(repositoryClass: NoticeRepository::class)]
 #[ApiResource]
+#[ApiResource(
+    uriTemplate: '/companies/{companyId}/notices',
+    uriVariables: [
+        'companyId' => new Link(fromClass: Companie::class, toProperty: 'companie'),
+    ],
+)]
 class Notice
 {
     #[ORM\Id]

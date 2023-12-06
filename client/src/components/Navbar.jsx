@@ -4,8 +4,19 @@ import { Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import CarRentalIcon from '@mui/icons-material/CarRental';
 import logo from '../assets/img/la-gova.png';
+import {useCallback, useState} from "react";
 
 const Navbar = () => {
+
+    const localStorageToken = localStorage.getItem('token');
+    const [myToken, setMyToken] = useState(localStorageToken);
+
+    const handleLogout = useCallback(() => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('refresh_token');
+        setMyToken(null);
+    }, [localStorageToken]);
+
     return (
         <AppBar position="static" sx={{ backgroundColor: 'white', color: 'black' }}>
         <Toolbar>
@@ -15,8 +26,16 @@ const Navbar = () => {
             <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: '1em' }}>
                 <ul style={{ listStyleType: 'none', display: 'flex', gap: '1em' }}>
                     <li><a href="#"><Button startIcon={<CarRentalIcon />}>Louer mon véhicule</Button></a></li>
-                    <li><a href="/register"><Button variant="contained">S&apos;inscrire</Button></a></li>
-                    <li><a href="/login"><Button variant="outlined">Se connecter</Button></a></li>
+                    {
+                        !myToken ? (
+                            <>
+                                <li><a href="/login"><Button>Se connecter</Button></a></li>
+                                <li><a href="/register"><Button>S'inscrire</Button></a></li>
+                            </>
+                        ) : (
+                            <li><Button onClick={handleLogout}>Se déconnecter</Button></li>
+                        )
+                    }
                     <li><a href="#"><Button>FR | EN</Button></a></li>
                 </ul>
             </Box>
