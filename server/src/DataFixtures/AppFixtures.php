@@ -26,7 +26,7 @@ class AppFixtures extends Fixture
         $faker = Factory::create();
 
         $roles = [];
-        $roleNames = ['admin', 'client', 'prestataire'];
+        $roleNames = ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_PRO'];
         foreach ($roleNames as $name) {
             $role = new Role();
             $role->setName($name);
@@ -124,7 +124,7 @@ class AppFixtures extends Fixture
             $car->setEnergy($faker->randomElement($energies));
             $car->setCompanie($faker->randomElement($companies));
             $car->setCreatedAt(\DateTimeImmutable::createFromMutable($faker->dateTime()));
-            
+
             $category = $manager->find(Category::class, $faker->numberBetween(1, count($categories)));
             $car->setCategory($category);
 
@@ -137,7 +137,7 @@ class AppFixtures extends Fixture
             $media->setName('Image Voiture ' . ($i + 1));
             $media->setData('/img/' . ($i + 1) . '.jpeg');
             $media->setCreatedAt(\DateTimeImmutable::createFromMutable($faker->dateTime()));
-            
+
             $car = $manager->find(Car::class, $faker->numberBetween(1, 50));
             $media->setCar($car);
             $manager->persist($media);
@@ -149,7 +149,7 @@ class AppFixtures extends Fixture
             $notice->setNbStars($faker->numberBetween(1, 5));
             $notice->setCreatedAt(\DateTimeImmutable::createFromMutable($faker->dateTime()));
             $notice->setCompanie($faker->randomElement($companies));
-            $notice->setUserr($faker->randomElement($users));
+            $notice->setUser($faker->randomElement($users));
             $manager->persist($notice);
         }
 

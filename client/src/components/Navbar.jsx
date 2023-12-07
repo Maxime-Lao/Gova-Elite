@@ -9,11 +9,13 @@ import {useCallback, useState} from "react";
 const Navbar = () => {
 
     const localStorageToken = localStorage.getItem('token');
+    const email = localStorage.getItem('email');
     const [myToken, setMyToken] = useState(localStorageToken);
 
     const handleLogout = useCallback(() => {
         localStorage.removeItem('token');
         localStorage.removeItem('refresh_token');
+        localStorage.removeItem('email');
         setMyToken(null);
     }, [localStorageToken]);
 

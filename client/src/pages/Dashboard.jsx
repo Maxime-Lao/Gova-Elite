@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
+import React, {useEffect, useState} from 'react';
+import {createTheme, styled, ThemeProvider} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
@@ -11,23 +11,24 @@ import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
 import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { mainListItems, secondaryListItems } from '../components/dashboard/listItems.jsx';
-import Chart from '../components/dashboard/Chart.jsx';
-import Deposits from '../components/dashboard/Deposits.jsx';
-import Orders from '../components/dashboard/Orders.jsx';
+import {MainListItems, secondaryListItems} from '../components/dashboard/listItems.jsx';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Pie } from 'react-chartjs-2';
+import CardInfo from "../components/dashboard/CardInfo.jsx";
+import {Grid} from "@mui/material";
 
-function Copyright() {
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+export function Copyright() {
     return (
         <Typography variant="body2" color="text.secondary" align="center">
             {`Copyright © `}
-            <Link color="inherit" href="https://mui.com/">
-                Your Website
+            <Link color="inherit" href="/">
+                Gova Elite
             </Link>
             {` ${new Date().getFullYear()}.`}
         </Typography>
@@ -86,6 +87,51 @@ export default function Dashboard() {
         setOpen(!open);
     };
 
+    const token = localStorage.getItem('token');
+    const [users, setUsers] = useState([]);
+
+    const data = {
+        labels: ['Comptes vérifiés', 'Comptes non vérifiés'],
+        datasets: [
+            {
+                label: '# of Votes',
+                data: [users.filter((user) => user.isVerified === true).length, users.filter((user) => user.isVerified === false).length],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)'
+                ],
+                borderColor: [
+                    'rgb(255,255,255)',
+                    'rgb(255,255,255)',
+                ],
+                borderWidth: 1,
+            },
+        ],
+    };
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const response = await fetch('http://localhost:8000/api/users', {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+                if (response.ok) {
+                    const usersData = await response.json();
+                    setUsers(usersData);
+                } else {
+                    console.error('Erreur lors de la récupération des utilisateurs');
+                }
+            } catch (error) {
+                console.error('Erreur lors de la récupération des utilisateurs:', error);
+            }
+        };
+
+        fetchUsers();
+    }, [token]);
+
     return (
         <ThemeProvider theme={defaultTheme}>
             <Box sx={{ display: 'flex' }}>
@@ -135,7 +181,7 @@ export default function Dashboard() {
                     </Toolbar>
                     <Divider />
                     <List component="nav">
-                        {mainListItems}
+                        <MainListItems/>
                         <Divider sx={{ my: 1 }} />
                         {secondaryListItems}
                     </List>
@@ -153,41 +199,27 @@ export default function Dashboard() {
                     }}
                 >
                     <Toolbar />
-                    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-                        <Grid container spacing={3}>
-                            <Grid item xs={12} md={8} lg={9}>
-                                <Paper
-                                    sx={{
-                                        p: 2,
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        height: 240,
-                                    }}
-                                >
-                                    <Chart />
-                                </Paper>
-                            </Grid>
-                            <Grid item xs={12} md={4} lg={3}>
-                                <Paper
-                                    sx={{
-                                        p: 2,
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        height: 240,
-                                    }}
-                                >
-                                    <Deposits />
-                                </Paper>
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                                    <Orders />
-                                </Paper>
-                            </Grid>
+                    <Container>
+                        <Typography variant="h2" gutterBottom>
+                            Statistiques sur les utilisateurs
+                        </Typography>
+                        <Grid container spacing={4} className="ml">
+                            <CardInfo title="Nombre d'utilisateurs" nbInfo={users.length} />
+                            <CardInfo
+                                title="Nombre d'admins"
+                                nbInfo={users.filter(user => user.roles.includes('ROLE_ADMIN')).length}
+                            />
+                            <CardInfo
+                                title="Nombre de prestataires"
+                                nbInfo={users.filter(user => user.roles.includes('ROLE_PRO')).length}
+                            />
                         </Grid>
-                        <Box sx={{ pt: 4 }}>
-                            <Copyright />
-                        </Box>
+                        <div>
+                            <Typography variant="h2" gutterBottom>
+                                Graphique sur les utilisateurs
+                            </Typography>
+                            <Pie data={data} />
+                        </div>
                     </Container>
                 </Box>
             </Box>
