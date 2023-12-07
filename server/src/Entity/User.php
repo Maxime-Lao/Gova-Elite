@@ -52,13 +52,15 @@ use Doctrine\Common\Collections\Collection;
             securityMessage: "Only authenticated users can delete users."
         ),
     ],
-    normalizationContext: ['groups' => ['user:read']],
-    denormalizationContext: ['groups' => ['user:create', 'user:update']],
-
+    normalizationContext: [
+        'groups' => ['user:read'],
+        'enable_max_depth' => true, // Activer la profondeur maximale de sérialisation
+    ],    denormalizationContext: ['groups' => ['user:create', 'user:update']],
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
+    #[Groups(['user:read'])]
     private ?int $id = null;
 
     #[Assert\NotBlank(message: 'L\'adresse e-mail ne peut pas être vide')]
@@ -97,6 +99,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['user:read'])]
     private ?bool $isVerified = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -117,7 +120,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $token = null;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Rent::class)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Rent::class, orphanRemoval: true)]
     #[Groups('user:read')]
     private Collection $rents;
 
@@ -125,9 +128,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups('user:read', 'comment:read')]
     private Collection $comments;
 
-    #[ORM\OneToOne(mappedBy: 'user', targetEntity: Media::class, cascade: ['persist', 'remove'])]
-    #[Groups(['user:read', 'user:create', 'user:update'])]
-    private ?Media $media = null;
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Media::class, orphanRemoval: true)]
+    #[Groups('user:read')]
+    private Collection $media;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Notice::class, orphanRemoval: true)]
+    #[Groups('user:read')]
+    private Collection $notices;
 
     public function getPhone(): ?string
     {
@@ -290,6 +297,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->comments;
     }
 
+/**
+     * @return Collection<int, Media[]>
+     */
+    public function getMedia(): Collection
+    {
+        return $this->media;
+    }
+
+    /**
+     * @return Collection<int, Notice[]>
+     */
+    public function getNotices(): Collection
+    {
+        return $this->notices;
+    }
+
     public function addComment(Comment $comment): static
     {
         if (!$this->comments->contains($comment)) {
@@ -303,12 +326,50 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeComment(Comment $comment): static
     {
         if ($this->comments->removeElement($comment)) {
-            // set the owning side to null (unless already changed)
             if ($comment->getAuthor() === $this) {
                 $comment->setAuthor(null);
             }
         }
+        return $this;
+    }
 
+    public function addMedia(Media $media): static
+    {
+        if (!$this->media->contains($media)) {
+            $this->media->add($media);
+            $media->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMedia(Media $media): static
+    {
+        if ($this->media->removeElement($media)) {
+            if ($media->getUser() === $this) {
+                $media->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function addNotice(Notice $notice): static
+    {
+        if (!$this->notices->contains($notice)) {
+            $this->notices->add($notice);
+            $notice->setUser($this);
+        }
+        return $this;
+    }
+
+    public function removeNotice(Notice $notice): static
+    {
+        if ($this->notices->removeElement($notice)) {
+            if ($notice->getUser() === $this) {
+                $notice->setUser(null);
+            }
+        }
         return $this;
     }
 
@@ -341,10 +402,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->isVerified = $isVerified;
 
         return $this;
-    }
-
-    public function getMedia(): ?Media {
-        return $this->media;
     }
     
     public function setMedia(?Media $media): self {

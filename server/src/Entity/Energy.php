@@ -21,7 +21,7 @@ class Energy
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: "Le nom de l'énergie ne peut pas être vide")]
-    #[Groups(['car:read', 'user:read'])]
+    #[Groups(['car:read'])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'energy', targetEntity: Car::class)]

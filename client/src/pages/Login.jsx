@@ -21,6 +21,7 @@ export default function Login() {
         ).then((response) => {
             localStorage.setItem('token', response.token);
             localStorage.setItem('refresh_token', response.refresh_token);
+            localStorage.setItem('email', email);
             navigate('/');
         });
     };

@@ -21,7 +21,7 @@ class Companie
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: 'Le nom de la companie ne peut pas être vide')]
-    #[Groups(['car:read', 'car_search:read', 'user:read', 'comment:read'])]
+    #[Groups(['car:read', 'car_search:read', 'comment:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]

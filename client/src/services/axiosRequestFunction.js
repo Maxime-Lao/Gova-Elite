@@ -33,8 +33,6 @@ const sendRequest = async (endpoint, method = 'GET', data = {}, requireAuth = tr
     }
 };
 
-
-
 axiosInstance.interceptors.request.use(async config => {
 
     if (config.url.includes('/auth')

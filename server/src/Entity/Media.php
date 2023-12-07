@@ -80,15 +80,14 @@ class Media
         return $this;
     }
 
-    public function getUserr(): ?User
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUserr(?User $user): static
+    public function setUser(?User $user): static
     {
         $this->user = $user;
-
         return $this;
     }
 
