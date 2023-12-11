@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20231206111405 extends AbstractMigration
+final class Version20231211145354 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -54,7 +54,7 @@ final class Version20231206111405 extends AbstractMigration
         $this->addSql('CREATE INDEX IDX_9474526CC3C6F69F ON comment (car_id)');
         $this->addSql('COMMENT ON COLUMN comment.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN comment.updated_at IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('CREATE TABLE companie (id INT NOT NULL, name VARCHAR(100) NOT NULL, address VARCHAR(255) NOT NULL, zip_code INT NOT NULL, city VARCHAR(100) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE companie (id INT NOT NULL, name VARCHAR(100) NOT NULL, address VARCHAR(255) NOT NULL, zip_code VARCHAR(255) NOT NULL, city VARCHAR(100) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('COMMENT ON COLUMN companie.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN companie.updated_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('CREATE TABLE energy (id INT NOT NULL, name VARCHAR(100) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
@@ -75,9 +75,9 @@ final class Version20231206111405 extends AbstractMigration
         $this->addSql('CREATE INDEX IDX_D79572D944F5D008 ON model (brand_id)');
         $this->addSql('COMMENT ON COLUMN model.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN model.updated_at IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('CREATE TABLE notice (id INT NOT NULL, companie_id INT NOT NULL, userr_id INT DEFAULT NULL, message VARCHAR(255) NOT NULL, nb_stars INT NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE notice (id INT NOT NULL, companie_id INT NOT NULL, user_id INT DEFAULT NULL, message VARCHAR(255) NOT NULL, nb_stars INT NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_480D45C29DC4CE1F ON notice (companie_id)');
-        $this->addSql('CREATE INDEX IDX_480D45C2DF0FD358 ON notice (userr_id)');
+        $this->addSql('CREATE INDEX IDX_480D45C2A76ED395 ON notice (user_id)');
         $this->addSql('COMMENT ON COLUMN notice.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('CREATE TABLE notification (id INT NOT NULL, userr_id INT NOT NULL, message VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_BF5476CADF0FD358 ON notification (userr_id)');
@@ -92,7 +92,7 @@ final class Version20231206111405 extends AbstractMigration
         $this->addSql('COMMENT ON COLUMN rent.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN rent.updated_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('CREATE TABLE role (id INT NOT NULL, name VARCHAR(100) NOT NULL, PRIMARY KEY(id))');
-        $this->addSql('CREATE TABLE "user" (id INT NOT NULL, email VARCHAR(180) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, is_verified BOOLEAN DEFAULT NULL, firstname VARCHAR(255) DEFAULT NULL, lastname VARCHAR(255) DEFAULT NULL, phone VARCHAR(255) DEFAULT NULL, token VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE "user" (id INT NOT NULL, email VARCHAR(180) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, is_verified BOOLEAN DEFAULT NULL, firstname VARCHAR(255) DEFAULT NULL, lastname VARCHAR(255) DEFAULT NULL, phone VARCHAR(255) DEFAULT NULL, token VARCHAR(255) DEFAULT NULL, password_reset_token VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_8D93D649E7927C74 ON "user" (email)');
         $this->addSql('COMMENT ON COLUMN "user".created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('ALTER TABLE car ADD CONSTRAINT FK_773DE69D77201934 FOREIGN KEY (gear_id) REFERENCES gear (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
@@ -107,7 +107,7 @@ final class Version20231206111405 extends AbstractMigration
         $this->addSql('ALTER TABLE media ADD CONSTRAINT FK_6A2CA10CA76ED395 FOREIGN KEY (user_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE model ADD CONSTRAINT FK_D79572D944F5D008 FOREIGN KEY (brand_id) REFERENCES brand (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE notice ADD CONSTRAINT FK_480D45C29DC4CE1F FOREIGN KEY (companie_id) REFERENCES companie (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('ALTER TABLE notice ADD CONSTRAINT FK_480D45C2DF0FD358 FOREIGN KEY (userr_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE notice ADD CONSTRAINT FK_480D45C2A76ED395 FOREIGN KEY (user_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE notification ADD CONSTRAINT FK_BF5476CADF0FD358 FOREIGN KEY (userr_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE rent ADD CONSTRAINT FK_2784DCCC3C6F69F FOREIGN KEY (car_id) REFERENCES car (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE rent ADD CONSTRAINT FK_2784DCCA76ED395 FOREIGN KEY (user_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
@@ -146,7 +146,7 @@ final class Version20231206111405 extends AbstractMigration
         $this->addSql('ALTER TABLE media DROP CONSTRAINT FK_6A2CA10CA76ED395');
         $this->addSql('ALTER TABLE model DROP CONSTRAINT FK_D79572D944F5D008');
         $this->addSql('ALTER TABLE notice DROP CONSTRAINT FK_480D45C29DC4CE1F');
-        $this->addSql('ALTER TABLE notice DROP CONSTRAINT FK_480D45C2DF0FD358');
+        $this->addSql('ALTER TABLE notice DROP CONSTRAINT FK_480D45C2A76ED395');
         $this->addSql('ALTER TABLE notification DROP CONSTRAINT FK_BF5476CADF0FD358');
         $this->addSql('ALTER TABLE rent DROP CONSTRAINT FK_2784DCCC3C6F69F');
         $this->addSql('ALTER TABLE rent DROP CONSTRAINT FK_2784DCCA76ED395');

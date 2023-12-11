@@ -1,6 +1,6 @@
-
 import axios from 'axios';
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
+
 const API_BASE_URL = 'http://localhost:8000';
 
 const axiosInstance = axios.create({
@@ -33,13 +33,17 @@ const sendRequest = async (endpoint, method = 'GET', data = {}, requireAuth = tr
     }
 };
 
+
+
 axiosInstance.interceptors.request.use(async config => {
+
+    console.log(config)
 
     if (config.url.includes('/auth')
         || config.url.includes('/api/token/refresh')
         || (config.url.includes('/api/users') && config.method === 'post')
-        || (config.url.includes('/api/mdpresetemail') && config.method === 'post')
-        || (config.url.includes('/api/resetmdp') && config.method === 'post')
+        || (config.url.includes('/forgot_password_send_email') && config.method === 'post')
+        || (config.url.includes('/reset_password') && config.method === 'post')
     ) {
         return config;
     }
