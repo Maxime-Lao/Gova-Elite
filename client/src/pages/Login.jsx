@@ -57,6 +57,9 @@ export default function Login() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
+                    <Box mt={2} textAlign="left">
+                        <Link href="/login/identify">Mot de passe oublié?</Link>
+                    </Box>
                     <Button
                         type="submit"
                         variant="contained"

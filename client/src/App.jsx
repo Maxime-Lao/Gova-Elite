@@ -10,6 +10,8 @@ import RegisterPage from "./pages/Register.jsx";
 import Login from "./pages/Login.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Customers from "./pages/Customers.jsx";
+import IdentifyEmail from "./components/login/IdentifyEmail.jsx";
+import ResetPassword from "./components/login/ResetPassword.jsx";
 
 function App() {
   return (
@@ -26,6 +28,8 @@ function App() {
             <Route path="/bookings" element={<Bookings />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/customers" element={<Customers />} />
+            <Route path="/login/identify" element={<IdentifyEmail />} />
+            <Route path="/resetpswd/:token" element={<ResetPassword />} />
         </Routes>
       </Router>
     </ThemeProvider>
