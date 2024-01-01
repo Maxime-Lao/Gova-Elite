@@ -44,7 +44,7 @@ use Doctrine\Common\Collections\Collection;
         ),
         new Patch(
             processor: UserPasswordHasher::class,
-            security: "is_granted('ROLE_ADMIN')",
+            //security: "is_granted('ROLE_ADMIN')",
             securityMessage: "Only authenticated users can modify users."
         ),
         new Delete(

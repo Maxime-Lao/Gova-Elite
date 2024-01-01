@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Grid, Typography } from '@mui/material';
-import Navbar from "../../components/Navbar";
+import Navbar from "../../components/navbar/Navbar.jsx";
 import BookingsCard from "../../components/BookingsCard";
 import PastBookings from "../../components/PastBookings";
 import CircularProgress from '@mui/material/CircularProgress';

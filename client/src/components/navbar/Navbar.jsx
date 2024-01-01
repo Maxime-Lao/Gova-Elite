@@ -3,14 +3,18 @@ import { Toolbar } from "@mui/material";
 import { Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import CarRentalIcon from '@mui/icons-material/CarRental';
-import logo from '../assets/img/la-gova.png';
+import logo from '../../assets/img/la-gova.png';
 import {useCallback, useState} from "react";
+import AvatarDialog from "./AvatarDialog.jsx";
+import useGetConnectedUser from "../hooks/useGetConnectedUser.jsx";
 
 const Navbar = () => {
 
     const localStorageToken = localStorage.getItem('token');
     const email = localStorage.getItem('email');
     const [myToken, setMyToken] = useState(localStorageToken);
+
+    const user = useGetConnectedUser();
 
     const handleLogout = useCallback(() => {
         localStorage.removeItem('token');
@@ -35,7 +39,9 @@ const Navbar = () => {
                                 <li><a href="/register"><Button>S'inscrire</Button></a></li>
                             </>
                         ) : (
-                            <li><Button onClick={handleLogout}>Se déconnecter</Button></li>
+                            <li>
+                                <AvatarDialog firstName={user.connectedUser?.firstname} lastName={user.connectedUser?.lastname} handleLogout={ handleLogout }/>
+                            </li>
                         )
                     }
                     <li><a href="#"><Button>FR | EN</Button></a></li>

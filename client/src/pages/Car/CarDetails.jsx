@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Navbar from "../../components/Navbar";
+import Navbar from "../../components/navbar/Navbar.jsx";
 import Calendar from "../../components/Calendar";
 import { Grid, Typography, List, ListItem, ListItemText, ListItemIcon, TextField, Card, CardMedia, CardContent } from '@mui/material';
 import { CarRental, DirectionsCar } from '@mui/icons-material';
