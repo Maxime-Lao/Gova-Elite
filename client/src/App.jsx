@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Customers from "./pages/Customers.jsx";
 import IdentifyEmail from "./components/login/IdentifyEmail.jsx";
 import ResetPassword from "./components/login/ResetPassword.jsx";
+import Account from "./components/account/Account.jsx";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
             <Route path="/customers" element={<Customers />} />
             <Route path="/login/identify" element={<IdentifyEmail />} />
             <Route path="/resetpswd/:token" element={<ResetPassword />} />
+            <Route path="/account" element={<Account />} />
         </Routes>
       </Router>
     </ThemeProvider>

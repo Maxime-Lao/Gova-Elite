@@ -33,11 +33,7 @@ const sendRequest = async (endpoint, method = 'GET', data = {}, requireAuth = tr
     }
 };
 
-
-
 axiosInstance.interceptors.request.use(async config => {
-
-    console.log(config)
 
     if (config.url.includes('/auth')
         || config.url.includes('/api/token/refresh')
