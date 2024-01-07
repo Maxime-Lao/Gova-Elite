@@ -21,7 +21,7 @@ class Gear
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: "Le nom de la boîte ne peut pas être vide")]
-    #[Groups(['car:read'])]
+    #[Groups(['car:read', 'user:read'])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'gear', targetEntity: Car::class)]

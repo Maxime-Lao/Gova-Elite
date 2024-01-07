@@ -26,7 +26,7 @@ use Doctrine\Common\Collections\Collection;
 #[ApiResource(
     operations: [
         new GetCollection(
-            security: "is_granted('ROLE_ADMIN')",
+            //security: "is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['user:read']],
         ),
         new Post(
@@ -62,6 +62,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
     #[Groups(['user:read'])]
     private ?int $id = null;
+
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups('user:read')]
+    private ?Companie $companie = null;
 
     #[Assert\NotBlank(message: 'L\'adresse e-mail ne peut pas être vide')]
     #[Assert\Email(message: 'L\'adresse e-mail doit être valide')]
@@ -122,6 +127,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $passwordResetToken = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['user:read'])]
+    private ?bool $isValidKbis = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Rent::class, orphanRemoval: true)]
     #[Groups('user:read')]
@@ -258,6 +267,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getIsValidKbis(): ?bool
+    {
+        return $this->isValidKbis;
+    }
+
+    public function setIsValidKbis(?bool $isValidKbis): static
+    {
+        $this->isValidKbis = $isValidKbis;
+
+        return $this;
+    }
+
     /**
      * @see UserInterface
      */
@@ -326,6 +347,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getNotices(): Collection
     {
         return $this->notices;
+    }
+
+    public function getCompanie(): ?Companie
+    {
+        return $this->companie;
+    }
+
+    public function setCompagnie(?Companie $companie): static
+    {
+        $this->companie = $companie;
+
+        return $this;
     }
 
     public function addComment(Comment $comment): static

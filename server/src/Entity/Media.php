@@ -18,11 +18,12 @@ class Media
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups([ 'user:read'])]
     #[Assert\NotBlank(message: "Le nom du média ne peut pas être vide")]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['car:read', 'car_search:read'])]
+    #[Groups(['car:read', 'car_search:read', 'user:read'])]
     private ?string $data = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]

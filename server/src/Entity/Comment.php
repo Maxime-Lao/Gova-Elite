@@ -61,16 +61,16 @@ class Comment
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La note globale ne peut pas être vide')]
     #[Assert\Positive(message: 'La note globale doit être un nombre positif')]
-    #[Groups(['comment:read', 'car:read'])]
+    #[Groups(['comment:read', 'car:read', 'user:read'])]
     private ?float $globalRating = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le commentaire ne peut pas être vide')]
-    #[Groups(['comment:read', 'car:read'])]
+    #[Groups(['comment:read', 'car:read', 'user:read'])]
     private ?string $comment = null;
 
     #[ORM\Column]
-    #[Groups(['comment:read', 'car:read'])]
+    #[Groups(['comment:read', 'car:read', 'user:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
@@ -100,7 +100,6 @@ class Comment
     public function setCleanliness(float $cleanliness): static
     {
         $this->cleanliness = $cleanliness;
-
         return $this;
     }
 

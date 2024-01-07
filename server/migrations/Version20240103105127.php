@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20231211145354 extends AbstractMigration
+final class Version20240103105127 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -92,8 +92,9 @@ final class Version20231211145354 extends AbstractMigration
         $this->addSql('COMMENT ON COLUMN rent.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN rent.updated_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('CREATE TABLE role (id INT NOT NULL, name VARCHAR(100) NOT NULL, PRIMARY KEY(id))');
-        $this->addSql('CREATE TABLE "user" (id INT NOT NULL, email VARCHAR(180) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, is_verified BOOLEAN DEFAULT NULL, firstname VARCHAR(255) DEFAULT NULL, lastname VARCHAR(255) DEFAULT NULL, phone VARCHAR(255) DEFAULT NULL, token VARCHAR(255) DEFAULT NULL, password_reset_token VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE "user" (id INT NOT NULL, companie_id INT DEFAULT NULL, email VARCHAR(180) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, is_verified BOOLEAN DEFAULT NULL, firstname VARCHAR(255) DEFAULT NULL, lastname VARCHAR(255) DEFAULT NULL, phone VARCHAR(255) DEFAULT NULL, token VARCHAR(255) DEFAULT NULL, password_reset_token VARCHAR(255) DEFAULT NULL, is_valid_kbis BOOLEAN DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_8D93D649E7927C74 ON "user" (email)');
+        $this->addSql('CREATE INDEX IDX_8D93D6499DC4CE1F ON "user" (companie_id)');
         $this->addSql('COMMENT ON COLUMN "user".created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('ALTER TABLE car ADD CONSTRAINT FK_773DE69D77201934 FOREIGN KEY (gear_id) REFERENCES gear (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE car ADD CONSTRAINT FK_773DE69D7975B7E7 FOREIGN KEY (model_id) REFERENCES model (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
@@ -111,6 +112,7 @@ final class Version20231211145354 extends AbstractMigration
         $this->addSql('ALTER TABLE notification ADD CONSTRAINT FK_BF5476CADF0FD358 FOREIGN KEY (userr_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE rent ADD CONSTRAINT FK_2784DCCC3C6F69F FOREIGN KEY (car_id) REFERENCES car (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE rent ADD CONSTRAINT FK_2784DCCA76ED395 FOREIGN KEY (user_id) REFERENCES "user" (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE "user" ADD CONSTRAINT FK_8D93D6499DC4CE1F FOREIGN KEY (companie_id) REFERENCES companie (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
     }
 
     public function down(Schema $schema): void
@@ -150,6 +152,7 @@ final class Version20231211145354 extends AbstractMigration
         $this->addSql('ALTER TABLE notification DROP CONSTRAINT FK_BF5476CADF0FD358');
         $this->addSql('ALTER TABLE rent DROP CONSTRAINT FK_2784DCCC3C6F69F');
         $this->addSql('ALTER TABLE rent DROP CONSTRAINT FK_2784DCCA76ED395');
+        $this->addSql('ALTER TABLE "user" DROP CONSTRAINT FK_8D93D6499DC4CE1F');
         $this->addSql('DROP TABLE brand');
         $this->addSql('DROP TABLE car');
         $this->addSql('DROP TABLE category');
