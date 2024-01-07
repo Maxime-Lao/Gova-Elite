@@ -17,17 +17,21 @@ class Companie
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['user:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: 'Le nom de la companie ne peut pas être vide')]
-    #[Groups(['car:read', 'car_search:read', 'comment:read'])]
+    #[Groups(['car:read', 'car_search:read', 'comment:read', 'user:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'L\'adresse ne peut pas être vide')]
-    #[Groups(['car_search:read'])]
+    #[Groups(['car_search:read', 'user:read'])]
     private ?string $address = null;
+
+    #[ORM\OneToMany(mappedBy: 'companie', targetEntity: User::class, orphanRemoval: true)]
+    private Collection $users;
 
     #[ORM\Column]
     #[Assert\Type(type: 'integer', message: 'Le code postal doit être un nombre entier')]
@@ -37,22 +41,24 @@ class Companie
         minMessage: 'Le code postal doit avoir au moins 5 chiffres',
         maxMessage: 'Le code postal ne peut pas dépasser 10 chiffres'
     )]
-    #[Groups(['car_search:read'])]
+    #[Groups(['car_search:read', 'user:read'])]
     private ?string $zipCode = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['car_search:read'])]
+    #[Groups(['car_search:read', 'user:read'])]
     private ?string $city = null;
 
     #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Car::class)]
+    #[Groups(['user:read'])]
     private Collection $cars;
 
     #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Notice::class)]
+    #[Groups(['user:read'])]
     private Collection $notices;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
-
+    #[Groups(['user:read'])]
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
@@ -60,6 +66,7 @@ class Companie
     {
         $this->cars = new ArrayCollection();
         $this->notices = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -90,6 +97,8 @@ class Companie
 
         return $this;
     }
+
+
 
     public function getZipCode(): ?string
     {
@@ -169,6 +178,36 @@ class Companie
             // set the owning side to null (unless already changed)
             if ($notice->getCompanie() === $this) {
                 $notice->setCompanie(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): static
+    {
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+            $user->setCompagnie($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): static
+    {
+        if ($this->cars->removeElement($user)) {
+            // set the owning side to null (unless already changed)
+            if ($user->getCompanie() === $this) {
+                $user->setCompagnie(null);
             }
         }
 
