@@ -11,9 +11,7 @@ import useGetConnectedUser from "../hooks/useGetConnectedUser.jsx";
 const Navbar = () => {
 
     const localStorageToken = localStorage.getItem('token');
-    const email = localStorage.getItem('email');
     const [myToken, setMyToken] = useState(localStorageToken);
-
     const user = useGetConnectedUser();
 
     const handleLogout = useCallback(() => {

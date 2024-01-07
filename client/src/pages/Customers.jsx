@@ -40,8 +40,6 @@ export default function Customers() {
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    console.log(emailLoggedUser);
-
     useEffect(() => {
         const getUsers = async () => {
             try {
