@@ -27,17 +27,16 @@ class Rent
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['user:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Assert\NotBlank(message: 'La date de début de la réservation ne peut pas être vide')]
-    #[Groups(['car:read', 'user:read'])]
+    #[Groups(['car:read'])]
     private ?\DateTimeImmutable $dateStart = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Assert\NotBlank(message: 'La date de fin de la réservation ne peut pas être vide')]
-    #[Groups(['car:read', 'user:read'])]
+    #[Groups(['car:read'])]
     private ?\DateTimeImmutable $dateEnd = null;
 
     #[ORM\Column]
@@ -45,7 +44,6 @@ class Rent
     private ?int $totalPrice = null;
 
     #[ORM\ManyToOne(inversedBy: 'rents')]
-    #[Groups('user:read')]
     private ?Car $car = null;
 
     #[ORM\ManyToOne(inversedBy: 'rents')]
@@ -119,7 +117,6 @@ class Rent
     public function setUser(?User $user): static
     {
         $this->user = $user;
-
         return $this;
     }
 

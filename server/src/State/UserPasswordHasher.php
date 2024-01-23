@@ -8,18 +8,24 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Doctrine\ORM\EntityManagerInterface;
+
 final class UserPasswordHasher implements ProcessorInterface
 {
     private MailerInterface $mailer;
+    private EntityManagerInterface $entityManager;
 
     public function __construct(
         private readonly ProcessorInterface $processor,
         private readonly UserPasswordHasherInterface $passwordHasher,
         MailerInterface $mailer,
-        UrlGeneratorInterface $router)
+        UrlGeneratorInterface $router,
+        EntityManagerInterface $entityManager
+    )
     {
         $this->mailer = $mailer;
         $this->router = $router;
+        $this->entityManager = $entityManager;
     }
 
     private function sendWelcomeEmail(User $user)
@@ -53,6 +59,23 @@ final class UserPasswordHasher implements ProcessorInterface
             }
         }
         return $this->processor->process($data, $operation, $uriVariables, $context);
+    }
+
+    public function sendVerificationEmail(User $user)
+    {
+        $verificationUrl = $this->router->generate(
+            'user_verify',
+            ['token' =>  $user->getPasswordResetToken()],
+            UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $currentEmail = (new Email())
+            ->from('bedda.ayman.sio@gmail.com')
+            ->to($user->getEmail())
+            ->subject('Email verification')
+            ->text('')
+            ->html("<p>Cliquez ici pour changer votre mot de passe <a href=\"http://localhost:3000/resetpswd/" . $user->getPasswordResetToken() . "\">ici</a>.</p>");
+
+        $this->mailer->send($currentEmail);
     }
 
 }

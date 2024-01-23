@@ -21,6 +21,7 @@ export default function Login() {
         ).then((response) => {
             localStorage.setItem('token', response.token);
             localStorage.setItem('refresh_token', response.refresh_token);
+            localStorage.setItem('email', email);
             navigate('/');
         });
     };
@@ -56,6 +57,9 @@ export default function Login() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
+                    <Box mt={2} textAlign="left">
+                        <Link href="/login/identify">Mot de passe oublié?</Link>
+                    </Box>
                     <Button
                         type="submit"
                         variant="contained"

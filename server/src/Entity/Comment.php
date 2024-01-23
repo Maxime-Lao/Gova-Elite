@@ -61,7 +61,7 @@ class Comment
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La note globale ne peut pas être vide')]
     #[Assert\Positive(message: 'La note globale doit être un nombre positif')]
-    #[Groups(['comment:read', 'car:read'])]
+    #[Groups(['comment:read', 'car:read', 'user:read'])]
     private ?float $globalRating = null;
 
     #[ORM\Column]
@@ -74,17 +74,17 @@ class Comment
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['comment:read', 'car:read', 'user:read'])]
+    #[Groups(['comment:read', 'car:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['comment:read', 'user:read', 'car:read'])]
+    #[Groups(['comment:read', 'car:read'])]
     private ?User $author = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['user:read', 'car:read'])]
+    #[Groups(['car:read'])]
     private ?Car $car;
 
     public function getId(): ?int
@@ -100,7 +100,6 @@ class Comment
     public function setCleanliness(float $cleanliness): static
     {
         $this->cleanliness = $cleanliness;
-
         return $this;
     }
 
@@ -208,7 +207,6 @@ class Comment
     public function setAuthor(?User $author): static
     {
         $this->author = $author;
-
         return $this;
     }
 

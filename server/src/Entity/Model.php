@@ -11,17 +11,22 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ModelRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    normalizationContext: [
+        'groups' => ['model:read']
+    ]
+)]
 class Model
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['model:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100, nullable: true)]
     #[Assert\NotBlank(message: "Le nom du model ne peut pas être vide")]
-    #[Groups(['car:read', 'user:read', 'comment:read', 'car_search:read'])]
+    #[Groups(['car:read', 'comment:read', 'car_search:read', 'user:read', 'model:read'])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'model', targetEntity: Car::class)]
@@ -29,7 +34,7 @@ class Model
 
     #[ORM\ManyToOne(inversedBy: 'models')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['car:read', 'car_search:read'])]
+    #[Groups(['car:read', 'car_search:read', 'user:read',  'model:read'])]
     private ?Brand $brand = null;
 
     #[ORM\Column]

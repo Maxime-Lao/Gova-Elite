@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: CarRepository::class)]
 #[ApiResource(
     normalizationContext: ['groups' => ['car:read']],
-    denormalizationContext: ['groups' => ['car:write']],
+    //denormalizationContext: ['groups' => ['car:write']],
 )]
 #[ApiResource(
     uriTemplate: '/companies/{companyId}/cars',
@@ -31,18 +31,18 @@ class Car
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['car:read', 'user:read', 'comment:read', 'car_search:read'])]
+    #[Groups(['car:read', 'comment:read', 'car_search:read', 'user:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La description ne peut pas être vide')]
-    #[Groups(['car:read', 'user:read', 'comment:read'])]
+    #[Groups(['car:read', 'comment:read', 'user:read'])]
     private ?string $description = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le nombre de chevaux ne peut pas être vide')]
     #[Assert\Positive(message: 'Le nombre de chevaux doit être un nombre positif ou égal à zéro')]
-    #[Groups(['car:read', 'user:read', 'comment:read'])]
+    #[Groups(['car:read', 'comment:read', 'user:read'])]
     private ?int $year = null;
 
     #[ORM\Column]
@@ -66,7 +66,7 @@ class Car
     #[ORM\Column]
     #[Assert\NotBlank]
     #[Assert\Positive]
-    #[Groups(['car:read', 'user:read', 'car_search:read'])]
+    #[Groups(['car:read', 'car_search:read', 'user:read'])]
     private ?float $price = null;
 
     #[ORM\Column]
@@ -81,7 +81,7 @@ class Car
     private ?Gear $gear = null;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
-    #[Groups(['car:read', 'user:read', 'comment:read', 'car_search:read'])]
+    #[Groups(['car:read', 'comment:read', 'car_search:read', 'user:read'])]
     private ?Model $model = null;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
@@ -89,20 +89,26 @@ class Car
     #[Groups(['car:read', 'user:read'])]
     private ?Energy $energy = null;
 
-    #[ORM\OneToMany(mappedBy: 'car', targetEntity: Media::class)]
-    #[Groups(['car:read', 'user:read', 'car_search:read'])]
+    #[ORM\ManyToOne(inversedBy: 'cars')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['car:read', 'user:read'])]
+    private ?Category $category = null;
+
+    #[ORM\OneToMany(mappedBy: 'car', targetEntity: Media::class, orphanRemoval: true)]
+    #[Groups(['car:read', 'car_search:read', 'user:read'])]
     private Collection $media;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['car:read', 'user:read', 'comment:read', 'car_search:read'])]
+    #[Groups(['car:read', 'comment:read', 'car_search:read'])]
     private ?Companie $companie = null;
 
-    #[ORM\OneToMany(mappedBy: 'car', targetEntity: Rent::class)]
-    #[Groups('car:read')]
+    #[ORM\OneToMany(mappedBy: 'car', targetEntity: Rent::class, orphanRemoval: true)]
+    #[Groups(['car:read', 'user:read'])]
     private Collection $rents;
 
-    #[ORM\OneToMany(mappedBy: 'car', targetEntity: Comment::class)]
+    #[ORM\OneToMany(mappedBy: 'car', targetEntity: Comment::class, orphanRemoval: true)]
+    #[Groups(['user:read'])]
     private Collection $comments;
 
     #[ORM\Column]
@@ -110,7 +116,7 @@ class Car
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['car:read', 'user:read'])]
+    #[Groups(['car:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     public function __construct()
@@ -244,6 +250,16 @@ class Car
         return $this;
     }
 
+    public function getCategory(): ?Category {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): static {
+        $this->category = $category;
+
+        return $this;
+    }
+
     /**
      * @return Collection<int, Media>
      */
@@ -264,9 +280,9 @@ class Car
 
     public function removeMedia(Media $media): static
     {
-        if ($this->media->removeElement($media)) {
-            if ($media->getCar() === $this) {
-                $media->setCar(null);
+        if ($this->media->removeElement($medium)) {
+            if ($medium->getCar() === $this) {
+                $medium->setCar(null);
             }
         }
 

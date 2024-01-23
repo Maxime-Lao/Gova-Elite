@@ -45,6 +45,25 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     /**
      * Used to upgrade (rehash) the user's password automatically over time.
      */
+
+    public function findOneByEmail(string $email): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.email = :email')
+            ->setParameter('email', $email)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findOneByPasswordResetToken(string $token): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.passwordResetToken = :password_reset_token')
+            ->setParameter('password_reset_token', $token)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
     {
         if (!$user instanceof User) {

@@ -18,19 +18,20 @@ class Media
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups([ 'user:read'])]
     #[Assert\NotBlank(message: "Le nom du média ne peut pas être vide")]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['car:read', 'car_search:read'])]
+    #[Groups(['car:read', 'car_search:read', 'user:read'])]
     private ?string $data = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Car $car = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?User $user = null;
 
     #[ORM\Column]
@@ -80,15 +81,14 @@ class Media
         return $this;
     }
 
-    public function getUserr(): ?User
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUserr(?User $user): static
+    public function setUser(?User $user): static
     {
         $this->user = $user;
-
         return $this;
     }
 
