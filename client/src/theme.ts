@@ -16,12 +16,9 @@ export const theme = createTheme({
   },
   typography: {
     button: {
-      fontFamily: 'Montserrat',
+      textTransform: 'none',
+      fontWeight: '500',
     },
-    body2: {
-      fontFamily: 'Montserrat',
-    },
-    fontFamily: 'Montserrat',
   },
 });
 

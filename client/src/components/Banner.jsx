@@ -29,7 +29,7 @@ const Banner = () => {
 
     return (
         <Grid container sx={bannerStyle}>
-            <Typography variant="h4" component="h1" sx={{ color: 'white', textAlign: 'center', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -250%)' }}>
+            <Typography variant="h4" component="h1" sx={{ color: 'white', textAlign: 'center', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -250%)', fontWeight: "300" }}>
                 Réservez Votre Rêve,<br></br>
                 Conduisez l&apos;Exception.
             </Typography>

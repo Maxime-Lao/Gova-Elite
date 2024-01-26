@@ -8,7 +8,12 @@ export default {
         "./src/**/**/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sans: ["Montserrat", "sans-serif"],
+        serif: ["Montserrat", "sans-serif"],
+      },
+    },
   },
   plugins: [],
 }
