@@ -26,7 +26,7 @@ class Model
 
     #[ORM\Column(length: 100, nullable: true)]
     #[Assert\NotBlank(message: "Le nom du model ne peut pas être vide")]
-    #[Groups(['car:read', 'comment:read', 'car_search:read', 'user:read', 'model:read'])]
+    #[Groups(['car:read', 'comments_car:read', 'car_search:read', 'user:read', 'model:read', 'rents_user:read'])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'model', targetEntity: Car::class)]

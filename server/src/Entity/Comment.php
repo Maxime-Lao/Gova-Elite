@@ -13,78 +13,91 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
 #[ApiResource()]
 #[ApiResource(
-    normalizationContext: ['groups' => ['comment:read']],
     uriTemplate: '/cars/{carId}/comments',
     uriVariables: [
         'carId' => new Link(fromClass: Car::class, toProperty: 'car'),
     ],
-    operations: [ new GetCollection() ]
+    operations: [new GetCollection()],
+    normalizationContext: ['groups' => ['comments_car:read']],
+)]
+#[ApiResource(
+    uriTemplate: '/users/{userId}/comments',
+    uriVariables: [
+        'userId' => new Link(fromClass: User::class, toProperty: 'author'),
+    ],
+    operations: [new GetCollection()],
+    normalizationContext: ['groups' => ['comments_user:read']],
 )]
 class Comment
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['comment:read', 'car:read'])]
+    #[Groups(['comments_car:read', 'comments_user:read', 'car:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La note de propreté ne peut pas être vide')]
     #[Assert\Positive(message: 'La note de propreté doit être un égal à zéro')]
-    #[Groups(['comment:read', 'car:read'])]
+    #[Groups(['comments_car:read', 'car:read'])]
     private ?float $cleanliness = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La note de maintenance ne peut pas être vide')]
     #[Assert\Positive(message: 'La note de maintenance doit être un nombre positif')]
-    #[Groups(['comment:read', 'car:read'])]
+    #[Groups(['comments_car:read', 'car:read'])]
     private ?float $maintenance = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La note de communication ne peut pas être vide')]
     #[Assert\Positive(message: 'La note de communication doit être un nombre positif')]
-    #[Groups(['comment:read', 'car:read'])]
+    #[Groups(['comments_car:read', 'car:read'])]
     private ?float $communication = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La note de commodité ne peut pas être vide')]
     #[Assert\Positive(message: 'La note de commodité doit être un nombre positif')]
-    #[Groups(['comment:read', 'car:read'])]
+    #[Groups(['comments_car:read', 'car:read'])]
     private ?float $convenience = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La note de précision ne peut pas être vide')]
     #[Assert\Positive(message: 'La note de précision doit être un nombre positif')]
-    #[Groups(['comment:read', 'car:read'])]
+    #[Groups(['comments_car:read', 'car:read'])]
     private ?float $accuracy = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La note globale ne peut pas être vide')]
     #[Assert\Positive(message: 'La note globale doit être un nombre positif')]
-    #[Groups(['comment:read', 'car:read', 'user:read'])]
+    #[Groups(['comments_car:read', 'car:read', 'user:read'])]
     private ?float $globalRating = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le commentaire ne peut pas être vide')]
-    #[Groups(['comment:read', 'car:read', 'user:read'])]
+    #[Groups(['comments_car:read', 'car:read', 'user:read'])]
     private ?string $comment = null;
 
+    #[ORM\ManyToOne(inversedBy: 'comments')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['comments_user', 'car:read', 'user:read'])]
+    private ?Rent $rent = null;
+
     #[ORM\Column]
-    #[Groups(['comment:read', 'car:read', 'user:read'])]
+    #[Groups(['comments_car:read', 'car:read', 'user:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['comment:read', 'car:read'])]
+    #[Groups(['comments_car:read', 'car:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['comment:read', 'car:read'])]
+    #[Groups(['comments_car:read', 'car:read'])]
     private ?User $author = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['car:read'])]
+    #[Groups(['car:read', 'comments_user:read'])]
     private ?Car $car;
 
     public function getId(): ?int
@@ -172,6 +185,17 @@ class Comment
     {
         $this->comment = $comment;
 
+        return $this;
+    }
+
+    public function getRent(): ?Rent
+    {
+        return $this->rent;
+    }
+    
+    public function setRent(?Rent $rent): static
+    {
+        $this->rent = $rent;
         return $this;
     }
 

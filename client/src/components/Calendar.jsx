@@ -8,6 +8,7 @@ function Calendar({ carId }) {
   const [endDate, setEndDate] = useState(null);
   const [rentedTimes, setRentedTimes] = useState([]);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const currentDate = new Date();
 
   const isRentButtonDisabled = !startDate || !endDate;
@@ -48,20 +49,6 @@ function Calendar({ carId }) {
 
     return dates;
   }).flat();
-
-  /*
-  const filterRentedTimes = time => {
-    const currentDate = new Date(time);
-    for (const rent of rentedTimes) {
-      const rentStart = new Date(rent.startDate);
-      const rentEnd = new Date(rent.endDate);
-      if (currentDate >= rentStart && currentDate <= rentEnd) {
-        return false;
-      }
-    }
-    return true;
-  };
-  */
  
   const handleRentalSubmit = async () => {
     if (startDate && endDate) {
@@ -70,7 +57,7 @@ function Calendar({ carId }) {
         dateEnd: endDate.toISOString(),
         totalPrice: 50,
         car: `/api/cars/${carId}`,
-        user: `/api/users/1`,
+        user: `/api/users/21`,
         createdAt: currentDate.toISOString().slice(0, 19).replace('T', ' '),
       };
 
@@ -92,6 +79,7 @@ function Calendar({ carId }) {
 
       if (!isDatesValid) {
         setError('La voiture n\'est pas disponible pour les dates sélectionnées.');
+        setSuccessMessage('');
         return;
       }
 
@@ -99,18 +87,26 @@ function Calendar({ carId }) {
         const response = await fetch('http://localhost:8000/api/rents', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/ld+json',
+            'Content-Type': 'application/json+ld',
           },
           body: JSON.stringify(requestData),
         });
 
         if (response.ok) {
-          console.log('Location réussie !');
+          const newReservation = {
+            startDate: startDate,
+            endDate: endDate,
+          };
+          setRentedTimes([...rentedTimes, newReservation]);
+
+          setSuccessMessage('Votre réservation a été effectuée avec succès!');
+          setError('');
         } else {
-          console.error('Erreur lors de la location');
+          setError('Erreur lors de la location');
         }
       } catch (error) {
         console.error(error);
+        setError('Erreur lors de la location');
       }
     }
   };
@@ -122,7 +118,8 @@ function Calendar({ carId }) {
         <Typography variant="h4" component="h2">
           Planification de la location
         </Typography>
-        {error && <p>{error}</p>}
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
         <Grid container spacing={2} justifyContent="center">
           <Grid item xs={12}>
             <DatePicker

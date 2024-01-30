@@ -34,7 +34,7 @@ use Doctrine\Common\Collections\Collection;
             validationContext: ['groups' => ['Default', 'user:create']]
         ),
         new Get(
-            security: "is_granted('ROLE_ADMIN')",
+            //security: "is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['user:read']],
         ),
         new Put(
@@ -109,12 +109,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Le prénom ne peut pas être vide')]
-    #[Groups(['user:read', 'user:create', 'user:update'])]
+    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Le nom ne peut pas être vide')]
-    #[Groups(['user:read', 'user:create', 'user:update'])]
+    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read'])]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -137,7 +137,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $rents;
 
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Comment::class, orphanRemoval: true)]
-    #[Groups('user:read', 'comment:read')]
+    #[Groups('user:read', 'comments_car:read')]
     private Collection $comments;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Media::class, orphanRemoval: true)]

@@ -17,7 +17,6 @@ import Account from "./components/account/Account.jsx";
 function App() {
   return (
     <ThemeProvider theme={myTheme}>
-      <ThemeProvider theme={myTheme}>
       <Router>
         <Routes>
             <Route path="/" element={<Home />} />
@@ -34,7 +33,6 @@ function App() {
             <Route path="/account" element={<Account />} />
         </Routes>
       </Router>
-    </ThemeProvider>
     </ThemeProvider>
   );
 }
