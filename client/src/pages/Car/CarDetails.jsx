@@ -20,14 +20,22 @@ function CarDetails() {
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:8000/api/cars/${id}/comments`) // Requête pour récupérer les commentaires de la voiture
+    fetch(`http://localhost:8000/api/cars/${id}/comments`)
       .then(response => response.json())
-      .then(data => setComments(data['hydra:member'])) // Stocker les commentaires dans le state
-      .catch(error => console.error(error));
+      .then(data => {
+        if (Array.isArray(data)) {
+          setComments(data);
+        } else {
+          console.error('Unexpected response structure for comments:', data);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching comments:', error);
+      });
   }, [id]);
 
   useEffect(() => {
-    fetch(`http://localhost:8000/api/cars/${id}`) // Requête pour récupérer les détails de la voiture
+    fetch(`http://localhost:8000/api/cars/${id}`)
       .then(response => response.json())
       .then(data => setCar(data))
       .catch(error => console.error(error));
