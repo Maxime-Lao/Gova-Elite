@@ -32,14 +32,13 @@ const ExpandMore = styled((props) => {
   }),
 }));
 
-function PastBookings({ rent, user }) {
+function PastBookings({ rent, user, onPastBookingChange }) {
   const [expanded, setExpanded] = React.useState(false);
   const formattedStartDate = format(new Date(rent.dateStart), "dd/MM/yyyy HH'h'", { locale: fr });
   const formattedEndDate = format(new Date(rent.dateEnd), "dd/MM/yyyy HH'h'", { locale: fr });
   const [openDialog, setOpenDialog] = React.useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState(null);
-  const [commentSubmitted, setCommentSubmitted] = useState(false);
-  const isButtonDisabled = rent.disable === 'yes' || commentSubmitted;
+  const isButtonDisabled = rent.disable === 'yes';
 
   const [comment, setComment] = React.useState({
     cleanliness: 0,
@@ -165,9 +164,9 @@ function PastBookings({ rent, user }) {
       });
 
       if (response.ok) {
+        onPastBookingChange();
         setFeedbackMessage('Votre commentaire a été pris en compte.');
         setOpenDialog(false);
-        setCommentSubmitted(true);
       } else {
         const errorData = await response.json();
         if (errorData.detail) {

@@ -52,9 +52,13 @@ function Calendar({ carId }) {
  
   const handleRentalSubmit = async () => {
     if (startDate && endDate) {
+      const timezoneOffset = new Date().getTimezoneOffset() * 60000;
+      const adjustedStartDate = new Date(startDate.getTime() - timezoneOffset);
+      const adjustedEndDate = new Date(endDate.getTime() - timezoneOffset);
+
       const requestData = {
-        dateStart: startDate.toISOString(),
-        dateEnd: endDate.toISOString(),
+        dateStart: adjustedStartDate.toISOString(),
+        dateEnd: adjustedEndDate.toISOString(),
         totalPrice: 50,
         car: `/api/cars/${carId}`,
         user: `/api/users/21`,
@@ -101,6 +105,8 @@ function Calendar({ carId }) {
 
           setSuccessMessage('Votre réservation a été effectuée avec succès!');
           setError('');
+          setStartDate(null);
+          setEndDate(null);
         } else {
           setError('Erreur lors de la location');
         }

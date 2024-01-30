@@ -37,10 +37,9 @@ const ExpandMore = styled((props) => {
   }),
 }));
 
-export default function BookingsCard({ rent, user }) {
+export default function BookingsCard({ rent, user, onDelete, onBookingChange }) {
   const [expanded, setExpanded] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [rentedTimes, setRentedTimes] = useState([]);
@@ -60,16 +59,15 @@ export default function BookingsCard({ rent, user }) {
   };
 
   const handleOpenModal = (carId) => {
+    setStartDate(null);
+    setEndDate(null);
+    setRentalSuccessMessage('');
     fetchUpdatedRentedTimes(carId);
     setOpenModal(true);
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
-  };
-
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
   };
 
   const handleExpandClick = () => {
@@ -123,7 +121,8 @@ export default function BookingsCard({ rent, user }) {
         method: 'DELETE',
       });
       if (response.ok) {
-        console.log('Réservation annulée avec succès.');
+        onDelete(id);
+        setOpen(false);
       } else {
         console.error('La suppression de la réservation a échoué.');
       }
@@ -134,9 +133,13 @@ export default function BookingsCard({ rent, user }) {
 
   const handleRentalSubmit = async (carId, rentId) => {
     if (startDate && endDate) {
+      const timezoneOffset = new Date().getTimezoneOffset() * 60000;
+      const adjustedStartDate = new Date(startDate.getTime() - timezoneOffset);
+      const adjustedEndDate = new Date(endDate.getTime() - timezoneOffset);
+
       const requestData = {
-        dateStart: startDate.toISOString(),
-        dateEnd: endDate.toISOString(),
+        dateStart: adjustedStartDate.toISOString(),
+        dateEnd: adjustedEndDate.toISOString(),
         totalPrice: 50,
         car: `/api/cars/${carId}`,
         user: `/api/users/${user}`,
@@ -174,8 +177,8 @@ export default function BookingsCard({ rent, user }) {
         });
 
         if (response.ok) {
+          onBookingChange();
           setRentalSuccessMessage('La location a été décalée !');
-          setOpenModal(false);
         } else {
           console.error('Erreur lors de la décale');
         }
@@ -274,7 +277,7 @@ export default function BookingsCard({ rent, user }) {
             Planification de la location
           </Typography>
           {rentalSuccessMessage && (
-            <Typography color="success" align="center" gutterBottom>
+            <Typography color="green" align="center" gutterBottom>
               {rentalSuccessMessage}
             </Typography>
           )}

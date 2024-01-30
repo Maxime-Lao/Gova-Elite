@@ -77,6 +77,30 @@ function Bookings() {
       disable: commentedRentIds.has(rent.id) ? 'yes' : 'no'
     }));
 
+  const handleBookingDeletion = (deletedRentId) => {
+    setUserData(userData.filter(rent => rent.id !== deletedRentId));
+  };
+
+  const refreshBookings = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/users/21/rents`);
+      const data = await response.json();
+      setUserData(data);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+  const refreshPastBookings = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/users/21/comments`);
+      const data = await response.json();
+      setUserCommentsData(data);
+    } catch (error) {
+      console.error('Error fetching user comments data:', error);
+    }
+  }
+
   return (
     <>
       <Navbar />
@@ -93,7 +117,7 @@ function Bookings() {
           {tabValue === 0 && (
             currentBookings.map((rent, index) => (
               <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
-                <CurrentBookingsCard rent={rent} user={21}/>
+                <CurrentBookingsCard rent={rent} user={21} onDelete={handleBookingDeletion} onBookingChange={refreshBookings}/>
               </Grid>
             ))
           )}
@@ -101,7 +125,7 @@ function Bookings() {
           {tabValue === 1 && (
             pastBookings.map((rent, index) => (
               <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
-                <PastBookingsCard rent={rent} user={21}/>
+                <PastBookingsCard rent={rent} user={21} onPastBookingChange={refreshPastBookings}/>
               </Grid>
             ))
           )}
