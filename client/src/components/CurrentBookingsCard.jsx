@@ -184,12 +184,18 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
   };
 
   const handleOpenStripeModal = () => {
+    const currentRentId = rent.id;
+  
     const isDatesValid = rentedTimes.every(rent => {
+      if (rent.id === currentRentId) {
+        return true;
+      }
+  
       const selectedStart = startDate.getTime();
       const selectedEnd = endDate.getTime();
       const rentStart = new Date(rent.dateStart).getTime();
       const rentEnd = new Date(rent.dateEnd).getTime();
-
+  
       if (
         (selectedStart >= rentStart && selectedStart <= rentEnd) ||
         (selectedEnd >= rentStart && selectedEnd <= rentEnd) ||
@@ -199,7 +205,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
       }
       return true;
     });
-
+  
     if (!isDatesValid) {
       setError('La voiture n\'est pas disponible pour les dates sélectionnées.');
       return;
