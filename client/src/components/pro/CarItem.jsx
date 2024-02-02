@@ -15,6 +15,8 @@ import CardActions from "@mui/material/CardActions";
 
 const CarItem = ({ car }) => {
 
+    console.log(car.media[0])
+
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const handleDelete = async () => {
@@ -49,7 +51,7 @@ const CarItem = ({ car }) => {
         <Card style={{ display: 'flex' }}>
             <CardMedia
                 component="img"
-                src='https://source.unsplash.com/random'
+                src={`http://localhost:8000/media/${car.media[0].filePath}`}
                 style={{ width: '200px' }}
             />
             <div style={{ flex: 1 }}>
