@@ -6,7 +6,11 @@ import CreateCar from "../components/pro/CreateCar.jsx";
 
 const HomePro = ({user}) => {
 
-    console.log(user.connectedUser.companie)
+    console.log(user.connectedUser)
+
+    if (!user.connectedUser.companie) {
+        return null;
+    }
 
     const tabsData = [
         { label: 'Ma société', content: <CompanieDetails companie={ user.connectedUser.companie }/> },

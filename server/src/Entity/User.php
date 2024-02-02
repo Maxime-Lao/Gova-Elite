@@ -140,7 +140,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups('user:read', 'comments_car:read')]
     private Collection $comments;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Media::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: MediaObject::class, orphanRemoval: true)]
     #[Groups('user:read')]
     private Collection $media;
 
@@ -334,7 +334,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
 /**
-     * @return Collection<int, Media[]>
+     * @return Collection<int, MediaObject[]>
      */
     public function getMedia(): Collection
     {
@@ -381,7 +381,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function addMedia(Media $media): static
+    public function addMedia(MediaObject $media): static
     {
         if (!$this->media->contains($media)) {
             $this->media->add($media);
@@ -391,7 +391,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function removeMedia(Media $media): static
+    public function removeMedia(MediaObject $media): static
     {
         if ($this->media->removeElement($media)) {
             if ($media->getUser() === $this) {
@@ -452,7 +452,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
     
-    public function setMedia(?Media $media): self {
+    public function setMedia(?MediaObject $media): self {
         if ($media === null && $this->media !== null) {
             $this->media->setUser(null);
         }

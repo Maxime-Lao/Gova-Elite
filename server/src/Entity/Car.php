@@ -94,7 +94,7 @@ class Car
     #[Groups(['car:read', 'user:read', 'rents_user:read'])]
     private ?Category $category = null;
 
-    #[ORM\OneToMany(mappedBy: 'car', targetEntity: Media::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'car', targetEntity: MediaObject::class, orphanRemoval: true)]
     #[Groups(['car:read', 'car_search:read', 'user:read', 'rents_user:read'])]
     private Collection $media;
 
@@ -261,14 +261,14 @@ class Car
     }
 
     /**
-     * @return Collection<int, Media>
+     * @return Collection<int, MediaObject>
      */
     public function getMedia(): Collection
     {
         return $this->media;
     }
 
-    public function addMedia(Media $media): static
+    public function addMedia(MediaObject $media): static
     {
         if (!$this->media->contains($media)) {
             $this->media->add($media);
@@ -278,7 +278,7 @@ class Car
         return $this;
     }
 
-    public function removeMedia(Media $media): static
+    public function removeMedia(MediaObject $media): static
     {
         if ($this->media->removeElement($medium)) {
             if ($medium->getCar() === $this) {

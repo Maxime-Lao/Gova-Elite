@@ -79,7 +79,7 @@ class Comment
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['comments_user', 'car:read', 'user:read'])]
+    #[Groups(['comments_user', 'car:read'])]
     private ?Rent $rent = null;
 
     #[ORM\Column]
