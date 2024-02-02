@@ -69,21 +69,21 @@ class Comment
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La note globale ne peut pas être vide')]
     #[Assert\Positive(message: 'La note globale doit être un nombre positif')]
-    #[Groups(['comments_car:read', 'car:read', 'user:read'])]
+    #[Groups(['comments_car:read', 'car:read'])]
     private ?float $globalRating = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le commentaire ne peut pas être vide')]
-    #[Groups(['comments_car:read', 'car:read', 'user:read'])]
+    #[Groups(['comments_car:read', 'car:read'])]
     private ?string $comment = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['comments_user', 'car:read', 'user:read'])]
+    #[Groups(['comments_user', 'car:read'])]
     private ?Rent $rent = null;
 
     #[ORM\Column]
-    #[Groups(['comments_car:read', 'car:read', 'user:read'])]
+    #[Groups(['comments_car:read', 'car:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]

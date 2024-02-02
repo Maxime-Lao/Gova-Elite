@@ -25,6 +25,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import { useNavigate } from "react-router-dom";
+import StripePaymentFormUpdate from './StripePaymentFormUpdate';
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -42,6 +43,10 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
   const [openModal, setOpenModal] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [rentId, setRentId] = useState(0);
+  const [paymentMethodId, setPaymentMethodId] = useState('');
+  const [isStripeModalOpen, setIsStripeModalOpen] = useState(false);
   const [rentedTimes, setRentedTimes] = useState([]);
   const [error, setError] = useState('');
   const [open, setOpen] = useState(false);
@@ -94,6 +99,17 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
     }
   }, [rent.car.id]);
 
+  useEffect(() => {
+    if (startDate && endDate && rent && rent.car.price) {
+      const diffTime = Math.abs(endDate - startDate);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+      const calculatedTotalPrice = diffDays * rent.car.price;
+      setTotalPrice(calculatedTotalPrice);
+      setPaymentMethodId(rent.paymentMethodId);
+      setRentId(rent.id);
+    }
+  }, [startDate, endDate, rent]);
+
   const fetchUpdatedRentedTimes = async (carId) => {
     try {
       const response = await fetch(`http://localhost:8000/api/cars/${carId}/rents`);
@@ -131,41 +147,20 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
     }
   };
 
-  const handleRentalSubmit = async (carId, rentId) => {
+  const handleRentalSubmit = async (rentId, newPaymentIntent) => {
     if (startDate && endDate) {
       const timezoneOffset = new Date().getTimezoneOffset() * 60000;
       const adjustedStartDate = new Date(startDate.getTime() - timezoneOffset);
       const adjustedEndDate = new Date(endDate.getTime() - timezoneOffset);
+      const currentDate = new Date(new Date().getTime() - timezoneOffset);
 
       const requestData = {
         dateStart: adjustedStartDate.toISOString(),
         dateEnd: adjustedEndDate.toISOString(),
-        totalPrice: 50,
-        car: `/api/cars/${carId}`,
-        user: `/api/users/${user}`,
-        updatedAt: new Date().toISOString(),
+        totalPrice: totalPrice,
+        paymentMethodId: newPaymentIntent,
+        updatedAt: currentDate.toISOString(),
       };
-
-      const isDatesValid = rentedTimes.every(rent => {
-        const selectedStart = startDate.getTime();
-        const selectedEnd = endDate.getTime();
-        const rentStart = new Date(rent.startDate).getTime();
-        const rentEnd = new Date(rent.endDate).getTime();
-
-        if (
-          (selectedStart >= rentStart && selectedStart <= rentEnd) ||
-          (selectedEnd >= rentStart && selectedEnd <= rentEnd) ||
-          (selectedStart <= rentStart && selectedEnd >= rentEnd)
-        ) {
-          return false;
-        }
-        return true;
-      });
-
-      if (!isDatesValid) {
-        setError('La voiture n\'est pas disponible pour les dates sélectionnées.');
-        return;
-      }
 
       try {
         const response = await fetch(`http://localhost:8000/api/rents/${rentId}`, {
@@ -186,6 +181,32 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
         console.error(error);
       }
     }
+  };
+
+  const handleOpenStripeModal = () => {
+    const isDatesValid = rentedTimes.every(rent => {
+      const selectedStart = startDate.getTime();
+      const selectedEnd = endDate.getTime();
+      const rentStart = new Date(rent.dateStart).getTime();
+      const rentEnd = new Date(rent.dateEnd).getTime();
+
+      if (
+        (selectedStart >= rentStart && selectedStart <= rentEnd) ||
+        (selectedEnd >= rentStart && selectedEnd <= rentEnd) ||
+        (selectedStart <= rentStart && selectedEnd >= rentEnd)
+      ) {
+        return false;
+      }
+      return true;
+    });
+
+    if (!isDatesValid) {
+      setError('La voiture n\'est pas disponible pour les dates sélectionnées.');
+      return;
+    }
+  
+    setError('');
+    setIsStripeModalOpen(true);
   };
 
   return (
@@ -334,17 +355,31 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
                 }}
               />
             </Grid>
-            {/* Ajoutez d'autres éléments si nécessaire */}
             <Grid item xs={12}>
+              {startDate && endDate && (
+                <Typography variant="h6" gutterBottom>
+                  Prix total : {totalPrice} €
+                </Typography>
+              )}
               <Button variant="contained" onClick={handleCloseModal} sx={{ marginRight: '1em' }}>
                 Fermer
               </Button>
-              <Button variant="contained" onClick={() => handleRentalSubmit(rent.car.id, rent.id)} disabled={isRentButtonDisabled}>
+              <Button variant="contained" onClick={handleOpenStripeModal} disabled={isRentButtonDisabled}>
                 Louer la voiture
               </Button>
             </Grid>
           </Grid>
           {error && <Typography color="error">{error}</Typography>}
+        </Box>
+      </Modal>
+      <Modal
+        open={isStripeModalOpen}
+        onClose={() => setIsStripeModalOpen(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box >
+          <StripePaymentFormUpdate onPaymentSuccess={handleRentalSubmit} rentId={rentId} originalPaymentIntentId={paymentMethodId} carPrice={totalPrice}/>
         </Box>
       </Modal>
     </Card>

@@ -139,6 +139,9 @@ function PastBookings({ rent, user, onPastBookingChange }) {
         cleanliness + maintenance + communication + convenience + accuracy;
       const average = total / 5;
       const globalRating = parseFloat(average.toFixed(1));
+
+      const timezoneOffset = new Date().getTimezoneOffset() * 60000;
+      const currentDate = new Date(new Date().getTime() - timezoneOffset);
   
       const commentData = {
         cleanliness,
@@ -149,8 +152,8 @@ function PastBookings({ rent, user, onPastBookingChange }) {
         globalRating,
         comment: commentText,
         rent,
-        createdAt,
-        updatedAt,
+        createdAt: currentDate.toISOString(),
+        updatedAt: currentDate.toISOString(),
         author,
         car,
       };
