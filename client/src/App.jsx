@@ -13,6 +13,9 @@ import Customers from "./pages/Customers.jsx";
 import IdentifyEmail from "./components/login/IdentifyEmail.jsx";
 import ResetPassword from "./components/login/ResetPassword.jsx";
 import Account from "./components/account/Account.jsx";
+import PaymentSuccess from './pages/PaymentSuccess.jsx';
+import UpdatePaymentSuccess from './pages/UpdatePaymentSucces.jsx';
+import NotFoundPage from './pages/NotFoundPage.jsx';
 
 function App() {
   return (
@@ -31,6 +34,9 @@ function App() {
               <Route path="/login/identify" element={<IdentifyEmail />} />
               <Route path="/resetpswd/:token" element={<ResetPassword />} />
               <Route path="/account" element={<Account />} />
+              <Route path="/payment-success" element={<PaymentSuccess />} />
+              <Route path="/update-payment-success" element={<UpdatePaymentSuccess />} />
+              <Route path="/not-found" element={<NotFoundPage />} />
           </Routes>
       </Router>
     </ThemeProvider>

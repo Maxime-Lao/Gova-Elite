@@ -158,6 +158,7 @@ class AppFixtures extends Fixture
             $rent->setDateStart(\DateTimeImmutable::createFromMutable($faker->dateTime()));
             $rent->setDateEnd(\DateTimeImmutable::createFromMutable($faker->dateTime()));
             $rent->setTotalPrice($faker->numberBetween(100, 1000));
+            $rent->setPaymentMethodId('pm_' . $faker->regexify('[A-Z0-9]{16}') . '_secret');
             $rent->setCar($faker->randomElement($cars));
             $rent->setUser($faker->randomElement($users));
             $rent->setCreatedAt(\DateTimeImmutable::createFromMutable($faker->dateTime()));

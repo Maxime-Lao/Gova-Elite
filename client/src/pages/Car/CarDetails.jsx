@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from "../../components/navbar/Navbar.jsx";
 import Calendar from "../../components/Calendar";
 import { Grid, Typography, List, ListItem, ListItemText, ListItemIcon, TextField, Card, CardMedia, CardContent } from '@mui/material';
@@ -15,12 +15,18 @@ import Stack from '@mui/material/Stack';
 
 function CarDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [car, setCar] = useState(null);
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
     fetch(`http://localhost:8000/api/cars/${id}/comments`)
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`An error occurred: ${response.statusText}`);
+        }
+        return response.json();
+      })
       .then(data => {
         if (Array.isArray(data)) {
           setComments(data);
@@ -35,10 +41,18 @@ function CarDetails() {
 
   useEffect(() => {
     fetch(`http://localhost:8000/api/cars/${id}`)
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Car not found');
+        }
+        return response.json();
+      })
       .then(data => setCar(data))
-      .catch(error => console.error(error));
-  }, [id]);
+      .catch(error => {
+        console.error(error);
+        navigate('/not-found');
+      });
+  }, [id, navigate]);
 
   const calculateAverageRating = () => {
     if (!comments) {

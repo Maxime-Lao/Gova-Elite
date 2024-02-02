@@ -52,7 +52,11 @@ class Rent
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le prix total ne peut pas être vide')]
     #[Groups(['rents_car:read', 'rents_user:read'])]
-    private ?int $totalPrice = null;
+    private ?float $totalPrice = null;
+
+    #[ORM\Column]
+    #[Groups(['rents_car:read', 'rents_user:read'])]
+    private ?string $paymentMethodId;
 
     #[ORM\ManyToOne(inversedBy: 'rents')]
     #[Groups(['rents_car:read', 'rents_user:read'])]
@@ -106,6 +110,18 @@ class Rent
     public function setTotalPrice(int $totalPrice): static
     {
         $this->totalPrice = $totalPrice;
+
+        return $this;
+    }
+
+    public function getPaymentMethodId(): ?string
+    {
+        return $this->paymentMethodId;
+    }
+
+    public function setPaymentMethodId(string $paymentMethodId): static
+    {
+        $this->paymentMethodId = $paymentMethodId;
 
         return $this;
     }
