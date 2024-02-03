@@ -28,7 +28,6 @@ const sendRequest = async (endpoint, method = 'GET', data = {}, requireAuth = tr
         });
         return response.data;
     } catch (error) {
-        console.error('Error with the request:', error.response?.data || error.message);
         throw error;
     }
 };
@@ -73,7 +72,6 @@ async function refreshToken() {
         localStorage.setItem('token', response.data.token);
         return response.data.token;
     } catch (error) {
-        console.log(error)
     }
 }
 

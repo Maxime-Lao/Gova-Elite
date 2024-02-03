@@ -3,6 +3,7 @@ import {Box, Button, FormControl, Grid, IconButton, InputLabel, MenuItem, Select
 import axios from "axios";
 import DeleteIcon from "@mui/icons-material/Delete.js";
 import useGetConnectedUser from "../hooks/useGetConnectedUser.jsx";
+import {convertBytesToMegaBytes} from "../../FileSizeHelper.jsx";
 
 const CreateCar = ({companieId}) => {
     const [photos, setPhotos] = useState([]);
@@ -27,6 +28,7 @@ const CreateCar = ({companieId}) => {
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
     const [description, setDescription] = useState();
+    const [errorPhoto, setErrorPhoto] = useState('')
 
     const token = localStorage.getItem('token');
     const user = useGetConnectedUser();
@@ -126,6 +128,15 @@ const CreateCar = ({companieId}) => {
         const updatedPhotos = [...photos.slice(0, index), ...photos.slice(index + 1)];
         setPhotos(updatedPhotos);
     };
+
+    const handlePhoto = (event) => {
+        if (convertBytesToMegaBytes(event.target.files[0].size) > 5) {
+            setErrorPhoto(`Votre photo: ${event.target.files[0].name} est volumineuse, veuilleez choisir des photos qui ne dépassent pas 5MO`)
+        } else {
+            setPhotos(prevPhotos => [...prevPhotos, ...event.target.files])
+            setErrorPhoto('')
+        }
+    }
 
     return (
         <Grid container spacing={2} justifyContent="center">
@@ -279,7 +290,7 @@ const CreateCar = ({companieId}) => {
                         margin="normal"
                         required
                     />
-                    <h3>Ajouter des images</h3>
+                    <h3>Ajouter des images(Taille maximle 5MO)</h3>
                     <Button
                         variant="contained"
                         component="label"
@@ -287,12 +298,19 @@ const CreateCar = ({companieId}) => {
                         Upload File
                         <input
                             type="file"
-                            onChange={event => setPhotos(prevPhotos => [...prevPhotos, ...event.target.files])}
+                            onChange={() => handlePhoto(event) }
                             multiple
                             hidden
                             required
                         />
                     </Button>
+                    {
+                        errorPhoto.length ? (
+                            <Box mt={2} textAlign="center">
+                                <p style={{color: 'red'}}>{errorPhoto}</p>
+                            </Box>
+                        ) : null
+                    }
                     <div className="flex space-x-4 mt-4">
                         {photos.map((photo, index) => (
                             <div key={`photo-container-${index}`} className="border-2">
