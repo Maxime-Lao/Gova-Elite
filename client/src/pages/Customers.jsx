@@ -18,7 +18,6 @@ import {
     TextField,
     Box
 } from "@mui/material";
-import axios from "axios";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 
@@ -43,18 +42,28 @@ export default function Customers() {
     useEffect(() => {
         const getUsers = async () => {
             try {
-                const response = await axios.get('http://localhost:8000/api/users', {
+                const response = await fetch('http://localhost:8000/api/users', {
+                    method: 'GET',
                     headers: {
+                        'Content-Type': 'application/json',
                         Authorization: `Bearer ${token}`
                     }
                 });
-                setUsers(response.data.filter(user => user.email !== emailLoggedUser));
+
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP! Statut: ${response.status}`);
+                }
+
+                const data = await response.json();
+                setUsers(data.filter(user => user.email !== emailLoggedUser));
             } catch (error) {
                 console.error(error);
             }
-        }
+        };
+
         getUsers();
-    }, [token]);
+    }, [token, emailLoggedUser]);
+
 
     const handleDelete = (user) => {
         setSelectedUser(user);
@@ -73,18 +82,24 @@ export default function Customers() {
 
     const handleConfirmDelete = async () => {
         try {
-            await axios.delete(`http://localhost:8000/api/users/${selectedUser.id}`, {
+            const response = await fetch(`http://localhost:8000/api/users/${selectedUser.id}`, {
+                method: 'DELETE',
                 headers: {
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 }
             });
+
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP! Statut: ${response.status}`);
+            }
+
             const updatedUsers = users.filter(user => user.id !== selectedUser.id);
             setUsers(updatedUsers);
             setOpenDeleteDialog(false);
             setSuccess('Utilisateur supprimé avec succès !');
         } catch (error) {
-            setError(error.response.data['hydra:description'])
-            console.error('erreur delete user' ,error);
+            setError('Une erreur s\'est produite lors de la suppression de l\'utilisateur.');
         }
     };
 
@@ -95,19 +110,24 @@ export default function Customers() {
 
     const handleUpdate = async () => {
         try {
-            await axios.patch(`http://localhost:8000/api/users/${selectedUser.id}`, {
-                email: email,
-                firstname: firstname,
-                lastname: lastname,
-                //roles: role === 'professionnel' ? ['ROLE_PRO'] : ['ROLE_USER'],
-                phone: phone,
-            }, {
+            const response = await fetch(`http://localhost:8000/api/users/${selectedUser.id}`, {
+                method: 'PATCH',
                 headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/merge-patch+json' // Spécifie le bon type de contenu pour PATCH
+                    'Content-Type': 'application/merge-patch+json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    email: email,
+                    firstname: firstname,
+                    lastname: lastname,
+                    phone: phone,
+                }),
+            });
 
-                }
-            })
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP! Statut: ${response.status}`);
+            }
+
             const updatedUsers = users.map(user => {
                 if (user.id === selectedUser.id) {
                     return {
@@ -115,18 +135,17 @@ export default function Customers() {
                         email: email,
                         firstname: firstname,
                         lastname: lastname,
-                        //roles: role === 'professionnel' ? ['ROLE_PRO'] : ['ROLE_USER'],
                         phone: phone,
                     };
                 }
                 return user;
             });
+
             setUsers(updatedUsers);
             setOpenEditDialog(false);
             setSuccess('Utilisateur modifié avec succès !');
         } catch (error) {
-            console.log('Erreur update user' ,error)
-            setError(error.response.data['hydra:description'])
+            setError('Une erreur s\'est produite lors de la mise à jour de l\'utilisateur.');
         }
     };
 

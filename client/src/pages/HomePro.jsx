@@ -5,11 +5,10 @@ import CompanieDetails from "../components/pro/CompanieDetails.jsx";
 import CreateCar from "../components/pro/CreateCar.jsx";
 
 const HomePro = ({user}) => {
-
-    console.log(user.connectedUser)
-
     if (!user.connectedUser.companie) {
-        return null;
+        return (
+            <h1>Veuillez patienter que votre compagnie soit validée pour pouvoir accéder à votre espace prestataire</h1>
+        );
     }
 
     const tabsData = [

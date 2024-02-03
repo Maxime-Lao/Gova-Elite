@@ -37,11 +37,11 @@ const Register = () => {
                 roles: role === 'professionnel' ? ['ROLE_PRO'] : ['ROLE_USER'],
                 phone: phone,
                 password: password,
+                isVerified: false
             },
             false
         ).then(response => navigate("/login"))
             .catch(error => {
-                console.error("Erreur lors de l'inscription:", error);
                 setError(error.response.data['hydra:description']);
                 //setError(error.response.data.message);
             });
