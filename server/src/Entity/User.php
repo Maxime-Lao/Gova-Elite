@@ -54,7 +54,7 @@ use Doctrine\Common\Collections\Collection;
     ],
     normalizationContext: [
         'groups' => ['user:read'],
-        'enable_max_depth' => true, // Activer la profondeur maximale de sérialisation
+        'enable_max_depth' => true,
     ],    denormalizationContext: ['groups' => ['user:create', 'user:update']],
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -100,10 +100,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $plainPassword = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['user:create', 'user:update','user:read'])]
-    private ?\DateTimeImmutable $createdAt = null;
-
-    #[ORM\Column(nullable: true)]
     #[Groups(['user:read', 'user:create'])]
     private ?bool $isVerified = null;
 
@@ -147,6 +143,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Notice::class, orphanRemoval: true)]
     #[Groups('user:read')]
     private Collection $notices;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['user:create', 'user:update','user:read'])]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['user:create', 'user:update','user:read'])]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     public function getPhone(): ?string
     {
@@ -194,18 +198,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->plainPassword = $plainPassword;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(?\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = new \DateTimeImmutable();;
-
-        return $this;
-    }
-
     public function getId(): ?int
     {
         return $this->id;
@@ -218,7 +210,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setEmail(string $email): static
     {
-        $this->email = $email;
+        $this->email = strtolower($email);
 
         return $this;
     }
@@ -424,6 +416,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastname(?string $lastname): static
     {
         $this->lastname = $lastname;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }

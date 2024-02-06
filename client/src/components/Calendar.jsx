@@ -156,7 +156,6 @@ function Calendar({ carId }) {
               dateFormat="MMMM d, yyyy h:mm aa"
               placeholderText="Date et heure de début"
               excludeDates={excludeDates}
-              //filterTime={filterRentedTimes} 
             />
           </Grid>
           <Grid item xs={12}>
@@ -171,7 +170,6 @@ function Calendar({ carId }) {
               dateFormat="MMMM d, yyyy h:mm aa"
               placeholderText="Date et heure de fin"
               excludeDates={excludeDates}
-              //filterTime={filterRentedTimes}
             />
           </Grid>
           <Grid item xs={12}>

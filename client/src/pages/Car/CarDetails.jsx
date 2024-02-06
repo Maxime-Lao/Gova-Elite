@@ -92,7 +92,7 @@ function CarDetails() {
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <Typography variant="h4" component="h2">
-                <strong>{car.model.name}</strong>
+                <strong>{car.model.brand.name} - {car.model.name}</strong>
                 <Typography component={'span'} variant={'body1'} gutterBottom>
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <Rating name="half-rating-read" value={calculateAverageRating()} precision={0.5} readOnly />
@@ -222,44 +222,46 @@ function CarDetails() {
             <Typography variant="h6" gutterBottom>
               Commentaires:
             </Typography>
-            <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-              {
-                comments ? comments.map(comment => (
-                      <ListItem alignItems="flex-start" key={comment.id}>
-                        <ListItemAvatar>
-                          <Avatar alt="Remy Sharp" src="https://images.unsplash.com/photo-1520283818086-3f6dffb019c0?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
-                        </ListItemAvatar>
-                        <ListItemText
-                            primary={
-                              <Grid container alignItems="center">
-                                <Grid item sx={{ marginLeft: '8px' }}>
-                                  {`${comment.author.firstname} ${comment.author.lastname}`}
-                                </Grid>
-                                <Grid item sx={{ marginLeft: '12px' }}>
-                                  <Stack spacing={1}>
-                                    <Rating name="half-rating-read" defaultValue={comment.globalRating} precision={0.5} readOnly />
-                                  </Stack>
-                                </Grid>
-                              </Grid>
-                            }
-                            secondary={
-                              <React.Fragment>
-                                <Typography
-                                    sx={{ display: 'inline' }}
-                                    component="span"
-                                    variant="body2"
-                                    color="text.primary"
-                                >
-                                  {format(new Date(comment.createdAt), "d MMM yyyy", { locale: fr })}
-                                </Typography>
-                                {" — " + comment.comment}
-                              </React.Fragment>
-                            }
-                        />
-                      </ListItem>
-                  )) : <p>Aucun commentaire disponible</p>
-              }
-            </List>
+            {comments.length === 0 ? (
+              <Typography variant="subtitle1">Pas de commentaire pour l'instant</Typography>
+            ) : (
+              <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+                {comments.map(comment => (
+                  <ListItem alignItems="flex-start" key={comment.id}>
+                    <ListItemAvatar>
+                      <Avatar alt="Remy Sharp" src="https://images.unsplash.com/photo-1520283818086-3f6dffb019c0?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={
+                        <Grid container alignItems="center">
+                          <Grid item sx={{ marginLeft: '8px' }}>
+                            {`${comment.author.firstname} ${comment.author.lastname}`}
+                          </Grid>
+                          <Grid item sx={{ marginLeft: '12px' }}>
+                            <Stack spacing={1}>
+                              <Rating name="half-rating-read" defaultValue={comment.globalRating} precision={0.5} readOnly />
+                            </Stack>
+                          </Grid>
+                        </Grid>
+                      }
+                      secondary={
+                        <React.Fragment>
+                          <Typography
+                            sx={{ display: 'inline' }}
+                            component="span"
+                            variant="body2"
+                            color="text.primary"
+                          >
+                            {format(new Date(comment.createdAt), "d MMM yyyy", { locale: fr })}
+                          </Typography>
+                          {" — " + comment.comment}
+                        </React.Fragment>
+                      }
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            )}
           </CardContent>
         </Grid>
       </Grid>

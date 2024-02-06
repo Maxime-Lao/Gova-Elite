@@ -94,6 +94,7 @@ const Register = () => {
                         onChange={(e) => setEmail(e.target.value)}
                         fullWidth
                         margin="normal"
+                        autoComplete="email"
                         required
                     />
                     <TextField
@@ -103,6 +104,7 @@ const Register = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         fullWidth
                         margin="normal"
+                        autoComplete="new-password"
                         required
                     />
                     <TextField

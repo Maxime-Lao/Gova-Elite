@@ -14,7 +14,7 @@ const CardInfo = ({ title, nbInfo }) => {
     const classes = useStyles();
 
     return (
-        <Card className={classes.card} variant="outlined">
+        <Card className={classes.card}>
             <CardContent>
                 <Typography variant="h6" component="div">
                     {title}

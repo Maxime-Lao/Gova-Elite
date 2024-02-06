@@ -20,6 +20,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import Rating from '@mui/material/Rating';
+import { useNavigate } from "react-router-dom";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -39,6 +40,7 @@ function PastBookings({ rent, user, onPastBookingChange }) {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState(null);
   const isButtonDisabled = rent.disable === 'yes';
+  const navigate = useNavigate();
 
   const [comment, setComment] = React.useState({
     cleanliness: 0,
@@ -187,6 +189,10 @@ function PastBookings({ rent, user, onPastBookingChange }) {
     }
   };
 
+  const handleRedirectCarsPage = async (id) => {
+    navigate(`/cars/${id}`);
+  };
+
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardHeader
@@ -235,7 +241,7 @@ function PastBookings({ rent, user, onPastBookingChange }) {
           </Typography>
         </CardContent>
       </Collapse>
-      <CardActions disableSpacing>
+      <CardActions>
         <Button onClick={handleOpenDialog} sx={{
             color: 'white',
             backgroundColor: '#00aaff',
@@ -244,7 +250,12 @@ function PastBookings({ rent, user, onPastBookingChange }) {
             },
           }}
           disabled={isButtonDisabled}>Noter</Button>
-        <Dialog open={openDialog} onClose={handleCloseDialog}>
+            <Button variant="contained" color="success" onClick={() => handleRedirectCarsPage (rent.car.id)}>
+              Reprendre RDV
+            </Button>
+      </CardActions>
+
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
           <DialogContent>
             <Typography component="h2" variant="h6" fontWeight="bold">Note de la voiture :</Typography>
             <Typography>Propreté :</Typography>
@@ -308,7 +319,6 @@ function PastBookings({ rent, user, onPastBookingChange }) {
             <Button onClick={handleSubmitComment} variant="contained" color="success">Valider</Button>
           </DialogActions>
         </Dialog>
-      </CardActions>
     </Card>
   );
 }
