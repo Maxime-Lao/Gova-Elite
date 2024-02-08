@@ -1,8 +1,12 @@
 import React, {useEffect, useState} from "react";
-import {Box, Button, FormControl, Grid, InputLabel, MenuItem, Select, TextField} from "@mui/material";
+import {Box, Button, FormControl, Grid, IconButton, InputLabel, MenuItem, Select, TextField} from "@mui/material";
 import axios from "axios";
+import DeleteIcon from "@mui/icons-material/Delete.js";
+import useGetConnectedUser from "../hooks/useGetConnectedUser.jsx";
+import {convertBytesToMegaBytes} from "../../FileSizeHelper.jsx";
 
 const CreateCar = ({companieId}) => {
+    const [photos, setPhotos] = useState([]);
     const [gear, setGear] = useState();
     const [brand, setBrand] = useState();
     const [selectedBrandId, setSelectedBrandId] = useState();
@@ -24,8 +28,10 @@ const CreateCar = ({companieId}) => {
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
     const [description, setDescription] = useState();
+    const [errorPhoto, setErrorPhoto] = useState('')
 
     const token = localStorage.getItem('token');
+    const user = useGetConnectedUser();
 
     useEffect(() => {
         fetch(`http://localhost:8000/api/gears`)
@@ -70,17 +76,37 @@ const CreateCar = ({companieId}) => {
         createdAt: new Date().toISOString(),
     }
 
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`http://localhost:8000/api/cars`, carData, {
+            const carResponse = await axios.post(`http://localhost:8000/api/cars`, carData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
-            console.log('Voiture créée avec succès', response.data);
+
+            console.log('Car created:', carResponse.data);
+
+            const carId = carResponse.data.id;
+            console.log(carId)
+
+            for (const photo of photos) {
+                const formData = new FormData();
+                formData.append('file', photo);
+                formData.append('car_id', carId);
+                formData.append('user_id', user.connectedUser.id);
+
+                const mediaResponse = await axios.post('http://localhost:8000/api/media_objects', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+
+                console.log('Media object created:', mediaResponse.data);
+            }
+
+            console.log('Voiture créée avec succès', carResponse.data);
             setSuccess('Voiture créée avec succès');
             setError('');
         } catch (error) {
@@ -96,6 +122,20 @@ const CreateCar = ({companieId}) => {
 
     const handleBrandChange = (e) => {
         setSelectedBrandId(e.target.value)
+    }
+
+    const deletePhoto = (index) => {
+        const updatedPhotos = [...photos.slice(0, index), ...photos.slice(index + 1)];
+        setPhotos(updatedPhotos);
+    };
+
+    const handlePhoto = (event) => {
+        if (convertBytesToMegaBytes(event.target.files[0].size) > 5) {
+            setErrorPhoto(`Votre photo: ${event.target.files[0].name} est volumineuse, veuilleez choisir des photos qui ne dépassent pas 5MO`)
+        } else {
+            setPhotos(prevPhotos => [...prevPhotos, ...event.target.files])
+            setErrorPhoto('')
+        }
     }
 
     return (
@@ -174,7 +214,7 @@ const CreateCar = ({companieId}) => {
                             onChange={(e) => setGear(e.target.value)}
                             required
                         >
-                            { myGears && myGears.map((gear) => (
+                            {myGears && myGears.map((gear) => (
                                 <MenuItem key={'gear-' + gear.id} value={gear.id}>
                                     {gear.name}
                                 </MenuItem>
@@ -189,7 +229,7 @@ const CreateCar = ({companieId}) => {
                             onChange={handleBrandChange}
                             required
                         >
-                            { myBrands && myBrands.map((brand) => (
+                            {myBrands && myBrands.map((brand) => (
                                 <MenuItem key={'brand-' + brand.id} value={brand.id}>
                                     {brand.name}
                                 </MenuItem>
@@ -204,7 +244,7 @@ const CreateCar = ({companieId}) => {
                             onChange={(e) => setModel(e.target.value)}
                             required
                         >
-                            { (selectedBrandId && myModels) && myModels.map((model) => (
+                            {(selectedBrandId && myModels) && myModels.map((model) => (
                                 <MenuItem key={'model-' + model.id} value={model.id}>
                                     {model.name}
                                 </MenuItem>
@@ -219,7 +259,7 @@ const CreateCar = ({companieId}) => {
                             onChange={(e) => setEnergy(e.target.value)}
                             required
                         >
-                            { myEnergies && myEnergies.map((energy) => (
+                            {myEnergies && myEnergies.map((energy) => (
                                 <MenuItem key={'energy-' + energy.id} value={energy.id}>
                                     {energy.name}
                                 </MenuItem>
@@ -234,7 +274,7 @@ const CreateCar = ({companieId}) => {
                             onChange={(e) => setCategory(e.target.value)}
                             required
                         >
-                            { myCategories && myCategories.map((category) => (
+                            {myCategories && myCategories.map((category) => (
                                 <MenuItem key={'category-' + category.id} value={category.id}>
                                     {category.libelle}
                                 </MenuItem>
@@ -250,6 +290,44 @@ const CreateCar = ({companieId}) => {
                         margin="normal"
                         required
                     />
+                    <h3>Ajouter des images(Taille maximle 5MO)</h3>
+                    <Button
+                        variant="contained"
+                        component="label"
+                    >
+                        Upload File
+                        <input
+                            type="file"
+                            onChange={() => handlePhoto(event) }
+                            multiple
+                            hidden
+                            required
+                        />
+                    </Button>
+                    {
+                        errorPhoto.length ? (
+                            <Box mt={2} textAlign="center">
+                                <p style={{color: 'red'}}>{errorPhoto}</p>
+                            </Box>
+                        ) : null
+                    }
+                    <div className="flex space-x-4 mt-4">
+                        {photos.map((photo, index) => (
+                            <div key={`photo-container-${index}`} className="border-2">
+                                <img
+                                    key={`uploaded-photo-${index}`}
+                                    src={URL.createObjectURL(photo)}
+                                    alt={`Uploaded Photo ${index + 1}`}
+                                    className="max-h-28 max-w-28"
+                                />
+                                <div className="flex justify-end">
+                                    <IconButton aria-label="Supprimer" onClick={() => deletePhoto(index)}>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                     <Button
                         type="submit"
                         variant="contained"

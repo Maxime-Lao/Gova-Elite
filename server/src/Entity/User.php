@@ -34,7 +34,7 @@ use Doctrine\Common\Collections\Collection;
             validationContext: ['groups' => ['Default', 'user:create']]
         ),
         new Get(
-            security: "is_granted('ROLE_ADMIN')",
+            //security: "is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['user:read']],
         ),
         new Put(
@@ -54,7 +54,7 @@ use Doctrine\Common\Collections\Collection;
     ],
     normalizationContext: [
         'groups' => ['user:read'],
-        'enable_max_depth' => true, // Activer la profondeur maximale de sérialisation
+        'enable_max_depth' => true,
     ],    denormalizationContext: ['groups' => ['user:create', 'user:update']],
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -100,21 +100,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $plainPassword = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['user:create', 'user:update','user:read'])]
-    private ?\DateTimeImmutable $createdAt = null;
-
-    #[ORM\Column(nullable: true)]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'user:create'])]
     private ?bool $isVerified = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Le prénom ne peut pas être vide')]
-    #[Groups(['user:read', 'user:create', 'user:update'])]
+    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Le nom ne peut pas être vide')]
-    #[Groups(['user:read', 'user:create', 'user:update'])]
+    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read'])]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -137,16 +133,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $rents;
 
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Comment::class, orphanRemoval: true)]
-    #[Groups('user:read', 'comment:read')]
+    #[Groups('user:read', 'comments_car:read')]
     private Collection $comments;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Media::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: MediaObject::class, orphanRemoval: true)]
     #[Groups('user:read')]
     private Collection $media;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Notice::class, orphanRemoval: true)]
     #[Groups('user:read')]
     private Collection $notices;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['user:create', 'user:update','user:read'])]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['user:create', 'user:update','user:read'])]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     public function getPhone(): ?string
     {
@@ -194,18 +198,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->plainPassword = $plainPassword;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(?\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = new \DateTimeImmutable();;
-
-        return $this;
-    }
-
     public function getId(): ?int
     {
         return $this->id;
@@ -218,7 +210,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setEmail(string $email): static
     {
-        $this->email = $email;
+        $this->email = strtolower($email);
 
         return $this;
     }
@@ -334,7 +326,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
 /**
-     * @return Collection<int, Media[]>
+     * @return Collection<int, MediaObject[]>
      */
     public function getMedia(): Collection
     {
@@ -381,7 +373,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function addMedia(Media $media): static
+    public function addMedia(MediaObject $media): static
     {
         if (!$this->media->contains($media)) {
             $this->media->add($media);
@@ -391,7 +383,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function removeMedia(Media $media): static
+    public function removeMedia(MediaObject $media): static
     {
         if ($this->media->removeElement($media)) {
             if ($media->getUser() === $this) {
@@ -428,6 +420,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
     public function getUpdatedAt(): ?\DateTimeImmutable
     {
         return $this->updatedAt;
@@ -452,7 +456,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
     
-    public function setMedia(?Media $media): self {
+    public function setMedia(?MediaObject $media): self {
         if ($media === null && $this->media !== null) {
             $this->media->setUser(null);
         }

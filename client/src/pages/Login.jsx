@@ -7,23 +7,29 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
+    const [error, setError] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        sendRequest(
-            '/auth',
-            'post',
-            {
-                email: email,
-                password: password,
-            },
-            false
-        ).then((response) => {
+        try {
+            const response = await sendRequest(
+                '/auth',
+                'post',
+                {
+                    email: email,
+                    password: password,
+                },
+                false
+            );
+
             localStorage.setItem('token', response.token);
             localStorage.setItem('refresh_token', response.refresh_token);
             localStorage.setItem('email', email);
             navigate('/');
-        });
+        } catch (error) {
+            // En cas d'erreur, mettez le message d'erreur dans l'état 'error'
+            setError(error.response.data.message);
+        }
     };
 
     return (
@@ -39,6 +45,13 @@ export default function Login() {
                 <Box mt={2} textAlign="center">
                     <h2>Connectez-vous !</h2>
                 </Box>
+                {
+                    error.length ? (
+                        <Box mt={2} textAlign="center">
+                            <p style={{color: 'red'}}>{error}</p>
+                        </Box>
+                    ) : null
+                }
                 <form onSubmit={handleSubmit}>
                     <TextField
                         label="Email"

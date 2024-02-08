@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {createTheme, styled, ThemeProvider} from '@mui/material/styles';
+import {createTheme, styled, ThemeProvider, useTheme} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
@@ -10,16 +10,16 @@ import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Badge from '@mui/material/Badge';
-import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import {MainListItems, secondaryListItems} from '../components/dashboard/listItems.jsx';
+import {MainListItems, secondaryListItems} from '../components/dashboard/ListItems.jsx';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
 import CardInfo from "../components/dashboard/CardInfo.jsx";
 import {Grid} from "@mui/material";
+import { useMediaQuery } from '@mui/material';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -79,10 +79,41 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     },
 }));
 
-const defaultTheme = createTheme();
+const defaultTheme = createTheme({
+    palette: {
+      primary: {
+        main: '#556cd6',
+      },
+      secondary: {
+        main: '#19857b',
+      },
+    },
+    typography: {
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      h2: {
+        fontSize: '2.4rem',
+        fontWeight: 500,
+      },
+      body1: {
+        fontSize: '1rem',
+      },
+    },
+    components: {
+      MuiAppBar: {
+        styleOverrides: {
+          root: {
+ 
+          },
+        },
+      },
+    },
+  });
 
 export default function Dashboard() {
-    const [open, setOpen] = useState(true);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [open, setOpen] = useState(!isMobile);
+
     const toggleDrawer = () => {
         setOpen(!open);
     };
@@ -108,6 +139,10 @@ export default function Dashboard() {
             },
         ],
     };
+
+    useEffect(() => {
+        setOpen(!isMobile);
+    }, [isMobile]);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -199,28 +234,42 @@ export default function Dashboard() {
                     }}
                 >
                     <Toolbar />
-                    <Container>
-                        <Typography variant="h2" gutterBottom>
+                    <Box
+                        sx={{
+                            mt: 4,
+                            mb: 4,
+                            flexGrow: 1,
+                            paddingX: 5,
+                        }}
+                    >
+                        <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
                             Statistiques sur les utilisateurs
                         </Typography>
-                        <Grid container spacing={4} className="ml">
-                            <CardInfo title="Nombre d'utilisateurs" nbInfo={users.length} />
-                            <CardInfo
-                                title="Nombre d'admins"
-                                nbInfo={users.filter(user => user.roles.includes('ROLE_ADMIN')).length}
-                            />
-                            <CardInfo
-                                title="Nombre de prestataires"
-                                nbInfo={users.filter(user => user.roles.includes('ROLE_PRO')).length}
-                            />
+                        <Grid container spacing={3} justifyContent="center">
+                            <Grid item xs={12} md={4} lg={4}>
+                                <CardInfo title="Nombre d'utilisateurs" nbInfo={users.length} />
+                            </Grid>
+                            <Grid item xs={12} md={4} lg={4}>
+                                <CardInfo title="Nombre d'admins" nbInfo={users.filter(user => user.roles.includes('ROLE_ADMIN')).length} />
+                            </Grid>
+                            <Grid item xs={12} md={4} lg={4}>
+                                <CardInfo title="Nombre de prestataires" nbInfo={users.filter(user => user.roles.includes('ROLE_PRO')).length} />
+                            </Grid>
                         </Grid>
-                        <div>
-                            <Typography variant="h2" gutterBottom>
-                                Graphique sur les utilisateurs
-                            </Typography>
-                            <Pie data={data} />
-                        </div>
-                    </Container>
+
+                        <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
+                            Graphique sur les utilisateurs
+                        </Typography>
+                        <Grid container spacing={3} justifyContent="center">
+                            <Grid item xs={12} md={6}>
+                                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                    <div style={{ height: '400px', width: '100%', maxWidth: '600px' }}>
+                                    <Pie data={data} options={{ maintainAspectRatio: true }} />
+                                    </div>
+                                </div>
+                            </Grid>
+                        </Grid>
+                    </Box>
                 </Box>
             </Box>
         </ThemeProvider>

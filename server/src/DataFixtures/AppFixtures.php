@@ -153,17 +153,6 @@ class AppFixtures extends Fixture
             $manager->persist($notice);
         }
 
-        for ($i = 0; $i < 10; $i++) {
-            $rent = new Rent();
-            $rent->setDateStart(\DateTimeImmutable::createFromMutable($faker->dateTime()));
-            $rent->setDateEnd(\DateTimeImmutable::createFromMutable($faker->dateTime()));
-            $rent->setTotalPrice($faker->numberBetween(100, 1000));
-            $rent->setCar($faker->randomElement($cars));
-            $rent->setUser($faker->randomElement($users));
-            $rent->setCreatedAt(\DateTimeImmutable::createFromMutable($faker->dateTime()));
-            $manager->persist($rent);
-        }
-
         $manager->flush();
     }
 }

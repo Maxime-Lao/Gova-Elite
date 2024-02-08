@@ -14,16 +14,19 @@ const CarList = ({ cars }) => {
     };
 
     return (
-        { cars } ? (
-            <div style={containerStyle}>
-                {cars.map((car) => (
-                    <div key={car.id} style={itemStyle}>
-                        <CarItem car={car}/>
-                    </div>
-                ))}
-            </div>) : <h2>
-            Vous n'avez pas encore de voiture enregistrée
-        </h2>
+        <div>
+            {cars.length ? (
+                <div style={containerStyle}>
+                    {cars.map((car) => (
+                        <div key={car.id} style={itemStyle}>
+                            <CarItem car={car} />
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <h2>Vous n'avez pas encore de voiture enregistrée</h2>
+            )}
+        </div>
     );
 };
 

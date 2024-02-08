@@ -20,6 +20,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import Rating from '@mui/material/Rating';
+import { useNavigate } from "react-router-dom";
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -32,11 +33,15 @@ const ExpandMore = styled((props) => {
   }),
 }));
 
-function PastBookings({ rent }) {
+function PastBookings({ rent, user, onPastBookingChange }) {
   const [expanded, setExpanded] = React.useState(false);
   const formattedStartDate = format(new Date(rent.dateStart), "dd/MM/yyyy HH'h'", { locale: fr });
   const formattedEndDate = format(new Date(rent.dateEnd), "dd/MM/yyyy HH'h'", { locale: fr });
   const [openDialog, setOpenDialog] = React.useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState(null);
+  const isButtonDisabled = rent.disable === 'yes';
+  const navigate = useNavigate();
+
   const [comment, setComment] = React.useState({
     cleanliness: 0,
     maintenance: 0,
@@ -45,9 +50,10 @@ function PastBookings({ rent }) {
     accuracy: 0,
     globalRating: 0,
     comment: '',
+    rent: `/api/rents/${rent.id}`,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    author: '/api/users/1',
+    author: `/api/users/${user}`,
     car: `/api/cars/${rent.car.id}`,
   });
 
@@ -96,9 +102,26 @@ function PastBookings({ rent }) {
     setOpenDialog(false);
   };
 
+  const areAllFieldsFilled = () => {
+    const requiredFields = ['cleanliness', 'maintenance', 'communication', 'convenience', 'accuracy', 'comment'];
+  
+    for (const field of requiredFields) {
+      if (!comment[field]) {
+        updateErrorMessages(field, 'Veuillez remplir tous les champs.');
+        return false;
+      }
+    }
+  
+    return true;
+  };
+
   const handleSubmitComment = async () => {
     try {
       resetErrorMessages();
+
+      if (!areAllFieldsFilled()) {
+        return;
+      }
       
       const {
         cleanliness,
@@ -107,6 +130,7 @@ function PastBookings({ rent }) {
         convenience,
         accuracy,
         comment: commentText,
+        rent,
         createdAt,
         updatedAt,
         author,
@@ -117,6 +141,9 @@ function PastBookings({ rent }) {
         cleanliness + maintenance + communication + convenience + accuracy;
       const average = total / 5;
       const globalRating = parseFloat(average.toFixed(1));
+
+      const timezoneOffset = new Date().getTimezoneOffset() * 60000;
+      const currentDate = new Date(new Date().getTime() - timezoneOffset);
   
       const commentData = {
         cleanliness,
@@ -126,8 +153,9 @@ function PastBookings({ rent }) {
         accuracy,
         globalRating,
         comment: commentText,
-        createdAt,
-        updatedAt,
+        rent,
+        createdAt: currentDate.toISOString(),
+        updatedAt: currentDate.toISOString(),
         author,
         car,
       };
@@ -135,13 +163,15 @@ function PastBookings({ rent }) {
       const response = await fetch('http://localhost:8000/api/comments', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/ld+json',
+          'Content-Type': 'application/json+ld',
         },
         body: JSON.stringify(commentData),
       });
 
       if (response.ok) {
-        console.log('Feedback réussie !');
+        onPastBookingChange();
+        setFeedbackMessage('Votre commentaire a été pris en compte.');
+        setOpenDialog(false);
       } else {
         const errorData = await response.json();
         if (errorData.detail) {
@@ -157,6 +187,10 @@ function PastBookings({ rent }) {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleRedirectCarsPage = async (id) => {
+    navigate(`/cars/${id}`);
   };
 
   return (
@@ -207,15 +241,21 @@ function PastBookings({ rent }) {
           </Typography>
         </CardContent>
       </Collapse>
-      <CardActions disableSpacing>
+      <CardActions>
         <Button onClick={handleOpenDialog} sx={{
             color: 'white',
             backgroundColor: '#00aaff',
             '&:hover': {
               backgroundColor: '#4bc3ff',
             },
-          }}>Noter</Button>
-        <Dialog open={openDialog} onClose={handleCloseDialog}>
+          }}
+          disabled={isButtonDisabled}>Noter</Button>
+            <Button variant="contained" color="success" onClick={() => handleRedirectCarsPage (rent.car.id)}>
+              Reprendre RDV
+            </Button>
+      </CardActions>
+
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
           <DialogContent>
             <Typography component="h2" variant="h6" fontWeight="bold">Note de la voiture :</Typography>
             <Typography>Propreté :</Typography>
@@ -262,18 +302,23 @@ function PastBookings({ rent }) {
               cols={40}
               placeholder="Ajouter un commentaire..."
             />
-          </DialogContent>
+
           {Object.keys(errorMessages).map((fieldName) => (
             <Typography key={fieldName} color="error">
               {errorMessages[fieldName]}
             </Typography>
           ))}
+          {feedbackMessage && (
+            <Typography color="success">
+              {feedbackMessage}
+            </Typography>
+          )}
+          </DialogContent>
           <DialogActions>
             <Button onClick={handleCloseDialog} variant="contained" color="error">Annuler</Button>
             <Button onClick={handleSubmitComment} variant="contained" color="success">Valider</Button>
           </DialogActions>
         </Dialog>
-      </CardActions>
     </Card>
   );
 }

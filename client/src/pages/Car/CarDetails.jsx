@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from "../../components/navbar/Navbar.jsx";
 import Calendar from "../../components/Calendar";
 import { Grid, Typography, List, ListItem, ListItemText, ListItemIcon, TextField, Card, CardMedia, CardContent } from '@mui/material';
 import { CarRental, DirectionsCar } from '@mui/icons-material';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import format from 'date-fns/format';
@@ -16,25 +15,47 @@ import Stack from '@mui/material/Stack';
 
 function CarDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [car, setCar] = useState(null);
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:8000/api/cars/${id}/comments`) // Requête pour récupérer les commentaires de la voiture
-      .then(response => response.json())
-      .then(data => setComments(data['hydra:member'])) // Stocker les commentaires dans le state
-      .catch(error => console.error(error));
+    fetch(`http://localhost:8000/api/cars/${id}/comments`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`An error occurred: ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (Array.isArray(data)) {
+          setComments(data);
+        } else {
+          console.error('Unexpected response structure for comments:', data);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching comments:', error);
+      });
   }, [id]);
 
   useEffect(() => {
-    fetch(`http://localhost:8000/api/cars/${id}`) // Requête pour récupérer les détails de la voiture
-      .then(response => response.json())
+    fetch(`http://localhost:8000/api/cars/${id}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Car not found');
+        }
+        return response.json();
+      })
       .then(data => setCar(data))
-      .catch(error => console.error(error));
-  }, [id]);
+      .catch(error => {
+        console.error(error);
+        navigate('/not-found');
+      });
+  }, [id, navigate]);
 
   const calculateAverageRating = () => {
-    if (comments.length === 0) {
+    if (!comments) {
       return 0;
     }
 
@@ -71,12 +92,12 @@ function CarDetails() {
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <Typography variant="h4" component="h2">
-                <strong>{car.model.name}</strong>
+                <strong>{car.model.brand.name} - {car.model.name}</strong>
                 <Typography component={'span'} variant={'body1'} gutterBottom>
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <Rating name="half-rating-read" value={calculateAverageRating()} precision={0.5} readOnly />
                     <Typography variant="body1">
-                      ({comments.length} avis)
+                      ({comments ? comments.length : 0} avis)
                     </Typography>
                   </Stack>
                 </Typography>
@@ -201,42 +222,46 @@ function CarDetails() {
             <Typography variant="h6" gutterBottom>
               Commentaires:
             </Typography>
-            <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-              {comments.map(comment => (
-                <ListItem alignItems="flex-start" key={comment.id}>
-                  <ListItemAvatar>
-                    <Avatar alt="Remy Sharp" src="https://images.unsplash.com/photo-1520283818086-3f6dffb019c0?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
-                  </ListItemAvatar>
-                  <ListItemText
-                    primary={
-                      <Grid container alignItems="center">
-                        <Grid item sx={{ marginLeft: '8px' }}>
-                          {`${comment.author.firstname} ${comment.author.lastname}`}
+            {comments.length === 0 ? (
+              <Typography variant="subtitle1">Pas de commentaire pour l'instant</Typography>
+            ) : (
+              <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+                {comments.map(comment => (
+                  <ListItem alignItems="flex-start" key={comment.id}>
+                    <ListItemAvatar>
+                      <Avatar alt="Remy Sharp" src="https://images.unsplash.com/photo-1520283818086-3f6dffb019c0?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={
+                        <Grid container alignItems="center">
+                          <Grid item sx={{ marginLeft: '8px' }}>
+                            {`${comment.author.firstname} ${comment.author.lastname}`}
+                          </Grid>
+                          <Grid item sx={{ marginLeft: '12px' }}>
+                            <Stack spacing={1}>
+                              <Rating name="half-rating-read" defaultValue={comment.globalRating} precision={0.5} readOnly />
+                            </Stack>
+                          </Grid>
                         </Grid>
-                        <Grid item sx={{ marginLeft: '12px' }}>
-                          <Stack spacing={1}>
-                            <Rating name="half-rating-read" defaultValue={comment.globalRating} precision={0.5} readOnly />
-                          </Stack>
-                        </Grid>
-                      </Grid>
-                    }
-                    secondary={
-                      <React.Fragment>
-                        <Typography
-                          sx={{ display: 'inline' }}
-                          component="span"
-                          variant="body2"
-                          color="text.primary"
-                        >
-                          {format(new Date(comment.createdAt), "d MMM yyyy", { locale: fr })}
-                        </Typography>
-                        {" — " + comment.comment}
-                      </React.Fragment>
-                    }
-                  />
-                </ListItem>
-              ))}
-            </List>
+                      }
+                      secondary={
+                        <React.Fragment>
+                          <Typography
+                            sx={{ display: 'inline' }}
+                            component="span"
+                            variant="body2"
+                            color="text.primary"
+                          >
+                            {format(new Date(comment.createdAt), "d MMM yyyy", { locale: fr })}
+                          </Typography>
+                          {" — " + comment.comment}
+                        </React.Fragment>
+                      }
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            )}
           </CardContent>
         </Grid>
       </Grid>

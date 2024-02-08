@@ -20,34 +20,51 @@ use Symfony\Component\Validator\Constraints as Assert;
     uriVariables: [
         'carId' => new Link(fromClass: Car::class, toProperty: 'car'),
     ],
-    operations: [new GetCollection()]
+    operations: [new GetCollection()],
+    normalizationContext: ['groups' => ['rents_car:read']],
+)]
+#[ApiResource(
+    uriTemplate: '/users/{userId}/rents',
+    uriVariables: [
+        'userId' => new Link(fromClass: User::class, toProperty: 'user'),
+    ],
+    operations: [new GetCollection()],
+    normalizationContext: ['groups' => ['rents_user:read']],
 )]
 class Rent
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['rents_car:read', 'rents_user:read', 'car:read', 'comments_user:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Assert\NotBlank(message: 'La date de début de la réservation ne peut pas être vide')]
-    #[Groups(['car:read'])]
+    #[Groups(['rents_car:read', 'rents_user:read', 'car:read'])]
     private ?\DateTimeImmutable $dateStart = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Assert\NotBlank(message: 'La date de fin de la réservation ne peut pas être vide')]
-    #[Groups(['car:read'])]
+    #[Groups(['rents_car:read', 'rents_user:read', 'car:read'])]
     private ?\DateTimeImmutable $dateEnd = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le prix total ne peut pas être vide')]
-    private ?int $totalPrice = null;
+    #[Groups(['rents_car:read', 'rents_user:read'])]
+    private ?float $totalPrice = null;
+
+    #[ORM\Column]
+    #[Groups(['rents_car:read', 'rents_user:read'])]
+    private ?string $paymentMethodId;
 
     #[ORM\ManyToOne(inversedBy: 'rents')]
+    #[Groups(['rents_car:read', 'rents_user:read'])]
     private ?Car $car = null;
 
     #[ORM\ManyToOne(inversedBy: 'rents')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['rents_car:read', 'rents_user:read'])]
     private ?User $user = null;
 
     #[ORM\Column]
@@ -93,6 +110,18 @@ class Rent
     public function setTotalPrice(int $totalPrice): static
     {
         $this->totalPrice = $totalPrice;
+
+        return $this;
+    }
+
+    public function getPaymentMethodId(): ?string
+    {
+        return $this->paymentMethodId;
+    }
+
+    public function setPaymentMethodId(string $paymentMethodId): static
+    {
+        $this->paymentMethodId = $paymentMethodId;
 
         return $this;
     }

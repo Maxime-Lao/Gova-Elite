@@ -37,11 +37,11 @@ const Register = () => {
                 roles: role === 'professionnel' ? ['ROLE_PRO'] : ['ROLE_USER'],
                 phone: phone,
                 password: password,
+                isVerified: false
             },
             false
         ).then(response => navigate("/login"))
             .catch(error => {
-                console.error("Erreur lors de l'inscription:", error);
                 setError(error.response.data['hydra:description']);
                 //setError(error.response.data.message);
             });
@@ -94,6 +94,7 @@ const Register = () => {
                         onChange={(e) => setEmail(e.target.value)}
                         fullWidth
                         margin="normal"
+                        autoComplete="email"
                         required
                     />
                     <TextField
@@ -103,6 +104,7 @@ const Register = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         fullWidth
                         margin="normal"
+                        autoComplete="new-password"
                         required
                     />
                     <TextField

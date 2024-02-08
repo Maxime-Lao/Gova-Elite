@@ -7,6 +7,7 @@ import logo from '../../assets/img/la-gova.png';
 import {useCallback, useState} from "react";
 import AvatarDialog from "./AvatarDialog.jsx";
 import useGetConnectedUser from "../hooks/useGetConnectedUser.jsx";
+import {useNavigate} from "react-router-dom";
 
 const Navbar = () => {
 
@@ -19,7 +20,8 @@ const Navbar = () => {
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('email');
         setMyToken(null);
-    }, [localStorageToken]);
+        location.reload();
+    }, [localStorageToken, user]);
 
     return (
         <AppBar position="static" sx={{ backgroundColor: 'white', color: 'black' }}>
@@ -31,7 +33,7 @@ const Navbar = () => {
                 <ul style={{ listStyleType: 'none', display: 'flex', gap: '1em' }}>
                     <li><a href="#"><Button startIcon={<CarRentalIcon />}>Louer mon véhicule</Button></a></li>
                     {
-                        !myToken ? (
+                        !myToken || !user.connectedUser.id ? (
                             <>
                                 <li><a href="/login"><Button>Se connecter</Button></a></li>
                                 <li><a href="/register"><Button>S'inscrire</Button></a></li>
