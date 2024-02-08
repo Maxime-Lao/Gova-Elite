@@ -88,6 +88,7 @@ function SearchBar() {
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
+                    gap: '1em',
                     marginBottom: '1em',
                     flexDirection: { xs: 'column', sm: 'row'}
                     }}
@@ -95,19 +96,23 @@ function SearchBar() {
                     <Grid item xs={12} sm={4}>
                     <DatePicker
                     selected={startDate}
+                    selectsStart
                     onChange={handleStartDateChange}
                     minDate={new Date()}
                     dateFormat="dd/MM/yyyy"
                     placeholderText="Date de début"
+                    className="date-picker"
                     />
                     </Grid>
                     <Grid item xs={12} sm={4}>
-                    <DatePicker sx={{ backgroundColor: 'white' }}
+                    <DatePicker
+                    selectsEnd
                     selected={endDate}
                     onChange={handleEndDateChange}
                     minDate={startDate || new Date()}
                     dateFormat="dd/MM/yyyy"
                     placeholderText="Date de fin"
+                    className="date-picker"
                     />
                     </Grid>
                     <Grid item xs={12} sm={4}>
@@ -120,7 +125,7 @@ function SearchBar() {
                                 options={{ types: ['(cities)'] }}
                             >
                                 <TextField
-                                    sx={{ backgroundColor: 'white' }}
+                                    sx={{ backgroundColor: 'white', borderRadius: '5px' }}
                                     label="Lieu"
                                     variant="filled"
                                     fullWidth

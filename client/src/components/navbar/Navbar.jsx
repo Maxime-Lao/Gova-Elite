@@ -1,4 +1,4 @@
-import { AppBar, Button } from "@mui/material";
+import { AppBar, Button, Link } from "@mui/material";
 import { Toolbar } from "@mui/material";
 import { Typography } from "@mui/material";
 import { Box } from "@mui/system";
@@ -26,9 +26,11 @@ const Navbar = () => {
     return (
         <AppBar position="static" sx={{ backgroundColor: 'white', color: 'black' }}>
         <Toolbar>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                <img src={logo} alt="La Gova" style={{ height: '50px' }} />
-            </Typography>
+            <Link href="/" underline="none" color="inherit"  sx={{ flexGrow: 1 }}>
+                <Typography variant="h6" component="div">
+                    <img src={logo} alt="La Gova" style={{ height: '50px' }} />
+                </Typography>
+            </Link>
             <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: '1em' }}>
                 <ul style={{ listStyleType: 'none', display: 'flex', gap: '1em' }}>
                     <li><a href="#"><Button startIcon={<CarRentalIcon />}>Louer mon véhicule</Button></a></li>
