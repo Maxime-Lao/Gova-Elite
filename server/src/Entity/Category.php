@@ -19,7 +19,7 @@ class Category
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'car_search:read'])]
     private ?string $libelle = null;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Car::class)]

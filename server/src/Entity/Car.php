@@ -36,31 +36,31 @@ class Car
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La description ne peut pas être vide')]
-    #[Groups(['car:read', 'comment:read', 'user:read'])]
+    #[Groups(['car:read', 'comment:read', 'user:read', 'car_search:read'])]
     private ?string $description = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le nombre de chevaux ne peut pas être vide')]
     #[Assert\Positive(message: 'Le nombre de chevaux doit être un nombre positif ou égal à zéro')]
-    #[Groups(['car:read', 'comment:read', 'user:read'])]
+    #[Groups(['car:read', 'comment:read', 'user:read', 'car_search:read'])]
     private ?int $year = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le nombre de sièges ne peut pas être vide')]
     #[Assert\Positive(message: 'Le nombre de sièges doit être un nombre positif ou égal à zéro')]
-    #[Groups(['car:read', 'user:read'])]
+    #[Groups(['car:read', 'user:read', 'car_search:read'])]
     private ?int $horses = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le prix ne peut pas être vide')]
     #[Assert\Positive(message: 'Le prix doit être un nombre positif ou égal à zéro')]
-    #[Groups(['car:read', 'user:read'])]
+    #[Groups(['car:read', 'user:read', 'car_search:read'])]
     private ?int $nbSeats = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le kilométrage ne peut pas être vide')]
     #[Assert\Positive(message: 'Le kilométrage doit être un nombre positif ou égal à zéro')]
-    #[Groups(['car:read', 'user:read'])]
+    #[Groups(['car:read', 'user:read', 'car_search:read'])]
     private ?int $nbDoors = null;
 
     #[ORM\Column]
@@ -72,12 +72,12 @@ class Car
     #[ORM\Column]
     #[Assert\NotBlank]
     #[Assert\Positive]
-    #[Groups(['car:read', 'user:read'])]
+    #[Groups(['car:read', 'user:read', 'car_search:read'])]
     private ?int $mileage = null;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['car:read', 'user:read'])]
+    #[Groups(['car:read', 'user:read', 'car_search:read'])]
     private ?Gear $gear = null;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
@@ -86,12 +86,12 @@ class Car
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['car:read', 'user:read'])]
+    #[Groups(['car:read', 'user:read', 'car_search:read'])]
     private ?Energy $energy = null;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['car:read', 'user:read'])]
+    #[Groups(['car:read', 'user:read', 'car_search:read'])]
     private ?Category $category = null;
 
     #[ORM\OneToMany(mappedBy: 'car', targetEntity: Media::class, orphanRemoval: true)]

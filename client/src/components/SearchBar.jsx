@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { TextField, Button, Grid, Box, Alert } from "@mui/material";
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { DatePicker } from '@mui/x-date-pickers';
-import { Autocomplete, useLoadScript } from "@react-google-maps/api";
+import DatePicker from 'react-datepicker';
+import { Autocomplete, useJsApiLoader } from "@react-google-maps/api";
 //router
 import { useNavigate } from "react-router-dom";
 
@@ -19,8 +17,8 @@ function SearchBar() {
 
     const navigate = useNavigate();
 
-    const { isLoaded } = useLoadScript({
-        googleMapsApiKey: "AIzaSyBhyfTQwmYXFdOLspNfnqED5ZjsTbR_HsQ",
+    const { isLoaded } = useJsApiLoader({
+        googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
         libraries,
       });
 
@@ -35,15 +33,14 @@ function SearchBar() {
     };
 
     const handleLocationChange = () => {
-    const place = autocomplete.getPlace();
-    console.log(place);
-    if (place.geometry) {
-        setLocation(place);
-        clearErrors();
-    } else {
-        setError(true);
-        setErrorMessage("Lieu invalide.");
-    }
+        const place = autocomplete.getPlace();
+        if (place.geometry && place.formatted_address) {
+            setLocation(place);
+            clearErrors();
+        } else {
+            setError(true);
+            setErrorMessage("Lieu invalide.");
+        }
     };
 
     const handleSubmit = (event) => {
@@ -55,21 +52,23 @@ function SearchBar() {
         return;
     }
 
-    if (startDate.isAfter(endDate)) {
+    if (startDate >= endDate) {
         setError(true);
-        setErrorMessage("La date de début doit être avant la date de fin.");
+        setErrorMessage("La date de début doit être antérieure à la date de fin.");
+        return;
+    }
+  
+    if (!location.geometry) {
+        setError(true);
+        setErrorMessage("Lieu invalide.");
         return;
     }
 
-    const formattedStartDate = encodeURIComponent(startDate.format("DD/MM/YYYY"));
-    const formattedEndDate = encodeURIComponent(endDate.format("DD/MM/YYYY"));
+    const formattedStartDate = encodeURIComponent(startDate.toLocaleDateString("fr-FR"));
+    const formattedEndDate = encodeURIComponent(endDate.toLocaleDateString("fr-FR"));
     const formattedLocation = encodeURIComponent(location.name);
     const formattedLocationLat = encodeURIComponent(location.geometry.location.lat());
     const formattedLocationLng = encodeURIComponent(location.geometry.location.lng());
-  
-    console.log(formattedStartDate);
-    console.log(formattedEndDate);
-    console.log(formattedLocation);
 
     navigate(`/search?startDate=${formattedStartDate}&endDate=${formattedEndDate}&location=${formattedLocation}&locationLat=${formattedLocationLat}&locationLng=${formattedLocationLng}`);
     };
@@ -94,24 +93,22 @@ function SearchBar() {
                     }}
                 >
                     <Grid item xs={12} sm={4}>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker sx={{ backgroundColor: 'white' }}
-                                label="Date de début"
-                                value={startDate}
-                                onChange={handleStartDateChange}
-                                slotProps={{ inputProps: { readOnly: true } }}
-                            />
-                        </LocalizationProvider>
+                    <DatePicker
+                    selected={startDate}
+                    onChange={handleStartDateChange}
+                    minDate={new Date()}
+                    dateFormat="dd/MM/yyyy"
+                    placeholderText="Date de début"
+                    />
                     </Grid>
                     <Grid item xs={12} sm={4}>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker sx={{ backgroundColor: 'white' }}
-                                label="Date de fin"
-                                value={endDate}
-                                onChange={handleEndDateChange}
-                                slotProps={{ inputProps: { readOnly: true } }}
-                            />
-                        </LocalizationProvider>
+                    <DatePicker sx={{ backgroundColor: 'white' }}
+                    selected={endDate}
+                    onChange={handleEndDateChange}
+                    minDate={startDate || new Date()}
+                    dateFormat="dd/MM/yyyy"
+                    placeholderText="Date de fin"
+                    />
                     </Grid>
                     <Grid item xs={12} sm={4}>
                         {isLoaded && (
