@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RentRepository::class)]
-#[ApiResource]
+#[ApiResource(normalizationContext: ['groups' => ['rents:read']])]
 #[ApiResource(
     uriTemplate: '/cars/{carId}/rents',
     uriVariables: [
@@ -36,22 +36,22 @@ class Rent
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['rents_car:read', 'rents_user:read', 'car:read', 'comments_user:read'])]
+    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read', 'car:read', 'comments_user:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Assert\NotBlank(message: 'La date de début de la réservation ne peut pas être vide')]
-    #[Groups(['rents_car:read', 'rents_user:read', 'car:read'])]
+    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read', 'car:read'])]
     private ?\DateTimeImmutable $dateStart = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Assert\NotBlank(message: 'La date de fin de la réservation ne peut pas être vide')]
-    #[Groups(['rents_car:read', 'rents_user:read', 'car:read'])]
+    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read', 'car:read'])]
     private ?\DateTimeImmutable $dateEnd = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le prix total ne peut pas être vide')]
-    #[Groups(['rents_car:read', 'rents_user:read'])]
+    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read'])]
     private ?float $totalPrice = null;
 
     #[ORM\Column]
@@ -59,18 +59,24 @@ class Rent
     private ?string $paymentMethodId;
 
     #[ORM\ManyToOne(inversedBy: 'rents')]
-    #[Groups(['rents_car:read', 'rents_user:read'])]
+    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read'])]
     private ?Car $car = null;
 
     #[ORM\ManyToOne(inversedBy: 'rents')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['rents_car:read', 'rents_user:read'])]
+    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read'])]
     private ?User $user = null;
 
+    #[ORM\OneToMany(mappedBy: 'rent', targetEntity: Comment::class, orphanRemoval: true)]
+    #[Groups(['rents:read', 'user:read'])]
+    private Collection $comments;
+
     #[ORM\Column]
+    #[Groups('rents:read')]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups('rents:read')]
     private ?\DateTimeImmutable $updatedAt = null;
     
     public function getId(): ?int
@@ -146,6 +152,36 @@ class Rent
     public function setUser(?User $user): static
     {
         $this->user = $user;
+        return $this;
+    }
+
+     /**
+     * @return Collection<int, Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setRent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): static
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getRent() === $this) {
+                $comment->setRent(null);
+            }
+        }
+
         return $this;
     }
 

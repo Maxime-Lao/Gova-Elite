@@ -21,10 +21,10 @@ class Category
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: 'Le libelle ne peut pas être vide')]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'car:read'])]
     private ?string $libelle = null;
 
-    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Car::class)]
+    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Car::class, orphanRemoval: true)]
     private Collection $cars;
 
     #[ORM\Column(nullable: true)]
@@ -76,7 +76,6 @@ class Category
     public function removeCar(Car $car): static
     {
         if ($this->cars->removeElement($car)) {
-            // set the owning side to null (unless already changed)
             if ($car->getCategory() === $this) {
                 $car->setCategory(null);
             }

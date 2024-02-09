@@ -12,12 +12,19 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Users from "./pages/Users.jsx";
 import Brands from './pages/Brands.jsx';
 import Categories from './pages/Categories.jsx';
+import Gears from './pages/Gears.jsx';
+import Energies from './pages/Energies.jsx';
+import Companies from './pages/Companies.jsx';
 import IdentifyEmail from "./components/login/IdentifyEmail.jsx";
 import ResetPassword from "./components/login/ResetPassword.jsx";
 import Account from "./components/account/Account.jsx";
 import PaymentSuccess from './pages/PaymentSuccess.jsx';
 import UpdatePaymentSuccess from './pages/UpdatePaymentSucces.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
+import Rents from './pages/Rents.jsx';
+import Comments from './pages/Comments.jsx';
+import Cars from './pages/Cars.jsx';
+import Models from './pages/Models.jsx';
 
 function App() {
   return (
@@ -33,8 +40,15 @@ function App() {
               <Route path="/bookings" element={<Bookings />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/admin/users" element={<Users />} />
+              <Route path="/admin/cars" element={<Cars />} />
               <Route path="/admin/brands" element={<Brands />} />
               <Route path="/admin/categories" element={<Categories />} />
+              <Route path="/admin/gears" element={<Gears />} />
+              <Route path="/admin/models" element={<Models />} />
+              <Route path="/admin/energies" element={<Energies />} />
+              <Route path="/admin/companies" element={<Companies />} />
+              <Route path="/admin/rents" element={<Rents />} />
+              <Route path="/admin/comments" element={<Comments />} />
               <Route path="/login/identify" element={<IdentifyEmail />} />
               <Route path="/resetpswd/:token" element={<ResetPassword />} />
               <Route path="/account" element={<Account />} />

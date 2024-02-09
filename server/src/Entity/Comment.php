@@ -11,7 +11,7 @@ use ApiPlatform\Metadata\GetCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
-#[ApiResource()]
+#[ApiResource(normalizationContext: ['groups' => ['comments:read']])]
 #[ApiResource(
     uriTemplate: '/cars/{carId}/comments',
     uriVariables: [
@@ -33,71 +33,71 @@ class Comment
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['comments_car:read', 'comments_user:read', 'car:read'])]
+    #[Groups(['comments:read', 'comments_car:read', 'comments_user:read', 'car:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La note de propreté ne peut pas être vide')]
     #[Assert\Positive(message: 'La note de propreté doit être un égal à zéro')]
-    #[Groups(['comments_car:read', 'car:read'])]
+    #[Groups(['comments:read', 'comments_car:read', 'car:read'])]
     private ?float $cleanliness = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La note de maintenance ne peut pas être vide')]
     #[Assert\Positive(message: 'La note de maintenance doit être un nombre positif')]
-    #[Groups(['comments_car:read', 'car:read'])]
+    #[Groups(['comments:read', 'comments_car:read', 'car:read'])]
     private ?float $maintenance = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La note de communication ne peut pas être vide')]
     #[Assert\Positive(message: 'La note de communication doit être un nombre positif')]
-    #[Groups(['comments_car:read', 'car:read'])]
+    #[Groups(['comments:read', 'comments_car:read', 'car:read'])]
     private ?float $communication = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La note de commodité ne peut pas être vide')]
     #[Assert\Positive(message: 'La note de commodité doit être un nombre positif')]
-    #[Groups(['comments_car:read', 'car:read'])]
+    #[Groups(['comments:read', 'comments_car:read', 'car:read'])]
     private ?float $convenience = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La note de précision ne peut pas être vide')]
     #[Assert\Positive(message: 'La note de précision doit être un nombre positif')]
-    #[Groups(['comments_car:read', 'car:read'])]
+    #[Groups(['comments:read', 'comments_car:read', 'car:read'])]
     private ?float $accuracy = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La note globale ne peut pas être vide')]
     #[Assert\Positive(message: 'La note globale doit être un nombre positif')]
-    #[Groups(['comments_car:read', 'car:read'])]
+    #[Groups(['comments:read', 'comments_car:read', 'car:read'])]
     private ?float $globalRating = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le commentaire ne peut pas être vide')]
-    #[Groups(['comments_car:read', 'car:read'])]
+    #[Groups(['comments:read', 'comments_car:read', 'car:read'])]
     private ?string $comment = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['comments_user', 'car:read'])]
+    #[Groups(['comments_user', 'car:read', 'comments_user:read'])]
     private ?Rent $rent = null;
 
     #[ORM\Column]
-    #[Groups(['comments_car:read', 'car:read'])]
+    #[Groups(['comments:read', 'comments_car:read', 'car:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['comments_car:read', 'car:read'])]
+    #[Groups(['comments:read', 'comments_car:read', 'car:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['comments_car:read', 'car:read'])]
+    #[Groups(['comments:read', 'comments_car:read', 'car:read'])]
     private ?User $author = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['car:read', 'comments_user:read'])]
+    #[Groups(['comments:read', 'car:read'])]
     private ?Car $car;
 
     public function getId(): ?int

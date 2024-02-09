@@ -24,7 +24,7 @@ class Gear
     #[Groups(['car:read', 'user:read'])]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'gear', targetEntity: Car::class)]
+    #[ORM\OneToMany(mappedBy: 'gear', targetEntity: Car::class, orphanRemoval: true)]
     private Collection $cars;
 
     #[ORM\Column]
@@ -76,7 +76,6 @@ class Gear
     public function removeCar(Car $car): static
     {
         if ($this->cars->removeElement($car)) {
-            // set the owning side to null (unless already changed)
             if ($car->getGear() === $this) {
                 $car->setGear(null);
             }

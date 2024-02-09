@@ -81,7 +81,7 @@ class Car
     private ?Gear $gear = null;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
-    #[Groups(['car:read', 'comments_car:read', 'car_search:read', 'user:read', 'rents_user:read'])]
+    #[Groups(['car:read', 'comments_car:read', 'car_search:read', 'user:read', 'rents_user:read', 'rents:read', 'comments:read'])]
     private ?Model $model = null;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
@@ -100,7 +100,7 @@ class Car
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['car:read', 'comments_car:read', 'car_search:read', 'rents_user:read'])]
+    #[Groups(['car:read', 'comments_car:read', 'car_search:read', 'rents_user:read', 'rents:read', 'comments:read'])]
     private ?Companie $companie = null;
 
     #[ORM\OneToMany(mappedBy: 'car', targetEntity: Rent::class, orphanRemoval: true)]
@@ -280,9 +280,9 @@ class Car
 
     public function removeMedia(MediaObject $media): static
     {
-        if ($this->media->removeElement($medium)) {
-            if ($medium->getCar() === $this) {
-                $medium->setCar(null);
+        if ($this->media->removeElement($media)) {
+            if ($media->getCar() === $this) {
+                $media->setCar(null);
             }
         }
 

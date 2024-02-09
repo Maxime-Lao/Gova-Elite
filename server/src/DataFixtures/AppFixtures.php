@@ -7,7 +7,7 @@ use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use App\Entity\User;
 use App\Entity\Role;
-use App\Entity\Media;
+use App\Entity\MediaObject;
 use App\Entity\Companie;
 use App\Entity\Car;
 use App\Entity\Brand;
@@ -117,29 +117,25 @@ class AppFixtures extends Fixture
             $car->setHorses($faker->numberBetween(150, 400));
             $car->setNbSeats($faker->numberBetween(2, 7));
             $car->setNbDoors($faker->numberBetween(3, 5));
-            $car->setPrice($faker->numberBetween(20000, 80000));
+            $car->setPrice($faker->numberBetween(10, 25));
             $car->setMileage($faker->numberBetween(10000, 100000));
             $car->setGear($faker->randomElement($gears));
             $car->setModel($faker->randomElement($models));
             $car->setEnergy($faker->randomElement($energies));
+            $category = $faker->randomElement($categories);
+            $car->setCategory($category);
             $car->setCompanie($faker->randomElement($companies));
             $car->setCreatedAt(\DateTimeImmutable::createFromMutable($faker->dateTime()));
-
-            $category = $manager->find(Category::class, $faker->numberBetween(1, count($categories)));
-            $car->setCategory($category);
 
             $manager->persist($car);
             $cars[] = $car;
         }
 
         for ($i = 0; $i < 20; $i++) {
-            $media = new Media();
-            $media->setName('Image Voiture ' . ($i + 1));
-            $media->setData('/img/' . ($i + 1) . '.jpeg');
+            $media = new MediaObject();
+            $media->setUser($faker->randomElement($users));
+            $media->setCar($faker->randomElement($cars));
             $media->setCreatedAt(\DateTimeImmutable::createFromMutable($faker->dateTime()));
-
-            $car = $manager->find(Car::class, $faker->numberBetween(1, 50));
-            $media->setCar($car);
             $manager->persist($media);
         }
 
