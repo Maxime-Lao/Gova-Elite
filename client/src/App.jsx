@@ -18,6 +18,7 @@ import Account from "./components/account/Account.jsx";
 import PaymentSuccess from './pages/PaymentSuccess.jsx';
 import UpdatePaymentSuccess from './pages/UpdatePaymentSucces.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
+import CarDetailsPro from "./components/pro/CarDetailsPro.jsx";
 import { useJsApiLoader } from '@react-google-maps/api';
 import { useState } from 'react';
 
@@ -49,6 +50,7 @@ function App() {
               <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/update-payment-success" element={<UpdatePaymentSuccess />} />
               <Route path="/not-found" element={<NotFoundPage />} />
+              <Route path="/car-details/:carId" element={<CarDetailsPro/>} />
           </Routes>
       </Router>
     </ThemeProvider>
