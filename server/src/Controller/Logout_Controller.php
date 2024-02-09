@@ -17,17 +17,18 @@ class Logout_Controller
         $this->requestStack = $requestStack;
     }
 
+    public function __invoke(): JsonResponse
+    {
+        return $this->logout();
+    }
 
-
-    public function logout(): JsonResponse
+    private function logout(): JsonResponse
     {
         $currentToken = $this->getCurrentJWT();
 
         if ($currentToken) {
             $this->blacklistService->addToBlacklist($currentToken);
         }
-
-
 
         return new JsonResponse(['message' => 'Déconnexion réussie.']);
     }

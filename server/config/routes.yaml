@@ -20,3 +20,8 @@ reset_password:
     path: /reset_password
     controller: 'App\Controller\ResetPasswordController'
     methods: [POST]
+
+logout:
+    path: /logout
+    controller: 'App\Controller\Logout_Controller'
+    methods: [POST]

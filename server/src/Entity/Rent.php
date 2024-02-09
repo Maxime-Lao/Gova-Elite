@@ -41,12 +41,12 @@ class Rent
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Assert\NotBlank(message: 'La date de début de la réservation ne peut pas être vide')]
-    #[Groups(['rents_car:read', 'rents_user:read', 'car:read'])]
+    #[Groups(['rents_car:read', 'rents_user:read', 'car:read', 'user:read'])]
     private ?\DateTimeImmutable $dateStart = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Assert\NotBlank(message: 'La date de fin de la réservation ne peut pas être vide')]
-    #[Groups(['rents_car:read', 'rents_user:read', 'car:read'])]
+    #[Groups(['rents_car:read', 'rents_user:read', 'car:read', 'user:read'])]
     private ?\DateTimeImmutable $dateEnd = null;
 
     #[ORM\Column]

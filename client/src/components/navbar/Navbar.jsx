@@ -7,7 +7,6 @@ import logo from '../../assets/img/la-gova.png';
 import {useCallback, useState} from "react";
 import AvatarDialog from "./AvatarDialog.jsx";
 import useGetConnectedUser from "../hooks/useGetConnectedUser.jsx";
-import {useNavigate} from "react-router-dom";
 
 const Navbar = () => {
 
@@ -16,6 +15,18 @@ const Navbar = () => {
     const user = useGetConnectedUser();
 
     const handleLogout = useCallback(() => {
+        try {
+            const response = fetch('http://localhost:8000/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${myToken}`,
+                },
+            });
+            console.log(response);
+        } catch (error) {
+            console.error('Erreur lors de la déconnexion: ' + error.message);
+        }
         localStorage.removeItem('token');
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('email');

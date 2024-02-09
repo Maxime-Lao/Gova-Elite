@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -37,6 +38,23 @@ use Doctrine\Common\Collections\Collection;
             //security: "is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['user:read']],
         ),
+        new Get(
+            uriTemplate: '/users/by-email/{email}',
+            name: 'getUserByEmail',
+            controller: 'App\Controller\UserController::getUserByEmail',
+            normalizationContext: ['groups' => ['user:read']],
+            openapiContext: [
+                'summary' => 'Get user by email',
+                'parameters' => [
+                    [
+                        'name' => 'email',
+                        'in' => 'path',
+                        'required' => true,
+                        'type' => 'string',
+                    ],
+                ],
+            ],
+        ),
         new Put(
             processor: UserPasswordHasher::class,
             security: "is_granted('ROLE_ADMIN')",
@@ -59,6 +77,7 @@ use Doctrine\Common\Collections\Collection;
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    #[ApiProperty(identifier: false)]
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
     #[Groups(['user:read'])]
     private ?int $id = null;
