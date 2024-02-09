@@ -25,6 +25,8 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import format from 'date-fns/format';
+import { fr } from 'date-fns/locale';
 import {createTheme, styled, ThemeProvider, useTheme} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -127,44 +129,39 @@ const defaultTheme = createTheme({
     },
 });
 
-export default function Users() {
+export default function Companies() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [open, setOpen] = useState(!isMobile);
     const [isLoading, setIsLoading] = useState(true);
-    const [users, setUsers] = useState([]);
+    const [companies, setCompanies] = useState([]);
     const [openCreateDialog, setOpenCreateDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedCompany, setSelectedCompany] = useState(null);
     const token = localStorage.getItem('token');
-    const emailLoggedUser = localStorage.getItem('email');
     const [formErrors, setFormErrors] = useState({});
 
     const toggleDrawer = () => {
         setOpen(!open);
     };
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [firstname, setFirstname] = useState('');
-    const [lastname, setLastname] = useState('');
-    const [role, setRole] = useState('');
-    const [phone, setPhone] = useState('');
+    const [name, setName] = useState('');
+    const [address, setAddress] = useState('');
+    const [zipCode, setZipCode] = useState('');
+    const [city, setCity] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const [kbis, setKbis] = useState('');
-    const [showKbis, setShowKbis] = useState(false);
 
     useEffect(() => {
         setOpen(!isMobile);
     }, [isMobile]);
 
     useEffect(() => {
-        const getUsers = async () => {
+        const getCompanies = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://localhost:8000/api/users', {
+                const response = await fetch('http://localhost:8000/api/companies', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -177,7 +174,7 @@ export default function Users() {
                 }
 
                 const data = await response.json();
-                setUsers(data.filter(user => user.email !== emailLoggedUser));
+                setCompanies(data);
                 setIsLoading(false);
             } catch (error) {
                 console.error(error);
@@ -185,50 +182,45 @@ export default function Users() {
             }
         };
 
-        getUsers();
-    }, [token, emailLoggedUser]);
+        getCompanies();
+    }, [token]);
 
 
-    const handleDelete = (user) => {
-        setSelectedUser(user);
+    const handleDelete = (company) => {
+        setSelectedCompany(company);
         setOpenDeleteDialog(true);
     };
 
     useEffect(() => {
-        if (selectedUser) {
-            setEmail(selectedUser.email);
-            setFirstname(selectedUser.firstname)
-            setLastname(selectedUser.lastname)
-            setPassword(selectedUser.password)
-            setPhone(selectedUser.phone)
-            setRole(selectedUser.roles)
+        if (selectedCompany) {
+            setName(selectedCompany.name);
+            setAddress(selectedCompany.address);
+            setZipCode(selectedCompany.zipCode);
+            setCity(selectedCompany.city);
         }
-    }, [selectedUser]);    
+    }, [selectedCompany]);    
 
     const handleCreate = async () => {
         event.preventDefault();
         
         try {
-            const response = await fetch('http://localhost:8000/api/users', {
+            const response = await fetch('http://localhost:8000/api/companies', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    email: email,
-                    plainPassword: password,
-                    firstname: firstname,
-                    lastname: lastname,
-                    phone: phone,
-                    password: password,
-                    roles: role === 'professionnel' ? ['ROLE_PRO'] : role === 'particulier' ? ['ROLE_USER'] : ['ROLE_ADMIN'],
-                    isVerified: true
+                    name: name,
+                    address: address,
+                    zipCode: parseInt(zipCode),
+                    city: city,
+                    createdAt: new Date().toISOString(),
                 }),
             });
 
             if (!response.ok) {
-            setFormErrors({});
+                setFormErrors({});
 
                 const data = await response.json();
 
@@ -239,29 +231,27 @@ export default function Users() {
                     });
                     setFormErrors(errors);
                 } else {
-                    setError('Une erreur s\'est produite lors de la création de l\'utilisateur.');
+                    setError('Une erreur s\'est produite lors de la création de la compagnie.');
                 }
                 return;
             } else {
                 const data = await response.json();
                 setError('');
-                setUsers([...users, data]);
+                setCompanies([...companies, data]);
                 setOpenCreateDialog(false);
-                setSuccess('Utilisateur créé avec succès !');
+                setSuccess('Compagnie créée avec succès !');
             }
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la création de l\'utilisateur.');
+            setError('Une erreur s\'est produite lors de la création de la compagnie.');
         }
     };
 
     const handleOpenCreateDialog = () => {
         setFormErrors({});
-        setEmail('');
-        setFirstname('')
-        setLastname('')
-        setPassword('')
-        setPhone('')
-        setRole('')
+        setName('');
+        setAddress('');
+        setZipCode('');
+        setCity('');
         setOpenCreateDialog(true);
     };
     
@@ -269,19 +259,9 @@ export default function Users() {
         setOpenCreateDialog(false);
     };
 
-    const handleRoleChange = (e) => {
-        setRole(e.target.value);
-        if (e.target.value === 'professionnel') {
-            setShowKbis(true);
-        } else {
-            setShowKbis(false);
-            setKbis('');
-        }
-    };
-
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/users/${selectedUser.id}`, {
+            const response = await fetch(`http://localhost:8000/api/companies/${selectedCompany.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -293,60 +273,76 @@ export default function Users() {
                 throw new Error(`Erreur HTTP! Statut: ${response.status}`);
             }
 
-            const updatedUsers = users.filter(user => user.id !== selectedUser.id);
+            const updatedCompanies = companies.filter(company => company.id !== selectedCompany.id);
             setError('');
-            setUsers(updatedUsers);
+            setCompanies(updatedCompanies);
             setOpenDeleteDialog(false);
-            setSuccess('Utilisateur supprimé avec succès !');
+            setSuccess('Compagnie supprimée avec succès !');
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la suppression de l\'utilisateur.');
+            setError('Une erreur s\'est produite lors de la suppression de la compagnie.');
         }
     };
 
-    const handleEdit = (user) => {
-        setSelectedUser(user);
+    const handleEdit = (company) => {
+        setFormErrors({});
+        setSelectedCompany(company);
         setOpenEditDialog(true);
     };
 
     const handleUpdate = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/users/${selectedUser.id}`, {
+            const response = await fetch(`http://localhost:8000/api/companies/${selectedCompany.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/merge-patch+json',
                     Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    email: email,
-                    firstname: firstname,
-                    lastname: lastname,
-                    phone: phone,
+                    name: name,
+                    address: address,
+                    zipCode: parseInt(zipCode),
+                    city: city,
+                    updatedAt: new Date().toISOString(),
                 }),
             });
 
             if (!response.ok) {
-                throw new Error(`Erreur HTTP! Statut: ${response.status}`);
-            }
+                setFormErrors({});
 
-            const updatedUsers = users.map(user => {
-                if (user.id === selectedUser.id) {
-                    return {
-                        ...user,
-                        email: email,
-                        firstname: firstname,
-                        lastname: lastname,
-                        phone: phone,
-                    };
+                const data = await response.json();
+
+                if (data.violations) {
+                    const errors = {};
+                    data.violations.forEach(violation => {
+                        errors[violation.propertyPath] = violation.message;
+                    });
+                    setFormErrors(errors);
+                } else {
+                    setError('Une erreur s\'est produite lors de la création de la compagnie.');
                 }
-                return user;
-            });
-
-            setError('');
-            setUsers(updatedUsers);
-            setOpenEditDialog(false);
-            setSuccess('Utilisateur modifié avec succès !');
+                return;
+            } else {
+                const updatedCompanies = companies.map(company => {
+                    if (company.id === selectedCompany.id) {
+                        return {
+                            ...company,
+                            name: name,
+                            address: address,
+                            zipCode: zipCode,
+                            city: city,
+                            updatedAt: new Date().toISOString(),
+                        };
+                    }
+                    return company;
+                });
+    
+                setError('');
+                setCompanies(updatedCompanies);
+                setOpenEditDialog(false);
+                setSuccess('Compagnie modifiée avec succès !');
+            }
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la mise à jour de l\'utilisateur.');
+            setError('Une erreur s\'est produite lors de la mise à jour de la compagnie.');
         }
     };
 
@@ -428,7 +424,7 @@ export default function Users() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des utilisateurs
+                            Liste des compagnies
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
@@ -444,7 +440,7 @@ export default function Users() {
         );
     }
 
-    if (!users.length) {
+    if (!companies.length) {
         return (
 
             <ThemeProvider theme={defaultTheme}>
@@ -522,7 +518,7 @@ export default function Users() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des utilisateurs
+                            Liste des compagnies
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                         <Grid item xs={12}>
@@ -543,90 +539,51 @@ export default function Users() {
                                 
                                 <Box sx={{ mb: 2 }}>
                                     <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
-                                        Créer un nouvel utilisateur
+                                        Créer une nouvelle compagnie
                                     </Button>
                                 </Box>
 
                                 <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
-                                    <DialogTitle>Créer un nouvel utilisateur</DialogTitle>
+                                    <DialogTitle>Créer une nouvelle compagnie</DialogTitle>
                                     <form onSubmit={handleCreate}>
                                         <DialogContent>
                                             <TextField
-                                                label="Nom"
-                                                value={firstname}
-                                                onChange={(e) => setFirstname(e.target.value)}
+                                                label="Name"
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
                                                 fullWidth
                                                 margin="normal"
-                                                error={!!formErrors.firstname}
+                                                error={!!formErrors.name}
                                                 required
                                             />
                                             <TextField
-                                                label="Prénom"
-                                                value={lastname}
-                                                onChange={(e) => setLastname(e.target.value)}
+                                                label="Address"
+                                                value={address}
+                                                onChange={(e) => setAddress(e.target.value)}
                                                 fullWidth
                                                 margin="normal"
-                                                error={!!formErrors.lastname}
+                                                error={!!formErrors.address}
                                                 required
                                             />
                                             <TextField
-                                                label="Email"
-                                                type="email"
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
+                                                label="Zip code"
+                                                value={zipCode}
+                                                onChange={(e) => setZipCode(e.target.value)}
                                                 fullWidth
                                                 margin="normal"
-                                                autoComplete="email"
-                                                error={!!formErrors.email}
+                                                error={!!formErrors.zipCode}
+                                                type="number"
                                                 required
                                             />
                                             <TextField
-                                                label="Mot de passe"
-                                                type="password"
-                                                value={password}
-                                                onChange={(e) => setPassword(e.target.value)}
+                                                label="City"
+                                                value={city}
+                                                onChange={(e) => setCity(e.target.value)}
                                                 fullWidth
                                                 margin="normal"
-                                                error={!!formErrors.password}
-                                                autoComplete="new-password"
+                                                error={!!formErrors.city}
                                                 required
                                             />
-                                            <TextField
-                                                label="Téléphone"
-                                                type="tel"
-                                                value={phone}
-                                                pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
-                                                onChange={(e) => setPhone(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.phone}
-                                                required
-                                            />
-                                            <FormControl fullWidth margin="normal">
-                                                <InputLabel id="role-label">Rôle *</InputLabel>
-                                                <Select
-                                                    labelId="role-label"
-                                                    value={role}
-                                                    onChange={handleRoleChange}
-                                                    error={!!formErrors.role}
-                                                    required
-                                                >
-                                                    <MenuItem value="particulier">Particulier</MenuItem>
-                                                    <MenuItem value="professionnel">Professionnel</MenuItem>
-                                                    <MenuItem value="administrateur">Administrateur</MenuItem>
-                                                </Select>
-                                            </FormControl>
-                                            {showKbis && (
-                                                <FormControl fullWidth margin="normal">
-                                                    <InputLabel htmlFor="kbis-file">KBIS</InputLabel>
-                                                    <Input
-                                                        id="kbis-file"
-                                                        type="file"
-                                                        onChange={(e) => setKbisFile(e.target.files[0])}
-                                                        fullWidth
-                                                    />
-                                                </FormControl>
-                                            )}
                                         </DialogContent>
                                         <DialogActions>
                                             <Button onClick={handleCloseCreateDialog}>Annuler</Button>
@@ -649,11 +606,12 @@ export default function Users() {
                                         <TableHead>
                                             <TableRow style={{background: '#556cd6'}}>
                                                 <TableCell style={{color: 'white'}}>Nom</TableCell>
-                                                <TableCell style={{color: 'white'}}>Prénom</TableCell>
-                                                <TableCell style={{color: 'white'}}>Email</TableCell>
-                                                <TableCell style={{color: 'white'}}>Téléphone</TableCell>
-                                                <TableCell style={{color: 'white'}}>Rôle</TableCell>
-                                                <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
+                                                <TableCell style={{color: 'white'}}>Adresse</TableCell>
+                                                <TableCell style={{color: 'white'}}>Code postal</TableCell>
+                                                <TableCell style={{color: 'white'}}>Ville</TableCell>
+                                                <TableCell style={{color: 'white'}}>Crée à</TableCell>
+                                                <TableCell style={{color: 'white'}}>Modifié à</TableCell>
+                                                <TableCell  style={{color: 'white'}} align="right">Actions</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -661,7 +619,7 @@ export default function Users() {
                                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                             >
                                                 <TableCell component="th" scope="row" colSpan={8} align="center">
-                                                    Aucun utilisateur trouvé
+                                                    Aucune compagnie trouvée
                                                 </TableCell>
                                             </TableRow>
                                         </TableBody>
@@ -752,7 +710,7 @@ export default function Users() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des utilisateurs
+                            Liste des compagnies
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                             <Grid item xs={12}>
@@ -773,90 +731,51 @@ export default function Users() {
                                 
                                 <Box sx={{ mb: 2 }}>
                                     <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
-                                        Créer un nouvel utilisateur
+                                        Créer une nouvelle compagnie
                                     </Button>
                                 </Box>
 
                                 <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
-                                    <DialogTitle>Créer un nouvel utilisateur</DialogTitle>
+                                    <DialogTitle>Créer une nouvelle compagnie</DialogTitle>
                                     <form onSubmit={handleCreate}>
                                         <DialogContent>
                                             <TextField
-                                                label="Nom"
-                                                value={firstname}
-                                                onChange={(e) => setFirstname(e.target.value)}
+                                                label="Name"
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
                                                 fullWidth
                                                 margin="normal"
-                                                error={!!formErrors.firstname}
+                                                error={!!formErrors.name}
                                                 required
                                             />
                                             <TextField
-                                                label="Prénom"
-                                                value={lastname}
-                                                onChange={(e) => setLastname(e.target.value)}
+                                                label="Address"
+                                                value={address}
+                                                onChange={(e) => setAddress(e.target.value)}
                                                 fullWidth
                                                 margin="normal"
-                                                error={!!formErrors.lastname}
+                                                error={!!formErrors.address}
                                                 required
                                             />
                                             <TextField
-                                                label="Email"
-                                                type="email"
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
+                                                label="Zip code"
+                                                value={zipCode}
+                                                onChange={(e) => setZipCode(e.target.value)}
                                                 fullWidth
                                                 margin="normal"
-                                                autoComplete="email"
-                                                error={!!formErrors.email}
+                                                error={!!formErrors.zipCode}
+                                                type="number"
                                                 required
                                             />
                                             <TextField
-                                                label="Mot de passe"
-                                                type="password"
-                                                value={password}
-                                                onChange={(e) => setPassword(e.target.value)}
+                                                label="City"
+                                                value={city}
+                                                onChange={(e) => setCity(e.target.value)}
                                                 fullWidth
                                                 margin="normal"
-                                                error={!!formErrors.password}
-                                                autoComplete="new-password"
+                                                error={!!formErrors.city}
                                                 required
                                             />
-                                            <TextField
-                                                label="Téléphone"
-                                                type="tel"
-                                                value={phone}
-                                                pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
-                                                onChange={(e) => setPhone(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.phone}
-                                                required
-                                            />
-                                            <FormControl fullWidth margin="normal">
-                                                <InputLabel id="role-label">Rôle *</InputLabel>
-                                                <Select
-                                                    labelId="role-label"
-                                                    value={role}
-                                                    onChange={handleRoleChange}
-                                                    error={!!formErrors.role}
-                                                    required
-                                                >
-                                                    <MenuItem value="particulier">Particulier</MenuItem>
-                                                    <MenuItem value="professionnel">Professionnel</MenuItem>
-                                                    <MenuItem value="administrateur">Administrateur</MenuItem>
-                                                </Select>
-                                            </FormControl>
-                                            {showKbis && (
-                                                <FormControl fullWidth margin="normal">
-                                                    <InputLabel htmlFor="kbis-file">KBIS</InputLabel>
-                                                    <Input
-                                                        id="kbis-file"
-                                                        type="file"
-                                                        onChange={(e) => setKbisFile(e.target.files[0])}
-                                                        fullWidth
-                                                    />
-                                                </FormControl>
-                                            )}
                                         </DialogContent>
                                         <DialogActions>
                                             <Button onClick={handleCloseCreateDialog}>Annuler</Button>
@@ -879,92 +798,111 @@ export default function Users() {
                                         <TableHead>
                                             <TableRow style={{background: '#556cd6'}}>
                                                 <TableCell style={{color: 'white'}}>Nom</TableCell>
-                                                <TableCell style={{color: 'white'}}>Prénom</TableCell>
-                                                <TableCell style={{color: 'white'}}>Email</TableCell>
-                                                <TableCell style={{color: 'white'}}>Téléphone</TableCell>
-                                                <TableCell style={{color: 'white'}}>Rôle</TableCell>
-                                                <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
+                                                <TableCell style={{color: 'white'}}>Adresse</TableCell>
+                                                <TableCell style={{color: 'white'}}>Code postal</TableCell>
+                                                <TableCell style={{color: 'white'}}>Ville</TableCell>
+                                                <TableCell style={{color: 'white'}}>Crée à</TableCell>
+                                                <TableCell style={{color: 'white'}}>Modifié à</TableCell>
+                                                <TableCell  style={{color: 'white'}} align="right">Actions</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {users.map((user) => (
+                                            {companies.map((company) => (
                                                 <TableRow
-                                                    key={user.id}
+                                                    key={company.id}
                                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                 >
                                                     <TableCell component="th" scope="row">
-                                                        {user.lastname}
+                                                        {company.name}
                                                     </TableCell>
-                                                    <TableCell>{user.firstname}</TableCell>
-                                                    <TableCell>{user.email}</TableCell>
-                                                    <TableCell>{user.phone}</TableCell>
-                                                    <TableCell>{user.roles[0]}</TableCell>
+                                                    <TableCell>{company.address}</TableCell>
+                                                    <TableCell>{company.zipCode}</TableCell>
+                                                    <TableCell>{company.city}</TableCell>
+                                                    <TableCell>{company.createdAt ? format(new Date(company.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
+                                                    <TableCell>{company.updatedAt ? format(new Date(company.updatedAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
                                                     <TableCell align="right">
-                                                        <IconButton onClick={() => handleEdit(user)}>
+                                                        <IconButton onClick={() => handleEdit(company)}>
                                                             <EditIcon />
                                                         </IconButton>
-                                                        <IconButton onClick={() => handleDelete(user)}>
+                                                        <IconButton onClick={() => handleDelete(company)}>
                                                             <DeleteIcon />
                                                         </IconButton>
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>
-                           
+                               
                                         <Dialog
                                             open={openDeleteDialog}
                                             onClose={() => setOpenDeleteDialog(false)}
                                         >
                                             <DialogTitle>Confirmation</DialogTitle>
                                             <DialogContent>
-                                                Êtes-vous sûr de vouloir supprimer cet utilisateur ?
+                                                Êtes-vous sûr de vouloir supprimer cette compagnie ?
                                             </DialogContent>
                                             <DialogActions>
                                                 <Button onClick={() => setOpenDeleteDialog(false)}>Annuler</Button>
                                                 <Button onClick={handleConfirmDelete} autoFocus>Supprimer</Button>
                                             </DialogActions>
                                         </Dialog>
-                                
+                                 
                                         <Dialog
                                             open={openEditDialog}
                                             onClose={() => setOpenEditDialog(false)}
                                         >
-                                            <DialogTitle>Modifier l'utilisateur</DialogTitle>
+                                            <DialogTitle>Modifier la compagnie</DialogTitle>
                                             <DialogContent>
                                                 <TextField
-                                                    label="Email"
-                                                    type="email"
-                                                    value={email}
-                                                    onChange={(e) => setEmail(e.target.value)}
+                                                    label="Name"
+                                                    type="text"
+                                                    value={name}
+                                                    onChange={(e) => setName(e.target.value)}
                                                     fullWidth
                                                     margin="normal"
+                                                    required
                                                 />
                                                 <TextField
-                                                    label="Nom"
-                                                    value={firstname}
-                                                    onChange={(e) => setFirstname(e.target.value)}
+                                                    label="Address"
+                                                    type="text"
+                                                    value={address}
+                                                    onChange={(e) => setAddress(e.target.value)}
                                                     fullWidth
                                                     margin="normal"
+                                                    error={!!formErrors.address}
+                                                    required
                                                 />
                                                 <TextField
-                                                    label="Prénom"
-                                                    value={lastname}
-                                                    onChange={(e) => setLastname(e.target.value)}
+                                                    label="Zip code"
+                                                    value={zipCode}
+                                                    onChange={(e) => setZipCode(e.target.value)}
                                                     fullWidth
                                                     margin="normal"
+                                                    type="number"
+                                                    required
                                                 />
                                                 <TextField
-                                                    label="Téléphone"
-                                                    value={phone}
-                                                    onChange={(e) => setPhone(e.target.value)}
+                                                    label="City"
+                                                    type="text"
+                                                    value={city}
+                                                    onChange={(e) => setCity(e.target.value)}
                                                     fullWidth
                                                     margin="normal"
+                                                    required
                                                 />
                                             </DialogContent>
                                             <DialogActions>
                                                 <Button onClick={() => setOpenEditDialog(false)}>Annuler</Button>
                                                 <Button onClick={handleUpdate} autoFocus>Enregistrer</Button>
                                             </DialogActions>
+                                            {Object.keys(formErrors).length > 0 && (
+                                                <Box sx={{ margin: 2 }}>
+                                                    {Object.values(formErrors).map((error, index) => (
+                                                        <Typography key={index} color="error">
+                                                            - {error}
+                                                        </Typography>
+                                                    ))}
+                                                </Box>
+                                            )}
                                         </Dialog>
                                     </Table>
                                 </TableContainer>

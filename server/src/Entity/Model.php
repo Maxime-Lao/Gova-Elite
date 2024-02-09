@@ -26,21 +26,23 @@ class Model
 
     #[ORM\Column(length: 100, nullable: true)]
     #[Assert\NotBlank(message: "Le nom du model ne peut pas être vide")]
-    #[Groups(['car:read', 'comments_car:read', 'car_search:read', 'user:read', 'model:read', 'rents_user:read'])]
+    #[Groups(['car:read', 'comments_car:read', 'car_search:read', 'user:read', 'model:read', 'rents_user:read', 'rents:read', 'comments:read'])]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'model', targetEntity: Car::class)]
+    #[ORM\OneToMany(mappedBy: 'model', targetEntity: Car::class, orphanRemoval: true)]
     private Collection $cars;
 
     #[ORM\ManyToOne(inversedBy: 'models')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['car:read', 'car_search:read', 'user:read',  'model:read'])]
+    #[Groups(['car:read', 'car_search:read', 'user:read',  'model:read', 'rents:read', 'comments:read'])]
     private ?Brand $brand = null;
 
     #[ORM\Column]
+    #[Groups(['model:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['model:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     public function __construct()
@@ -86,7 +88,6 @@ class Model
     public function removeCar(Car $car): static
     {
         if ($this->cars->removeElement($car)) {
-            // set the owning side to null (unless already changed)
             if ($car->getModel() === $this) {
                 $car->setModel(null);
             }

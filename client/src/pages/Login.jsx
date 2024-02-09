@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TextField, Button, Grid ,Box, Link } from "@mui/material";
+import { TextField, Button, Grid ,Box, Typography } from "@mui/material";
 import sendRequest from "../services/axiosRequestFunction";
 import { useNavigate } from 'react-router-dom';
 
@@ -30,6 +30,12 @@ export default function Login() {
             // En cas d'erreur, mettez le message d'erreur dans l'état 'error'
             setError(error.response.data.message);
         }
+    };
+
+    const linkStyle = {
+        cursor: 'pointer',
+        textDecoration: 'underline',
+        color: 'blue',
     };
 
     return (
@@ -71,7 +77,9 @@ export default function Login() {
                         onChange={(e) => setPassword(e.target.value)}
                     />
                     <Box mt={2} textAlign="left">
-                        <Link href="/login/identify">Mot de passe oublié?</Link>
+                        <Typography onClick={() => navigate('/login/identify')} style={linkStyle}>
+                            Mot de passe oublié?
+                        </Typography>
                     </Box>
                     <Button
                         type="submit"
@@ -86,7 +94,9 @@ export default function Login() {
                 </form>
             </Grid>
             <Box mt={2} textAlign="center">
-                <Link href="/register">Vous n'avez pas de compte? Inscrivez-vous!</Link>
+                <Typography onClick={() => navigate('/register')} style={linkStyle}>
+                    Vous n'avez pas de compte? Inscrivez-vous!
+                </Typography>
             </Box>
         </Grid>
     );

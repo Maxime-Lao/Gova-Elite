@@ -13,6 +13,7 @@ const Navbar = () => {
     const localStorageToken = localStorage.getItem('token');
     const [myToken, setMyToken] = useState(localStorageToken);
     const user = useGetConnectedUser();
+    const navigate = useNavigate();
 
     const handleLogout = useCallback(() => {
         try {
@@ -34,6 +35,14 @@ const Navbar = () => {
         location.reload();
     }, [localStorageToken, user]);
 
+    const redirectToLogin = () => {
+        navigate('/login');
+    };
+
+    const redirectToRegister = () => {
+        navigate('/register');
+    };
+
     return (
         <AppBar position="static" sx={{ backgroundColor: 'white', color: 'black' }}>
         <Toolbar>
@@ -48,8 +57,8 @@ const Navbar = () => {
                     {
                         !myToken || !user.connectedUser.id ? (
                             <>
-                                <li><a href="/login"><Button>Se connecter</Button></a></li>
-                                <li><a href="/register"><Button>S'inscrire</Button></a></li>
+                                <li><Button onClick={redirectToLogin}>Se connecter</Button></li>
+                                <li><Button onClick={redirectToRegister}>S'inscrire</Button></li>
                             </>
                         ) : (
                             <li>

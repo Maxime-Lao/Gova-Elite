@@ -6,7 +6,7 @@ import {
     FormControl,
     InputLabel,
     Select,
-    MenuItem, Box, Link, Input
+    MenuItem, Box, Link, Input, Typography
 } from '@mui/material';
 import sendRequest from "../services/axiosRequestFunction";
 import {useNavigate} from "react-router-dom";
@@ -55,6 +55,12 @@ const Register = () => {
             setShowKbis(false);
             setKbis('');
         }
+    };
+
+    const linkStyle = {
+        cursor: 'pointer',
+        textDecoration: 'underline',
+        color: 'blue',
     };
 
     return (
@@ -157,7 +163,9 @@ const Register = () => {
                     </Button>
                 </form>
                 <Box mt={2} textAlign="center">
-                    <Link href="/login">Vous n'avez pas de compte? Inscrivez-vous!</Link>
+                    <Typography onClick={() => navigate('/login')} style={linkStyle}>
+                        Vous avez déjà un compte? Connectez-vous!
+                    </Typography>
                 </Box>
             </Grid>
         </Grid>

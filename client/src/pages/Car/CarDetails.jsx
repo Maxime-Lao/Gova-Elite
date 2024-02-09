@@ -12,6 +12,14 @@ import format from 'date-fns/format';
 import { fr } from 'date-fns/locale';
 import Rating from '@mui/material/Rating';
 import Stack from '@mui/material/Stack';
+import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
+import BedroomBabyIcon from '@mui/icons-material/BedroomBaby';
+import AirlineSeatReclineExtraIcon from '@mui/icons-material/AirlineSeatReclineExtra';
+import EuroIcon from '@mui/icons-material/Euro';
+import CarCrashIcon from '@mui/icons-material/CarCrash';
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+import BusinessIcon from '@mui/icons-material/Business';
+import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 
 function CarDetails() {
   const { id } = useParams();
@@ -92,7 +100,7 @@ function CarDetails() {
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <Typography variant="h4" component="h2">
-                <strong>{car.model.brand.name} - {car.model.name}</strong>
+                <strong>{car.model.brand.name} - {car.model.name} - {car.year}</strong>
                 <Typography component={'span'} variant={'body1'} gutterBottom>
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <Rating name="half-rating-read" value={calculateAverageRating()} precision={0.5} readOnly />
@@ -108,9 +116,9 @@ function CarDetails() {
                   <List>
                     <ListItem>
                       <ListItemIcon>
-                        <DirectionsCar />
+                        <BedroomBabyIcon />
                       </ListItemIcon>
-                      <ListItemText primary={`Année: ${car.year}`} />
+                      <ListItemText primary={`${car.horses} chevaux`} />
                     </ListItem>
                   </List>
                 </Grid>
@@ -118,73 +126,7 @@ function CarDetails() {
                   <List>
                     <ListItem>
                       <ListItemIcon>
-                        <CarRental />
-                      </ListItemIcon>
-                      <ListItemText primary={`Chevaux: ${car.horses}`} />
-                    </ListItem>
-                  </List>
-                </Grid>
-              </Grid>
-              <Grid container spacing={2}>
-                <Grid item xs={6}>
-                  <List>
-                    <ListItem>
-                      <ListItemIcon>
-                        <DirectionsCar />
-                      </ListItemIcon>
-                      <ListItemText primary={`${car.nbSeats}`} />
-                    </ListItem>
-                  </List>
-                </Grid>
-                <Grid item xs={6}>
-                  <List>
-                    <ListItem>
-                      <ListItemIcon>
-                        <CarRental />
-                      </ListItemIcon>
-                      <ListItemText primary={`${car.nbDoors}`} />
-                    </ListItem>
-                  </List>
-                </Grid>
-              </Grid>
-              <Grid container spacing={2}>
-                <Grid item xs={6}>
-                  <List>
-                    <ListItem>
-                      <ListItemIcon>
-                        <DirectionsCar />
-                      </ListItemIcon>
-                      <ListItemText primary={`${car.price}`} />
-                    </ListItem>
-                  </List>
-                </Grid>
-                <Grid item xs={6}>
-                  <List>
-                    <ListItem>
-                      <ListItemIcon>
-                        <CarRental />
-                      </ListItemIcon>
-                      <ListItemText primary={`${car.mileage}`} />
-                    </ListItem>
-                  </List>
-                </Grid>
-              </Grid>
-              <Grid container spacing={2}>
-                <Grid item xs={6}>
-                  <List>
-                    <ListItem>
-                      <ListItemIcon>
-                        <DirectionsCar />
-                      </ListItemIcon>
-                      <ListItemText primary={`${car.model.name}`} />
-                    </ListItem>
-                  </List>
-                </Grid>
-                <Grid item xs={6}>
-                  <List>
-                    <ListItem>
-                      <ListItemIcon>
-                        <CarRental />
+                        <SettingsSuggestIcon />
                       </ListItemIcon>
                       <ListItemText primary={`${car.gear.name}`} />
                     </ListItem>
@@ -196,7 +138,51 @@ function CarDetails() {
                   <List>
                     <ListItem>
                       <ListItemIcon>
-                        <DirectionsCar />
+                        <AirlineSeatReclineExtraIcon />
+                      </ListItemIcon>
+                      <ListItemText primary={`${car.nbSeats} sièges`} />
+                    </ListItem>
+                  </List>
+                </Grid>
+                <Grid item xs={6}>
+                  <List>
+                    <ListItem>
+                      <ListItemIcon>
+                        <CarRental />
+                      </ListItemIcon>
+                      <ListItemText primary={`${car.nbDoors} portes`} />
+                    </ListItem>
+                  </List>
+                </Grid>
+              </Grid>
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <List>
+                    <ListItem>
+                      <ListItemIcon>
+                        <EuroIcon />
+                      </ListItemIcon>
+                      <ListItemText primary={`${car.price}€`} />
+                    </ListItem>
+                  </List>
+                </Grid>
+                <Grid item xs={6}>
+                  <List>
+                    <ListItem>
+                      <ListItemIcon>
+                        <CarCrashIcon />
+                      </ListItemIcon>
+                      <ListItemText primary={`${car.mileage} km`} />
+                    </ListItem>
+                  </List>
+                </Grid>
+              </Grid>
+              <Grid container spacing={2}>
+                <Grid item xs={6}>
+                  <List>
+                    <ListItem>
+                      <ListItemIcon>
+                        <LocalGasStationIcon />
                       </ListItemIcon>
                       <ListItemText primary={`${car.energy.name}`} />
                     </ListItem>
@@ -206,7 +192,7 @@ function CarDetails() {
                   <List>
                     <ListItem>
                       <ListItemIcon>
-                        <CarRental />
+                        <BusinessIcon />
                       </ListItemIcon>
                       <ListItemText primary={`${car.companie.name}`} />
                     </ListItem>

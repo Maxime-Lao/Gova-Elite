@@ -22,10 +22,10 @@ class Brand
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: 'Le nom ne peut pas être vide')]
-    #[Groups(['car:read', 'car_search:read', 'user:read', 'model:read'])]
+    #[Groups(['car:read', 'car_search:read', 'user:read', 'model:read', 'rents:read', 'comments:read'])]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'brand', targetEntity: Model::class)]
+    #[ORM\OneToMany(mappedBy: 'brand', targetEntity: Model::class, orphanRemoval: true)]
     private Collection $models;
 
     #[ORM\Column]
@@ -77,7 +77,6 @@ class Brand
     public function removeModel(Model $model): static
     {
         if ($this->models->removeElement($model)) {
-            // set the owning side to null (unless already changed)
             if ($model->getBrand() === $this) {
                 $model->setBrand(null);
             }

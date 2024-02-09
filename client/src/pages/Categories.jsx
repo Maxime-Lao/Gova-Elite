@@ -25,6 +25,8 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import format from 'date-fns/format';
+import { fr } from 'date-fns/locale';
 import {createTheme, styled, ThemeProvider, useTheme} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -39,6 +41,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import {MainListItems, secondaryListItems} from '../components/dashboard/ListItems.jsx';
 import { useMediaQuery } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
 
 export function Copyright() {
     return (
@@ -130,6 +133,7 @@ export default function Categories() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [open, setOpen] = useState(!isMobile);
+    const [isLoading, setIsLoading] = useState(true);
     const [categories, setCategories] = useState([]);
     const [openCreateDialog, setOpenCreateDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -144,7 +148,6 @@ export default function Categories() {
 
     const [libelle, setLibelle] = useState('');
     const [error, setError] = useState('');
-    const [errorUpdate, setErrorUpdate] = useState('');
     const [success, setSuccess] = useState('');
 
     useEffect(() => {
@@ -153,6 +156,7 @@ export default function Categories() {
 
     useEffect(() => {
         const getCategories = async () => {
+            setIsLoading(true);
             try {
                 const response = await fetch('http://localhost:8000/api/categories', {
                     method: 'GET',
@@ -168,8 +172,10 @@ export default function Categories() {
 
                 const data = await response.json();
                 setCategories(data);
+                setIsLoading(false);
             } catch (error) {
                 console.error(error);
+                setIsLoading(false);
             }
         };
 
@@ -205,17 +211,15 @@ export default function Categories() {
             });
 
             if (!response.ok) {
-            setFormErrors({});
+                setFormErrors({});
 
                 const data = await response.json();
-                console.log(data.violations);
 
                 if (data.violations) {
                     const errors = {};
                     data.violations.forEach(violation => {
                         errors[violation.propertyPath] = violation.message;
                     });
-                    console.log(errors);
                     setFormErrors(errors);
                 } else {
                     setError('Une erreur s\'est produite lors de la création de la catégorie.');
@@ -223,6 +227,7 @@ export default function Categories() {
                 return;
             } else {
                 const data = await response.json();
+                setError('');
                 setCategories([...categories, data]);
                 setOpenCreateDialog(false);
                 setSuccess('Catégorie créée avec succès !');
@@ -257,26 +262,21 @@ export default function Categories() {
             }
 
             const updatedCategories = categories.filter(category => category.id !== selectedCategory.id);
+            setError('');
             setCategories(updatedCategories);
             setOpenDeleteDialog(false);
-            setSuccess('Categorie supprimée avec succès !');
+            setSuccess('Catégorie supprimée avec succès !');
         } catch (error) {
             setError('Une erreur s\'est produite lors de la suppression de la catégorie.');
         }
     };
 
     const handleEdit = (category) => {
-        setErrorUpdate('');
         setSelectedCategory(category);
         setOpenEditDialog(true);
     };
 
     const handleUpdate = async () => {
-        if (!libelle.trim()) {
-            setErrorUpdate('Le libelle de la catégorie ne peut pas être vide.');
-            return;
-        }
-
         try {
             const response = await fetch(`http://localhost:8000/api/categories/${selectedCategory.id}`, {
                 method: 'PATCH',
@@ -291,26 +291,298 @@ export default function Categories() {
             });
 
             if (!response.ok) {
-                throw new Error(`Erreur HTTP! Statut: ${response.status}`);
-            }
+                setFormErrors({});
+    
+                const data = await response.json();
 
-            const updatedCategories = categories.map(category => {
-                if (category.id === selectedCategory.id) {
-                    return {
-                        ...category,
-                        libelle: libelle
-                    };
+                if (data.violations) {
+                    const errors = {};
+                    data.violations.forEach(violation => {
+                        errors[violation.propertyPath] = violation.message;
+                    });
+                    setFormErrors(errors);
+                } else {
+                    setError('Une erreur s\'est produite lors de la création de la catégorie.');
                 }
-                return category;
-            });
-
-            setCategories(updatedCategories);
-            setOpenEditDialog(false);
-            setSuccess('Cattégorie modifiée avec succès !');
+                return;
+            } else {
+                const updatedCategories = categories.map(category => {
+                    if (category.id === selectedCategory.id) {
+                        return {
+                            ...category,
+                            libelle: libelle,
+                            updatedAt: new Date().toISOString(),
+                        };
+                    }
+                    return category;
+                });
+    
+                setError('');
+                setCategories(updatedCategories);
+                setOpenEditDialog(false);
+                setSuccess('Catégorie modifiée avec succès !');
+            }
         } catch (error) {
             setError('Une erreur s\'est produite lors de la mise à jour de la catégorie.');
         }
     };
+
+    if (isLoading) {
+        return (
+
+            <ThemeProvider theme={defaultTheme}>
+            <Box sx={{ display: 'flex' }}>
+                <CssBaseline />
+                <AppBar position="absolute" open={open}>
+                    <Toolbar sx={{ pr: '24px' }}>
+                        <IconButton
+                            edge="start"
+                            color="inherit"
+                            aria-label="open drawer"
+                            onClick={toggleDrawer}
+                            sx={{
+                                marginRight: '36px',
+                                ...(open && { display: 'none' }),
+                            }}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                        <Typography
+                            component="h1"
+                            variant="h6"
+                            color="inherit"
+                            noWrap
+                            sx={{ flexGrow: 1 }}
+                        >
+                            Dashboard
+                        </Typography>
+                        <IconButton color="inherit">
+                            <Badge badgeContent={4} color="secondary">
+                                <NotificationsIcon />
+                            </Badge>
+                        </IconButton>
+                    </Toolbar>
+                </AppBar>
+                <Drawer variant="permanent" open={open}>
+                    <Toolbar
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-end',
+                            px: [1],
+                        }}
+                    >
+                        <IconButton onClick={toggleDrawer}>
+                            <ChevronLeftIcon />
+                        </IconButton>
+                    </Toolbar>
+                    <Divider />
+                    <List component="nav">
+                        <MainListItems/>
+                        <Divider sx={{ my: 1 }} />
+                        {secondaryListItems}
+                    </List>
+                </Drawer>
+                <Box
+                    component="main"
+                    sx={{
+                        backgroundColor: (theme) =>
+                            theme.palette.mode === 'light'
+                                ? theme.palette.grey[100]
+                                : theme.palette.grey[900],
+                        flexGrow: 1,
+                        height: '100vh',
+                        overflow: 'auto',
+                    }}
+                >
+                    <Toolbar />
+                    <Box
+                        sx={{
+                            mt: 4,
+                            mb: 4,
+                            flexGrow: 1,
+                            paddingX: 5,
+                        }}
+                    >
+                        <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
+                            Liste des catégories
+                        </Typography>
+                        <Grid container spacing={3} justifyContent="center">
+                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+                                <Box sx={{ display: 'flex' }}>
+                                    <CircularProgress />
+                                </Box>
+                            </div>
+                        </Grid>
+                    </Box>
+                </Box>
+            </Box>
+        </ThemeProvider>
+        );
+    }
+
+    if (!categories.length) {
+        return (
+
+            <ThemeProvider theme={defaultTheme}>
+            <Box sx={{ display: 'flex' }}>
+                <CssBaseline />
+                <AppBar position="absolute" open={open}>
+                    <Toolbar sx={{ pr: '24px' }}>
+                        <IconButton
+                            edge="start"
+                            color="inherit"
+                            aria-label="open drawer"
+                            onClick={toggleDrawer}
+                            sx={{
+                                marginRight: '36px',
+                                ...(open && { display: 'none' }),
+                            }}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                        <Typography
+                            component="h1"
+                            variant="h6"
+                            color="inherit"
+                            noWrap
+                            sx={{ flexGrow: 1 }}
+                        >
+                            Dashboard
+                        </Typography>
+                        <IconButton color="inherit">
+                            <Badge badgeContent={4} color="secondary">
+                                <NotificationsIcon />
+                            </Badge>
+                        </IconButton>
+                    </Toolbar>
+                </AppBar>
+                <Drawer variant="permanent" open={open}>
+                    <Toolbar
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'flex-end',
+                            px: [1],
+                        }}
+                    >
+                        <IconButton onClick={toggleDrawer}>
+                            <ChevronLeftIcon />
+                        </IconButton>
+                    </Toolbar>
+                    <Divider />
+                    <List component="nav">
+                        <MainListItems/>
+                        <Divider sx={{ my: 1 }} />
+                        {secondaryListItems}
+                    </List>
+                </Drawer>
+                <Box
+                    component="main"
+                    sx={{
+                        backgroundColor: (theme) =>
+                            theme.palette.mode === 'light'
+                                ? theme.palette.grey[100]
+                                : theme.palette.grey[900],
+                        flexGrow: 1,
+                        height: '100vh',
+                        overflow: 'auto',
+                    }}
+                >
+                    <Toolbar />
+                    <Box
+                        sx={{
+                            mt: 4,
+                            mb: 4,
+                            flexGrow: 1,
+                            paddingX: 5,
+                        }}
+                    >
+                        <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
+                            Liste des catégories
+                        </Typography>
+                        <Grid container spacing={3} justifyContent="center">
+                            <Grid item xs={12}>
+                                {
+                                    success.length ? (
+                                        <Box mt={2} textAlign="center">
+                                            <p style={{color: 'green'}}>{success}</p>
+                                        </Box>
+                                    ) : null
+                                }
+                                {
+                                    error.length ? (
+                                        <Box mt={2} textAlign="center">
+                                            <p style={{color: 'red'}}>{error}</p>
+                                        </Box>
+                                    ) : null
+                                }
+                                
+                                <Box sx={{ mb: 2 }}>
+                                    <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
+                                        Créer une nouvelle catégorie
+                                    </Button>
+                                </Box>
+
+                                <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
+                                    <DialogTitle>Créer une nouvelle catégorie</DialogTitle>
+                                    <form onSubmit={handleCreate}>
+                                        <DialogContent>
+                                            <TextField
+                                                label="Libelle"
+                                                value={libelle}
+                                                onChange={(e) => setLibelle(e.target.value)}
+                                                fullWidth
+                                                margin="normal"
+                                                error={!!formErrors.libelle}
+                                                required
+                                            />
+                                        </DialogContent>
+                                        <DialogActions>
+                                            <Button onClick={handleCloseCreateDialog}>Annuler</Button>
+                                            <Button type="submit">Créer</Button>
+                                        </DialogActions>
+                                    </form>
+                                    {Object.keys(formErrors).length > 0 && (
+                                        <Box sx={{ margin: 2 }}>
+                                            {Object.values(formErrors).map((error, index) => (
+                                                <Typography key={index} color="error">
+                                                    - {error}
+                                                </Typography>
+                                            ))}
+                                        </Box>
+                                    )}
+                                </Dialog>
+
+                                <TableContainer component={Paper}>
+                                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                                        <TableHead>
+                                            <TableRow style={{background: '#556cd6'}}>
+                                                <TableCell style={{color: 'white'}}>Nom</TableCell>
+                                                <TableCell style={{color: 'white'}}>Crée à</TableCell>
+                                                <TableCell style={{color: 'white'}}>Modifié à</TableCell>
+                                                <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            <TableRow
+                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                            >
+                                                <TableCell component="th" scope="row" colSpan={8} align="center">
+                                                    Aucune catégorie trouvée
+                                                </TableCell>
+                                            </TableRow>
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Grid>
+                        </Grid>
+                    </Box>
+                </Box>
+            </Box>
+        </ThemeProvider>
+        );
+    }
 
     return (
         <ThemeProvider theme={defaultTheme}>
@@ -446,9 +718,11 @@ export default function Categories() {
                                 <TableContainer component={Paper}>
                                     <Table sx={{ minWidth: 650 }} aria-label="simple table">
                                         <TableHead>
-                                            <TableRow>
-                                                <TableCell>Nom</TableCell>
-                                                <TableCell align="right">Actions</TableCell>
+                                            <TableRow style={{background: '#556cd6'}}>
+                                                <TableCell style={{color: 'white'}}>Nom</TableCell>
+                                                <TableCell style={{color: 'white'}}>Crée à</TableCell>
+                                                <TableCell style={{color: 'white'}}>Modifié à</TableCell>
+                                                <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -460,6 +734,8 @@ export default function Categories() {
                                                     <TableCell component="th" scope="row">
                                                         {category.libelle}
                                                     </TableCell>
+                                                    <TableCell>{category.createdAt ? format(new Date(category.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
+                                                    <TableCell>{category.updatedAt ? format(new Date(category.updatedAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
                                                     <TableCell align="right">
                                                         <IconButton onClick={() => handleEdit(category)}>
                                                             <EditIcon />
@@ -505,15 +781,15 @@ export default function Categories() {
                                                 <Button onClick={() => setOpenEditDialog(false)}>Annuler</Button>
                                                 <Button onClick={handleUpdate} autoFocus>Enregistrer</Button>
                                             </DialogActions>
-                                            {
-                                                errorUpdate.length ? (
-                                                    <Box sx={{ margin: 2 }}>
-                                                        <Typography color="error">
-                                                            {errorUpdate}
+                                            {Object.keys(formErrors).length > 0 && (
+                                                <Box sx={{ margin: 2 }}>
+                                                    {Object.values(formErrors).map((error, index) => (
+                                                        <Typography key={index} color="error">
+                                                            - {error}
                                                         </Typography>
-                                                    </Box>
-                                                ) : null
-                                            }
+                                                    ))}
+                                                </Box>
+                                            )}
                                         </Dialog>
                                     </Table>
                                 </TableContainer>

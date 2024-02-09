@@ -42,6 +42,8 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import {MainListItems, secondaryListItems} from '../components/dashboard/ListItems.jsx';
 import { useMediaQuery } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
+import Rating from '@mui/material/Rating';
+import Stack from '@mui/material/Stack';
 
 export function Copyright() {
     return (
@@ -129,24 +131,20 @@ const defaultTheme = createTheme({
     },
 });
 
-export default function Brands() {
+export default function Comments() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [open, setOpen] = useState(!isMobile);
     const [isLoading, setIsLoading] = useState(true);
-    const [brands, setBrands] = useState([]);
-    const [openCreateDialog, setOpenCreateDialog] = useState(false);
+    const [comments, setComments] = useState([]);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-    const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [selectedBrand, setSelectedBrand] = useState(null);
+    const [selectedComment, setSelectedComment] = useState(null);
     const token = localStorage.getItem('token');
-    const [formErrors, setFormErrors] = useState({});
 
     const toggleDrawer = () => {
         setOpen(!open);
     };
 
-    const [name, setName] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
@@ -155,10 +153,10 @@ export default function Brands() {
     }, [isMobile]);
 
     useEffect(() => {
-        const getBrands = async () => {
+        const getComments = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://localhost:8000/api/brands', {
+                const response = await fetch('http://localhost:8000/api/comments', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -171,7 +169,7 @@ export default function Brands() {
                 }
 
                 const data = await response.json();
-                setBrands(data);
+                setComments(data);
                 setIsLoading(false);
             } catch (error) {
                 console.error(error);
@@ -179,76 +177,17 @@ export default function Brands() {
             }
         };
 
-        getBrands();
+        getComments();
     }, [token]);
-    
-    const handleDelete = (brand) => {
-        setSelectedBrand(brand);
+
+    const handleDelete = (comment) => {
+        setSelectedComment(comment);
         setOpenDeleteDialog(true);
-    };
-
-    useEffect(() => {
-        if (selectedBrand) {
-            setName(selectedBrand.name);
-        }
-    }, [selectedBrand]);    
-
-    const handleCreate = async () => {
-        event.preventDefault();
-        
-        try {
-            const response = await fetch('http://localhost:8000/api/brands', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    name: name,
-                    createdAt: new Date().toISOString(),
-                }),
-            });
-
-            if (!response.ok) {
-                setFormErrors({});
-
-                const data = await response.json();
-
-                if (data.violations) {
-                    const errors = {};
-                    data.violations.forEach(violation => {
-                        errors[violation.propertyPath] = violation.message;
-                    });
-                    setFormErrors(errors);
-                } else {
-                    setError('Une erreur s\'est produite lors de la création de la marque.');
-                }
-                return;
-            } else {
-                const data = await response.json();
-                setError('');
-                setBrands([...brands, data]);
-                setOpenCreateDialog(false);
-                setSuccess('Marque créée avec succès !');
-            }
-        } catch (error) {
-            setError('Une erreur s\'est produite lors de la création de la marque.');
-        }
-    };
-
-    const handleOpenCreateDialog = () => {
-        setFormErrors({});
-        setName('');
-        setOpenCreateDialog(true);
-    };
-    
-    const handleCloseCreateDialog = () => {
-        setOpenCreateDialog(false);
     };
 
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/brands/${selectedBrand.id}`, {
+            const response = await fetch(`http://localhost:8000/api/comments/${selectedComment.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -260,70 +199,13 @@ export default function Brands() {
                 throw new Error(`Erreur HTTP! Statut: ${response.status}`);
             }
 
-            const updatedBrands = brands.filter(brand => brand.id !== selectedBrand.id);
+            const updatedComments = comments.filter(comment => comment.id !== selectedComment.id);
             setError('');
-            setBrands(updatedBrands);
+            setComments(updatedComments);
             setOpenDeleteDialog(false);
-            setSuccess('Marque supprimée avec succès !');
+            setSuccess('Commentaire supprimé avec succès !');
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la suppression de la marque.');
-        }
-    };
-
-    const handleEdit = (brand) => {
-        setFormErrors({});
-        setSelectedBrand(brand);
-        setOpenEditDialog(true);
-    };
-
-    const handleUpdate = async () => {
-        try {
-            const response = await fetch(`http://localhost:8000/api/brands/${selectedBrand.id}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/merge-patch+json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    name: name,
-                    updatedAt: new Date().toISOString(),
-                }),
-            });
-
-            if (!response.ok) {
-                setFormErrors({});
-
-                const data = await response.json();
-
-                if (data.violations) {
-                    const errors = {};
-                    data.violations.forEach(violation => {
-                        errors[violation.propertyPath] = violation.message;
-                    });
-                    setFormErrors(errors);
-                } else {
-                    setError('Une erreur s\'est produite lors de la création de la marque.');
-                }
-                return;
-            } else {
-                const updatedBrands = brands.map(brand => {
-                    if (brand.id === selectedBrand.id) {
-                        return {
-                            ...brand,
-                            name: name,
-                            updatedAt: new Date().toISOString(),
-                        };
-                    }
-                    return brand;
-                });
-    
-                setError('');
-                setBrands(updatedBrands);
-                setOpenEditDialog(false);
-                setSuccess('Marque modifiée avec succès !');
-            }
-        } catch (error) {
-            setError('Une erreur s\'est produite lors de la mise à jour de la marque.');
+            setError('Une erreur s\'est produite lors de la suppression du commentaire.');
         }
     };
 
@@ -405,7 +287,7 @@ export default function Brands() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des marques
+                            Liste des commentaires
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
@@ -420,8 +302,8 @@ export default function Brands() {
         </ThemeProvider>
         );
     }
-
-    if (!brands.length) {
+    
+    if (!comments.length) {
         return (
 
             <ThemeProvider theme={defaultTheme}>
@@ -499,81 +381,34 @@ export default function Brands() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des marques
+                            Liste des commentaires
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
-                        <Grid item xs={12}>
-                                {
-                                    success.length ? (
-                                        <Box mt={2} textAlign="center">
-                                            <p style={{color: 'green'}}>{success}</p>
-                                        </Box>
-                                    ) : null
-                                }
-                                {
-                                    error.length ? (
-                                        <Box mt={2} textAlign="center">
-                                            <p style={{color: 'red'}}>{error}</p>
-                                        </Box>
-                                    ) : null
-                                }
-                                
-                                <Box sx={{ mb: 2 }}>
-                                    <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
-                                        Créer une nouvelle marque
-                                    </Button>
-                                </Box>
-
-                                <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
-                                    <DialogTitle>Créer une nouvelle marque</DialogTitle>
-                                    <form onSubmit={handleCreate}>
-                                        <DialogContent>
-                                            <TextField
-                                                label="Name"
-                                                value={name}
-                                                onChange={(e) => setName(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.name}
-                                                required
-                                            />
-                                        </DialogContent>
-                                        <DialogActions>
-                                            <Button onClick={handleCloseCreateDialog}>Annuler</Button>
-                                            <Button type="submit">Créer</Button>
-                                        </DialogActions>
-                                    </form>
-                                    {Object.keys(formErrors).length > 0 && (
-                                        <Box sx={{ margin: 2 }}>
-                                            {Object.values(formErrors).map((error, index) => (
-                                                <Typography key={index} color="error">
-                                                    - {error}
-                                                </Typography>
-                                            ))}
-                                        </Box>
-                                    )}
-                                </Dialog>
-
-                                <TableContainer component={Paper}>
-                                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                                        <TableHead>
-                                            <TableRow style={{background: '#556cd6'}}>
-                                                <TableCell style={{color: 'white'}}>Nom</TableCell>
-                                                <TableCell style={{color: 'white'}}>Crée à</TableCell>
-                                                <TableCell style={{color: 'white'}}>Modifié à</TableCell>
-                                                <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            <TableRow
-                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                            >
-                                                <TableCell component="th" scope="row" colSpan={8} align="center">
-                                                    Aucune marque trouvée
-                                                </TableCell>
-                                            </TableRow>
-                                        </TableBody>
-                                    </Table>
+                            <Grid item xs={12}>
+                            <TableContainer component={Paper}>
+                                <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                                    <TableHead>
+                                    <TableRow style={{background: '#556cd6'}}>
+                                        <TableCell style={{color: 'white'}}>Compagnie</TableCell>
+                                        <TableCell style={{color: 'white'}}>Modèle</TableCell>
+                                        <TableCell style={{color: 'white'}}>Marque</TableCell>
+                                        <TableCell style={{color: 'white'}}>Utilisateur</TableCell>
+                                        <TableCell style={{color: 'white'}}>Commentaire</TableCell>
+                                        <TableCell style={{color: 'white'}}>Note globale</TableCell>
+                                        <TableCell style={{color: 'white'}}>Créé à</TableCell>
+                                        <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
+                                    </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        <TableRow
+                                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                        >
+                                            <TableCell component="th" scope="row" colSpan={8} align="center">
+                                                Aucun commentaire trouvé
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
                                 </TableContainer>
                             </Grid>
                         </Grid>
@@ -660,136 +495,75 @@ export default function Brands() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des marques
+                            Liste des commentaires
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                             <Grid item xs={12}>
                                 {
                                     success.length ? (
-                                        <Box mt={2} textAlign="center">
+                                        <Box mt={2} textAlign="center" style={{marginBottom: '50px'}}>
                                             <p style={{color: 'green'}}>{success}</p>
                                         </Box>
                                     ) : null
                                 }
                                 {
                                     error.length ? (
-                                        <Box mt={2} textAlign="center">
+                                        <Box mt={2} textAlign="center" style={{marginBottom: '50px'}}>
                                             <p style={{color: 'red'}}>{error}</p>
                                         </Box>
                                     ) : null
                                 }
                                 
-                                <Box sx={{ mb: 2 }}>
-                                    <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
-                                        Créer une nouvelle marque
-                                    </Button>
-                                </Box>
-
-                                <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
-                                    <DialogTitle>Créer une nouvelle marque</DialogTitle>
-                                    <form onSubmit={handleCreate}>
-                                        <DialogContent>
-                                            <TextField
-                                                label="Name"
-                                                value={name}
-                                                onChange={(e) => setName(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.name}
-                                                required
-                                            />
-                                        </DialogContent>
-                                        <DialogActions>
-                                            <Button onClick={handleCloseCreateDialog}>Annuler</Button>
-                                            <Button type="submit">Créer</Button>
-                                        </DialogActions>
-                                    </form>
-                                    {Object.keys(formErrors).length > 0 && (
-                                        <Box sx={{ margin: 2 }}>
-                                            {Object.values(formErrors).map((error, index) => (
-                                                <Typography key={index} color="error">
-                                                    - {error}
-                                                </Typography>
-                                            ))}
-                                        </Box>
-                                    )}
-                                </Dialog>
-
                                 <TableContainer component={Paper}>
                                     <Table sx={{ minWidth: 650 }} aria-label="simple table">
                                         <TableHead>
                                             <TableRow style={{background: '#556cd6'}}>
-                                                <TableCell style={{color: 'white'}}>Nom</TableCell>
+                                                <TableCell style={{color: 'white'}}>Compagnie</TableCell>
+                                                <TableCell style={{color: 'white'}}>Modèle</TableCell>
+                                                <TableCell style={{color: 'white'}}>Marque</TableCell>
+                                                <TableCell style={{color: 'white'}}>Utilisateur</TableCell>
+                                                <TableCell style={{color: 'white'}}>Commentaire</TableCell>
+                                                <TableCell style={{color: 'white'}}>Notre globale</TableCell>
                                                 <TableCell style={{color: 'white'}}>Crée à</TableCell>
-                                                <TableCell style={{color: 'white'}}>Modifié à</TableCell>
                                                 <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {brands.map((brand) => (
+                                            {comments.map((comment) => (
                                                 <TableRow
-                                                    key={brand.id}
+                                                    key={comment.id}
                                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                 >
                                                     <TableCell component="th" scope="row">
-                                                        {brand.name}
+                                                        {comment.car.companie.name}
                                                     </TableCell>
-                                                    <TableCell>{brand.createdAt ? format(new Date(brand.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
-                                                    <TableCell>{brand.updatedAt ? format(new Date(brand.updatedAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
+                                                    <TableCell>{comment.car.model.name}</TableCell>
+                                                    <TableCell>{comment.car.model.brand.name}</TableCell>
+                                                    <TableCell>{comment.author.firstname} {comment.author.lastname}</TableCell>
+                                                    <TableCell>{comment.comment}</TableCell>
+                                                    <TableCell><Rating name="half-rating-read" value={comment.globalRating} precision={0.5} readOnly /></TableCell>
+                                                    <TableCell>{comment.createdAt ? format(new Date(comment.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
                                                     <TableCell align="right">
-                                                        <IconButton onClick={() => handleEdit(brand)}>
-                                                            <EditIcon />
-                                                        </IconButton>
-                                                        <IconButton onClick={() => handleDelete(brand)}>
+                                                        <IconButton onClick={() => handleDelete(comment)}>
                                                             <DeleteIcon />
                                                         </IconButton>
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>
-                               
+
                                         <Dialog
                                             open={openDeleteDialog}
                                             onClose={() => setOpenDeleteDialog(false)}
                                         >
                                             <DialogTitle>Confirmation</DialogTitle>
                                             <DialogContent>
-                                                Êtes-vous sûr de vouloir supprimer cette marque ?
+                                                Êtes-vous sûr de vouloir supprimer ce commentaire ?
                                             </DialogContent>
                                             <DialogActions>
                                                 <Button onClick={() => setOpenDeleteDialog(false)}>Annuler</Button>
                                                 <Button onClick={handleConfirmDelete} autoFocus>Supprimer</Button>
                                             </DialogActions>
-                                        </Dialog>
-                                 
-                                        <Dialog
-                                            open={openEditDialog}
-                                            onClose={() => setOpenEditDialog(false)}
-                                        >
-                                            <DialogTitle>Modifier la marque</DialogTitle>
-                                            <DialogContent>
-                                                <TextField
-                                                    label="Name"
-                                                    type="text"
-                                                    value={name}
-                                                    onChange={(e) => setName(e.target.value)}
-                                                    fullWidth
-                                                    margin="normal"
-                                                />
-                                            </DialogContent>
-                                            <DialogActions>
-                                                <Button onClick={() => setOpenEditDialog(false)}>Annuler</Button>
-                                                <Button onClick={handleUpdate} autoFocus>Enregistrer</Button>
-                                            </DialogActions>
-                                            {Object.keys(formErrors).length > 0 && (
-                                                <Box sx={{ margin: 2 }}>
-                                                    {Object.values(formErrors).map((error, index) => (
-                                                        <Typography key={index} color="error">
-                                                            - {error}
-                                                        </Typography>
-                                                    ))}
-                                                </Box>
-                                            )}
                                         </Dialog>
                                     </Table>
                                 </TableContainer>

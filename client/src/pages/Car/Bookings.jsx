@@ -45,9 +45,7 @@ function Bookings() {
   const commentedRentIds = new Set();
   if (userCommentsData) {
     userCommentsData.forEach(comment => {
-      comment.car.rents.forEach(rent => {
-        commentedRentIds.add(rent.id);
-      });
+      commentedRentIds.add(comment.rent.id);
     });
   }
 

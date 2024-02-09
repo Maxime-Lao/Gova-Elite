@@ -22,7 +22,7 @@ class Companie
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: 'Le nom de la companie ne peut pas être vide')]
-    #[Groups(['car:read', 'car_search:read', 'comments_car:read', 'user:read', 'rents_user:read'])]
+    #[Groups(['car:read', 'car_search:read', 'comments_car:read', 'user:read', 'rents_user:read', 'rents:read', 'comments:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
@@ -34,7 +34,7 @@ class Companie
     private Collection $users;
 
     #[ORM\Column]
-    #[Assert\Type(type: 'integer', message: 'Le code postal doit être un nombre entier')]
+    #[Assert\NotBlank(message: 'Le code postal ne peut pas être vide')]
     #[Assert\Length(
         min: 5,
         max: 10,
@@ -42,17 +42,18 @@ class Companie
         maxMessage: 'Le code postal ne peut pas dépasser 10 chiffres'
     )]
     #[Groups(['car_search:read', 'user:read'])]
-    private ?string $zipCode = null;
+    private ?int $zipCode = null;
 
     #[ORM\Column(length: 100)]
+    #[Assert\NotBlank(message: 'La ville ne peut pas être vide')]
     #[Groups(['car_search:read', 'user:read'])]
     private ?string $city = null;
 
-    #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Car::class)]
+    #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Car::class, orphanRemoval: true)]
     #[Groups(['user:read'])]
     private Collection $cars;
 
-    #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Notice::class)]
+    #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Notice::class, orphanRemoval: true)]
     #[Groups(['user:read'])]
     private Collection $notices;
 
@@ -100,12 +101,12 @@ class Companie
 
 
 
-    public function getZipCode(): ?string
+    public function getZipCode(): ?int
     {
         return $this->zipCode;
     }
 
-    public function setZipCode(string $zipCode): static
+    public function setZipCode(int $zipCode): static
     {
         $this->zipCode = $zipCode;
 
@@ -175,7 +176,6 @@ class Companie
     public function removeNotice(Notice $notice): static
     {
         if ($this->notices->removeElement($notice)) {
-            // set the owning side to null (unless already changed)
             if ($notice->getCompanie() === $this) {
                 $notice->setCompanie(null);
             }
@@ -205,7 +205,6 @@ class Companie
     public function removeUser(User $user): static
     {
         if ($this->cars->removeElement($user)) {
-            // set the owning side to null (unless already changed)
             if ($user->getCompanie() === $this) {
                 $user->setCompagnie(null);
             }

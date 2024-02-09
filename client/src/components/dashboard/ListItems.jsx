@@ -1,4 +1,5 @@
-import * as React from 'react';
+import React, { useState } from 'react';
+import { useNavigate, useLocation } from "react-router-dom";
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -8,90 +9,135 @@ import PeopleIcon from '@mui/icons-material/People';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import LayersIcon from '@mui/icons-material/Layers';
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import {useNavigate} from "react-router-dom";
+import BrandingWatermarkIcon from '@mui/icons-material/BrandingWatermark';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
+import WebStoriesIcon from '@mui/icons-material/WebStories';
+import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
+import ClassIcon from '@mui/icons-material/Class';
+import BusinessIcon from '@mui/icons-material/Business';
+import BallotIcon from '@mui/icons-material/Ballot';
+import MessageIcon from '@mui/icons-material/Message';
+import HomeIcon from '@mui/icons-material/Home';
 
 export const MainListItems = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const [selectedPage, setSelectedPage] = useState(location.pathname);
+    
+    const handleListItemClick = (path) => {
+        setSelectedPage(path);
+        navigate(path);
+    };
+    
+    const isSelected = (path) => selectedPage === path;
 
     return (
         <React.Fragment>
-            <ListItemButton onClick={ () => navigate('/admin/dashboard') }>
+            <ListItemButton 
+                onClick={() => handleListItemClick('/admin/dashboard')}
+                selected={isSelected('/admin/dashboard')}
+            >
                 <ListItemIcon>
                     <DashboardIcon />
                 </ListItemIcon>
                 <ListItemText primary="Dashboard" />
             </ListItemButton>
-            <ListItemButton onClick={ () => navigate('/admin/users') }>
+            <ListItemButton
+                onClick={() => handleListItemClick('/admin/users')}
+                selected={isSelected('/admin/users')}
+            >
                 <ListItemIcon>
                     <PeopleIcon />
                 </ListItemIcon>
                 <ListItemText primary="Utilisateurs" />
             </ListItemButton>
-            <ListItemButton onClick={ () => navigate('/admin/brands') }>
+            <ListItemButton 
+                onClick={() => handleListItemClick('/admin/brands')}
+                selected={isSelected('/admin/brands')}
+            >
                 <ListItemIcon>
-                    <PeopleIcon />
+                    <BrandingWatermarkIcon />
                 </ListItemIcon>
                 <ListItemText primary="Marques" />
             </ListItemButton>
-            <ListItemButton onClick={ () => navigate('/admin/cars') }>
+            <ListItemButton
+                onClick={() => handleListItemClick('/admin/cars')}
+                selected={isSelected('/admin/cars')}
+            >
                 <ListItemIcon>
-                    <PeopleIcon />
+                    <DirectionsCarIcon />
                 </ListItemIcon>
                 <ListItemText primary="Voitures" />
             </ListItemButton>
-            <ListItemButton onClick={ () => navigate('/admin/gears') }>
+            <ListItemButton
+                onClick={() => handleListItemClick('/admin/gears')}
+                selected={isSelected('/admin/gears')}
+            >
                 <ListItemIcon>
-                    <PeopleIcon />
+                    <SettingsSuggestIcon />
                 </ListItemIcon>
                 <ListItemText primary="Boîtes de vitesse" />
             </ListItemButton>
-            <ListItemButton onClick={ () => navigate('/admin/models') }>
+            <ListItemButton
+                onClick={() => handleListItemClick('/admin/models')}
+                selected={isSelected('/admin/models')}
+            >
                 <ListItemIcon>
-                    <PeopleIcon />
+                    <WebStoriesIcon />
                 </ListItemIcon>
                 <ListItemText primary="Modèles" />
             </ListItemButton>
-            <ListItemButton onClick={ () => navigate('/admin/energies') }>
+            <ListItemButton
+                onClick={() => handleListItemClick('/admin/energies')}
+                selected={isSelected('/admin/energies')}
+            >
                 <ListItemIcon>
-                    <PeopleIcon />
+                    <LocalGasStationIcon />
                 </ListItemIcon>
                 <ListItemText primary="Energies" />
             </ListItemButton>
-            <ListItemButton onClick={ () => navigate('/admin/categories') }>
+            <ListItemButton
+                onClick={() => handleListItemClick('/admin/categories')}
+                selected={isSelected('/admin/categories')}
+            >
                 <ListItemIcon>
-                    <PeopleIcon />
+                    <ClassIcon />
                 </ListItemIcon>
                 <ListItemText primary="Catégories" />
             </ListItemButton>
-            <ListItemButton onClick={ () => navigate('/admin/companies') }>
+            <ListItemButton
+                onClick={() => handleListItemClick('/admin/companies')}
+                selected={isSelected('/admin/companies')}
+            >
                 <ListItemIcon>
-                    <PeopleIcon />
+                    <BusinessIcon />
                 </ListItemIcon>
                 <ListItemText primary="Compagnies" />
             </ListItemButton>
-            <ListItemButton onClick={ () => navigate('/admin/rents') }>
+            <ListItemButton 
+                onClick={() => handleListItemClick('/admin/rents')}
+                selected={isSelected('/admin/rents')}
+            >
                 <ListItemIcon>
-                    <PeopleIcon />
+                    <BallotIcon />
                 </ListItemIcon>
                 <ListItemText primary="Réservations" />
             </ListItemButton>
-            <ListItemButton onClick={ () => navigate('/admin/comments') }>
+            <ListItemButton
+                onClick={() => handleListItemClick('/admin/comments')}
+                selected={isSelected('/admin/comments')}
+            >
                 <ListItemIcon>
-                    <PeopleIcon />
+                    <MessageIcon />
                 </ListItemIcon>
                 <ListItemText primary="Commentaires" />
             </ListItemButton>
-            <ListItemButton>
+            <ListItemButton onClick={ () => navigate('/') }>
                 <ListItemIcon>
-                    <BarChartIcon />
+                    <HomeIcon />
                 </ListItemIcon>
-                <ListItemText primary="Reports" />
-            </ListItemButton>
-            <ListItemButton>
-                <ListItemIcon>
-                    <LayersIcon />
-                </ListItemIcon>
-                <ListItemText primary="Integrations" />
+                <ListItemText primary="Page d'accueil" />
             </ListItemButton>
         </React.Fragment>
     )
