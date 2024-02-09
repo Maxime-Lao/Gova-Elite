@@ -7,6 +7,7 @@ import logo from '../../assets/img/la-gova.png';
 import {useCallback, useState} from "react";
 import AvatarDialog from "./AvatarDialog.jsx";
 import useGetConnectedUser from "../hooks/useGetConnectedUser.jsx";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
 
