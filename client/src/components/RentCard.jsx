@@ -1,6 +1,9 @@
-import { Card, CardMedia, CardContent, Typography, Button, Box } from "@mui/material";
+import { Card, CardMedia, CardContent, Typography, Button, Box, Stack, Link } from "@mui/material";
+import DoorBackIcon from '@mui/icons-material/DoorBack';
+import EventSeatIcon from '@mui/icons-material/EventSeat';
+import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 
-const RentCard = (car) => {
+const RentCard = (data) => {
     return (
         <Card variant="outlined" orientation="horizontal"
         sx={{
@@ -20,22 +23,48 @@ const RentCard = (car) => {
                 sx={{ width: '40%' }}
             />
             <CardContent sx={{ display:"flex", flexDirection: "column", justifyContent: "space-between" }}>
-                <Typography sx={{ textTransform: 'uppercase' }} color="textSecondary" gutterBottom>
-                    {car.car.model.brand.name}
-                </Typography>
+                <Stack direction="row" spacing={2} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box>
+                        <Typography sx={{ textTransform: 'uppercase' }} color="textSecondary" gutterBottom>
+                            {data.car.model.brand.name}
+                        </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: '2em' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2, flexDirection: "column" }}>
+                            <DoorBackIcon sx={{ marginRight: 1 }} />
+                            <Typography variant="body2" color="textSecondary" component="p">
+                                {data.car.nbDoors} portes
+                            </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2, flexDirection: "column" }}>
+                            <EventSeatIcon sx={{ marginRight: 1 }} />
+                            <Typography variant="body2" color="textSecondary" component="p">
+                                {data.car.nbSeats} places
+                            </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: 2, flexDirection: "column" }}>
+                            <LocalGasStationIcon sx={{ marginRight: 1 }} />
+                            <Typography variant="body2" color="textSecondary" component="p">
+                                {data.car.energy.name}
+                            </Typography>
+                        </Box>
+                    </Box>
+                </Stack>
                 <Typography gutterBottom variant="h5" component="h2">
-                    {car.car.model.name}
+                    {data.car.model.name}
                 </Typography>
                 <Typography variant="body2" color="textSecondary" component="p">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.
+                    {data.car.description.length > 75 ? `${data.car.description.slice(0, 75)}...` : data.car.description}
                 </Typography>
-                <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'space-between' }}>
+                <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
                     <Typography variant="h6" color="textPrimary" component="p">
-                        {car.car.price} € / jour
+                        {data.car.price} € <span style={{ fontSize: '0.8em', fontWeight: "normal" }}>/ jour</span>
                     </Typography>
-                    <Button variant="contained" sx={{ backgroundColor: 'var(--joy-palette-neutral-700, #32383E)', color: 'var(--joy-palette-primary-contrastText, #FFFFFF)' }}>
-                        Je loue
-                    </Button>
+                    <Link href={`/cars/${data.car.id}?startDate=${data.query.startDate}&endDate=${data.query.endDate}&location=${data.query.location}`}>
+                        <Button variant="contained" sx={{ backgroundColor: 'var(--joy-palette-neutral-700, #32383E)', color: 'var(--joy-palette-primary-contrastText, #FFFFFF)' }}>
+                            Je loue
+                        </Button>
+                    </Link>
                 </Box>
             </CardContent>
         </Card>

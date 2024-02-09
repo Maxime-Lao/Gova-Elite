@@ -12,7 +12,7 @@ const useGetConnectedUser = () => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await fetch('http://localhost:8000/api/users', {
+                const response = await fetch(`http://localhost:8000/api/users/by-email/${email}`, {
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${myToken}`,
@@ -21,7 +21,7 @@ const useGetConnectedUser = () => {
 
                 if (response.ok) {
                     const usersData = await response.json();
-                    setUsers(usersData.find((user) => user.email === email));
+                    setUsers(usersData);
                 } else {
                     setError('Erreur lors de la récupération des utilisateurs');
                 }

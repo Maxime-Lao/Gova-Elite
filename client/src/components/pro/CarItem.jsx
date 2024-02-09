@@ -12,10 +12,9 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import CardActions from "@mui/material/CardActions";
+import { Link } from 'react-router-dom';
 
 const CarItem = ({ car }) => {
-
-    console.log(car.media)
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
@@ -76,6 +75,9 @@ const CarItem = ({ car }) => {
                     </Typography>
                 </CardContent>
                 <CardActions disableSpacing style={actionsStyle}>
+                    <Link to={`/car-details/${car.id}`} className="hover:text-blue-500">
+                        Plus de détails...
+                    </Link>
                     <IconButton aria-label="Modifier">
                         <EditIcon />
                     </IconButton>

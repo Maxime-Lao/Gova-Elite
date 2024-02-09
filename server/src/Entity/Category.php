@@ -21,7 +21,7 @@ class Category
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: 'Le libelle ne peut pas être vide')]
-    #[Groups(['user:read', 'car:read'])]
+    #[Groups(['user:read', 'car:read', 'car_search:read'])]
     private ?string $libelle = null;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Car::class, orphanRemoval: true)]

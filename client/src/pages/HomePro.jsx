@@ -16,7 +16,6 @@ const HomePro = ({user}) => {
         { label: 'Mes voitures', content: <CarList cars={ user.connectedUser.companie.cars }/>
         },
         { label: 'Ajouter une voiture', content: <CreateCar companieId={user.connectedUser.companie.id}/> },
-        { label: 'PLanning des voitures', content: <p>bababbaa2</p> },
     ];
 
     return (

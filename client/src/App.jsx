@@ -25,14 +25,24 @@ import Rents from './pages/Rents.jsx';
 import Comments from './pages/Comments.jsx';
 import Cars from './pages/Cars.jsx';
 import Models from './pages/Models.jsx';
+import CarDetailsPro from "./components/pro/CarDetailsPro.jsx";
+import { useJsApiLoader } from '@react-google-maps/api';
+import { useState } from 'react';
+
 
 function App() {
+  const [ libraries ] = useState(['places']);
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+    libraries,
+  });
+
   return (
       <ThemeProvider theme={myTheme}>
         <Router>
           <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/search" element={<SearchResult />} />
+              <Route path="/search" element={<SearchResult isMapLoaded={isLoaded} />} />
               <Route path="/cars/:id" element={<CarDetails />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<RegisterPage />} />
@@ -55,6 +65,7 @@ function App() {
               <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/update-payment-success" element={<UpdatePaymentSuccess />} />
               <Route path="/not-found" element={<NotFoundPage />} />
+              <Route path="/car-details/:carId" element={<CarDetailsPro/>} />
           </Routes>
       </Router>
     </ThemeProvider>

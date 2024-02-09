@@ -1,26 +1,17 @@
-import { useState, useCallback, useMemo } from "react";
-import { GoogleMap, useLoadScript, MarkerF, InfoWindowF, MarkerClustererF } from "@react-google-maps/api";
+import { useState, useCallback, useEffect } from "react";
+import { GoogleMap, MarkerF, InfoWindowF, MarkerClustererF } from "@react-google-maps/api";
 import { Box, CircularProgress, Typography, Card, CardContent } from "@mui/material";
 import carIcon from "../../assets/img/car.svg";
+import { RequestType, geocode, setKey } from "react-geocode";
+
+const mapContainerStyle = ({
+    width: "100%",
+    height: "100%",
+  })
 
 const Maps = ( data ) => {
-  console.log(data);
-  const { isLoaded } = useLoadScript({
-    googleMapsApiKey: "AIzaSyBhyfTQwmYXFdOLspNfnqED5ZjsTbR_HsQ",
 
-    MarkerClustererOptions: {
-      imagePath:
-        "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
-    },
-  });
-
-  const mapContainerStyle = useMemo(
-    () => ({
-      width: "100%",
-      height: "100%",
-    }),
-    []
-  );
+  const [markers, setMarkers] = useState([]);
 
   const applyOffset = useCallback(
     (point, offset) => {
@@ -34,6 +25,27 @@ const Maps = ( data ) => {
     },
     []
   );
+  
+  useEffect(() => {
+    setKey(import.meta.env.VITE_GOOGLE_MAPS_API_KEY);
+
+    data.addresses.forEach((address) => {
+      geocode(RequestType.ADDRESS, address)
+        .then((response) => {
+          const { lat, lng } = response.results[0].geometry.location;
+          setMarkers((prev) => [
+            ...prev,
+            {
+              lat: lat,
+              lng: lng,
+            },
+          ]);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    });
+  }, [data.addresses]);
 
   const [selected, setSelected] = useState(null);
   
@@ -48,13 +60,16 @@ const Maps = ( data ) => {
 
   return (
     <Box sx={{ width: "100%", height: "100%" }}>
-      {!isLoaded ? (
+      {!data.isLoaded ? (
         <CircularProgress sx={{ position: "absolute", top: "50%", left: "50%" }} />
       ) : (
-        <GoogleMap center={data.center} zoom={12} mapContainerStyle={mapContainerStyle}>
+        <GoogleMap 
+        center={data.center} 
+        zoom={12} 
+        mapContainerStyle={mapContainerStyle}>
           <MarkerClustererF options={{ imagePath: "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m" }}>
             {(clusterer) =>
-              data.markers.map((marker, index) => (
+              markers.map((marker, index) => (
                 <MarkerF
                   key={index}
                   position={applyOffset(marker, index / 0.001)}

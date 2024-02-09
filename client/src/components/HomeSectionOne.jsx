@@ -10,7 +10,7 @@ const HomeSectionOne = () => {
             <Grid container spacing={2}>
                 <Grid item xs={12} sm={4}>
                         <Box sx={{ height: '140px' }}>
-                            <img src={calendar} alt="calendar" style={{ width: '40%', height: '100%', display: 'flex', margin: 'auto' }} />
+                            <img src={calendar} alt="calendar" style={{ height: '100%', display: 'flex', margin: 'auto' }} />
                         </Box>
                         <CardContent>
                             <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: "300" }} >
@@ -24,7 +24,7 @@ const HomeSectionOne = () => {
                 </Grid>
                 <Grid item xs={12} sm={4}>
                     <Box sx={{ height: '140px' }}>
-                        <img src={location} alt="location" style={{ width: '40%', height: '100%', display: 'flex', margin: 'auto' }} />
+                        <img src={location} alt="location" style={{ height: '100%', display: 'flex', margin: 'auto' }} />
                     </Box>
                     <CardContent>
                         <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: "300" }} >
@@ -38,7 +38,7 @@ const HomeSectionOne = () => {
                 </Grid>
                 <Grid item xs={12} sm={4}>
                         <Box sx={{ height: '140px' }}>
-                            <img src={vehicle} alt="vehicle" style={{ width: '40%', height: '100%', display: 'flex', margin: 'auto' }} />
+                            <img src={vehicle} alt="vehicle" style={{ height: '100%', display: 'flex', margin: 'auto' }} />
                         </Box>
                         <CardContent>
                             <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: "300" }} >
