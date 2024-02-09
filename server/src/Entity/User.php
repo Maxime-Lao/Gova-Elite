@@ -56,16 +56,19 @@ use Doctrine\Common\Collections\Collection;
             ],
         ),
         new Put(
+            uriTemplate: '/users/{id}',
             processor: UserPasswordHasher::class,
             security: "is_granted('ROLE_ADMIN')",
             securityMessage: "Only authenticated users can modify users."
         ),
         new Patch(
+            uriTemplate: '/users/{id}',
             processor: UserPasswordHasher::class,
             //security: "is_granted('ROLE_ADMIN')",
             securityMessage: "Only authenticated users can modify users."
         ),
         new Delete(
+            uriTemplate: '/users/{id}',
             security: "is_granted('ROLE_ADMIN')",
             securityMessage: "Only authenticated users can delete users."
         ),
