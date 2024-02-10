@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -19,7 +19,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 
+#[ApiFilter(SearchFilter::class, properties: ['email' => 'exact'])]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[UniqueEntity('email')]
@@ -37,23 +39,6 @@ use Doctrine\Common\Collections\Collection;
         new Get(
             //security: "is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['user:read']],
-        ),
-        new Get(
-            uriTemplate: '/users/by-email/{email}',
-            name: 'getUserByEmail',
-            controller: 'App\Controller\UserController::getUserByEmail',
-            normalizationContext: ['groups' => ['user:read']],
-            openapiContext: [
-                'summary' => 'Get user by email',
-                'parameters' => [
-                    [
-                        'name' => 'email',
-                        'in' => 'path',
-                        'required' => true,
-                        'type' => 'string',
-                    ],
-                ],
-            ],
         ),
         new Put(
             uriTemplate: '/users/{id}',
@@ -80,7 +65,6 @@ use Doctrine\Common\Collections\Collection;
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    #[ApiProperty(identifier: false)]
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
     #[Groups(['user:read'])]
     private ?int $id = null;

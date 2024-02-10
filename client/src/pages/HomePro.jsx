@@ -7,7 +7,11 @@ import CreateCar from "../components/pro/CreateCar.jsx";
 const HomePro = ({user}) => {
     if (!user.connectedUser.companie) {
         return (
-            <h1>Veuillez patienter que votre compagnie soit validée pour pouvoir accéder à votre espace prestataire</h1>
+            <div className="flex items-center justify-center h-screen">
+                <div className="text-center">
+                    <h1>Nous sommes entrain de vérifier votre compagnie, veuillez attendre la validation pour accéder à votre espace prestataire</h1>
+                </div>
+            </div>
         );
     }
 
