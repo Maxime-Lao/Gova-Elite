@@ -28,7 +28,7 @@ const CreateCar = ({companieId}) => {
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
     const [description, setDescription] = useState();
-    const [errorPhoto, setErrorPhoto] = useState('')
+    const [errorPhoto, setErrorPhoto] = useState('');
 
     const token = localStorage.getItem('token');
     const user = useGetConnectedUser();
@@ -86,10 +86,7 @@ const CreateCar = ({companieId}) => {
                 }
             });
 
-            console.log('Car created:', carResponse.data);
-
             const carId = carResponse.data.id;
-            console.log(carId)
 
             for (const photo of photos) {
                 const formData = new FormData();
