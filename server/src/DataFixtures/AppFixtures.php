@@ -135,7 +135,6 @@ class AppFixtures extends Fixture
             $media = new MediaObject();
             $media->setUser($faker->randomElement($users));
             $media->setCar($faker->randomElement($cars));
-            $media->setCreatedAt(\DateTimeImmutable::createFromMutable($faker->dateTime()));
             $manager->persist($media);
         }
 

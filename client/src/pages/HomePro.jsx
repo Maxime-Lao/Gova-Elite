@@ -24,7 +24,6 @@ const HomePro = ({user}) => {
 
     return (
         <div>
-            <Navbar user={user} />
             <VerticalTabs tabsData={tabsData} />
         </div>
     )

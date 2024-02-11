@@ -18,7 +18,6 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[Vich\Uploadable]
 #[ORM\Entity]
-#[ApiResource(normalizationContext: ['groups' => ['media:read']])]
 #[ApiResource(
     normalizationContext: ['groups' => ['media_object:read']],
     types: ['https://schema.org/MediaObject'],
@@ -68,7 +67,7 @@ class MediaObject
 
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['media:read', 'user:read', 'car:read'])]
+    #[Groups(['user:read'])]
     public ?string $filePath = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
@@ -78,14 +77,6 @@ class MediaObject
     #[ORM\ManyToOne(inversedBy: 'media')]
     #[ORM\JoinColumn(nullable: true)]
     private ?User $user = null;
-
-    #[ORM\Column]
-    #[Groups(['user:read'])]
-    private ?\DateTimeImmutable $createdAt = null;
-
-    #[ORM\Column(nullable: true)]
-    #[Groups(['user:read'])]
-    private ?\DateTimeImmutable $updatedAt = null;
 
     public function getId(): ?int
     {
@@ -121,27 +112,5 @@ class MediaObject
         }
 
         return null;
-    }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
     }
 }
