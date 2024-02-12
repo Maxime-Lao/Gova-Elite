@@ -5,12 +5,12 @@ on:
     paths:
     - 'server/**'
     branches:
-    - main
+    - feat/ci
   pull_request:
     paths:
     - 'server/**'
     branches:
-    - main
+    - feat/ci
 
 jobs:
   build:
@@ -26,3 +26,10 @@ jobs:
 
     - name: Install dependencies
       run: cd server && composer install
+
+    - name: Docker Compose Install
+      run: |
+        sudo rm /usr/local/bin/docker-compose
+        curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o docker-compose
+        chmod +x docker-compose
+        sudo mv docker-compose /usr/local/bin/docker-compose
