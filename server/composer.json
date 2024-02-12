@@ -94,12 +94,13 @@
         "doctrine/doctrine-fixtures-bundle": "^3.5",
         "fakerphp/faker": "^1.23",
         "hautelook/alice-bundle": "^2.12",
-        "phpunit/phpunit": "^9.5",
+        "phpunit/phpunit": "^9.6",
         "roave/security-advisories": "dev-latest",
         "symfony/browser-kit": "6.3.*",
         "symfony/css-selector": "6.3.*",
         "symfony/debug-bundle": "6.3.*",
         "symfony/maker-bundle": "^1.51",
+        "symfony/phpunit-bridge": "^7.0",
         "symfony/stopwatch": "6.3.*",
         "symfony/web-profiler-bundle": "6.3.*"
     }
