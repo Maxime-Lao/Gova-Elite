@@ -17,6 +17,7 @@ class Energy
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['car:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]

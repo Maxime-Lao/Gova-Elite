@@ -15,7 +15,6 @@ const Navbar = () => {
     const [myToken, setMyToken] = useState(localStorageToken);
     const user = useGetConnectedUser();
     const navigate = useNavigate();
-
     const handleLogout = useCallback(() => {
         try {
             const response = fetch('http://localhost:8000/logout', {
@@ -25,7 +24,6 @@ const Navbar = () => {
                     'Authorization': `Bearer ${myToken}`,
                 },
             });
-            console.log(response);
         } catch (error) {
             console.error('Erreur lors de la déconnexion: ' + error.message);
         }

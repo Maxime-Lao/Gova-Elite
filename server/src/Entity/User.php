@@ -89,13 +89,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Assert\NotBlank(message: 'Le mot de passe ne peut pas être vide')]
-    #[Assert\Length(
+    #[Assert\NotBlank(groups: ['user:create'], message: 'Le mot de passe ne peut pas être vide')]
+    #[Assert\Length(groups: ['user:create'],
         min: 8,
         minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères'
     )]
     #[Groups(['user:create'])]
-    #[Assert\Regex(
+    #[Assert\Regex(groups: ['user:create'],
         pattern: '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/',
         message: 'Le mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial'
     )]

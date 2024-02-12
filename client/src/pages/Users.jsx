@@ -898,7 +898,9 @@ export default function Users() {
                                                     <TableCell>{user.firstname}</TableCell>
                                                     <TableCell>{user.email}</TableCell>
                                                     <TableCell>{user.phone}</TableCell>
-                                                    <TableCell>{user.roles[0]}</TableCell>
+                                                    <TableCell>{
+                                                        user.roles[0] === 'ROLE_PRO' ? 'Préstataire' : user.roles[0] === 'ROLE_USER' ? 'Particulier' : user.roles[0] === 'ROLE_ADMIN' ? 'Administrateur' : ''
+                                                    }</TableCell>
                                                     <TableCell align="right">
                                                         <IconButton onClick={() => handleEdit(user)}>
                                                             <EditIcon />
