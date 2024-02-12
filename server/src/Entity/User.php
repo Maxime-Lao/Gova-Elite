@@ -111,12 +111,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Le prénom ne peut pas être vide')]
-    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read', 'rents:read', 'comments:read'])]
+    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read', 'rents:read', 'comments:read', 'rents_companie:read'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Le nom ne peut pas être vide')]
-    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read', 'rents:read', 'comments:read'])]
+    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read', 'rents:read', 'comments:read', 'rents_companie:read'])]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -237,8 +237,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
     }

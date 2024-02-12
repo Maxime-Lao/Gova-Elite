@@ -26,7 +26,7 @@ class Model
 
     #[ORM\Column(length: 100, nullable: true)]
     #[Assert\NotBlank(message: "Le nom du model ne peut pas être vide")]
-    #[Groups(['car:read', 'comments_car:read', 'car_search:read', 'user:read', 'model:read', 'rents_user:read', 'rents:read', 'comments:read'])]
+    #[Groups(['car:read', 'comments_car:read', 'car_search:read', 'user:read', 'model:read', 'rents_user:read', 'rents:read', 'comments:read', 'rents_companie:read'])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'model', targetEntity: Car::class, orphanRemoval: true)]
@@ -34,7 +34,7 @@ class Model
 
     #[ORM\ManyToOne(inversedBy: 'models')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['car:read', 'car_search:read', 'user:read',  'model:read', 'rents:read', 'comments:read'])]
+    #[Groups(['car:read', 'car_search:read', 'user:read',  'model:read', 'rents:read', 'comments:read', 'rents_companie:read'])]
     private ?Brand $brand = null;
 
     #[ORM\Column]
