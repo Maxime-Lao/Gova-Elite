@@ -64,6 +64,7 @@ export default function Login() {
                         variant="outlined"
                         fullWidth
                         margin="normal"
+                        autoComplete="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
@@ -73,6 +74,7 @@ export default function Login() {
                         variant="outlined"
                         fullWidth
                         margin="normal"
+                        autoComplete="current-password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />

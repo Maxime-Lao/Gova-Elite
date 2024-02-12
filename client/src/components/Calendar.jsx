@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import useGetConnectedUser from "./hooks/useGetConnectedUser.jsx";
 import { Grid, Typography, Button, TextField, Modal, Box } from '@mui/material';
 import StripePaymentForm from './StripePaymentForm';
 
-function Calendar({ carId }) {
+function Calendar({ carId, companieId }) {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [carData, setCarData] = useState(0);
+  const user = useGetConnectedUser();
   const [totalPrice, setTotalPrice] = useState(0);
   const [rentedTimes, setRentedTimes] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -76,7 +78,8 @@ function Calendar({ carId }) {
         totalPrice: totalPrice,
         paymentMethodId: paymentIntent,
         car: `/api/cars/${carId}`,
-        user: `/api/users/21`,
+        user: `/api/users/${user.connectedUser.id}`,
+        companie: `/api/companies/${companieId}`,
         createdAt: currentDate.toISOString(),
       };
 
@@ -111,6 +114,13 @@ function Calendar({ carId }) {
   }, [startDate, endDate, rentedTimes, carId]);
 
   const handleOpenModal = () => {
+
+    if (!user || !user.connectedUser || user.connectedUser.length === 0) {
+      setError('Vous devez être connecté pour pourvoir payer !');
+      setSuccessMessage('');
+      return;
+    }
+
     const isDatesValid = rentedTimes.every(rent => {
       const selectedStart = startDate.getTime();
       const selectedEnd = endDate.getTime();

@@ -16,8 +16,6 @@ const Navbar = () => {
     const user = useGetConnectedUser();
     const navigate = useNavigate();
 
-    console.log(user.connectedUser.id);
-
     const handleLogout = useCallback(() => {
         try {
             const response = fetch('http://localhost:8000/logout', {
