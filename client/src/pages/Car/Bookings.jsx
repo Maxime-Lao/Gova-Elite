@@ -17,7 +17,7 @@ function Bookings() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/users/21/rents`);
+        const response = await fetch(`http://195.35.29.110:8000/api/users/21/rents`);
         const data = await response.json();
         setUserData(data);
       } catch (error) {
@@ -31,7 +31,7 @@ function Bookings() {
   useEffect(() => {
     const fetchUserCommentsData = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/users/21/comments`);
+        const response = await fetch(`http://195.35.29.110:8000/api/users/21/comments`);
         const data = await response.json();
         setUserCommentsData(data);
       } catch (error) {
@@ -81,7 +81,7 @@ function Bookings() {
 
   const refreshBookings = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/users/21/rents`);
+      const response = await fetch(`http://195.35.29.110:8000/api/users/21/rents`);
       const data = await response.json();
       setUserData(data);
     } catch (error) {
@@ -91,7 +91,7 @@ function Bookings() {
 
   const refreshPastBookings = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/users/21/comments`);
+      const response = await fetch(`http://195.35.29.110:8000/api/users/21/comments`);
       const data = await response.json();
       setUserCommentsData(data);
     } catch (error) {

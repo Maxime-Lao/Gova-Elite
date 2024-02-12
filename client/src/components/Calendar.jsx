@@ -20,7 +20,7 @@ function Calendar({ carId }) {
     const fetchRentedTimes = async () => {
       if (!carId) return;
       try {
-        const response = await fetch(`http://localhost:8000/api/cars/${carId}`);
+        const response = await fetch(`http://195.35.29.110:8000/api/cars/${carId}`);
         if (!response.ok) throw new Error('Erreur lors de la récupération des données');
         const carData = await response.json();
         const rents = carData.rents || [];
@@ -81,7 +81,7 @@ function Calendar({ carId }) {
       };
 
       try {
-        const response = await fetch('http://localhost:8000/api/rents', {
+        const response = await fetch('http://195.35.29.110:8000/api/rents', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json+ld',

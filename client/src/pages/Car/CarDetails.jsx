@@ -28,7 +28,7 @@ function CarDetails() {
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:8000/api/cars/${id}/comments`)
+    fetch(`http://195.35.29.110:8000/api/cars/${id}/comments`)
       .then(response => {
         if (!response.ok) {
           throw new Error(`An error occurred: ${response.statusText}`);
@@ -48,7 +48,7 @@ function CarDetails() {
   }, [id]);
 
   useEffect(() => {
-    fetch(`http://localhost:8000/api/cars/${id}`)
+    fetch(`http://195.35.29.110:8000/api/cars/${id}`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Car not found');

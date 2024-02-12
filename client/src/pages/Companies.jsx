@@ -161,7 +161,7 @@ export default function Companies() {
         const getCompanies = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://localhost:8000/api/companies', {
+                const response = await fetch('http://195.35.29.110:8000/api/companies', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -204,7 +204,7 @@ export default function Companies() {
         event.preventDefault();
         
         try {
-            const response = await fetch('http://localhost:8000/api/companies', {
+            const response = await fetch('http://195.35.29.110:8000/api/companies', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -261,7 +261,7 @@ export default function Companies() {
 
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/companies/${selectedCompany.id}`, {
+            const response = await fetch(`http://195.35.29.110:8000/api/companies/${selectedCompany.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -291,7 +291,7 @@ export default function Companies() {
 
     const handleUpdate = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/companies/${selectedCompany.id}`, {
+            const response = await fetch(`http://195.35.29.110:8000/api/companies/${selectedCompany.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/merge-patch+json',

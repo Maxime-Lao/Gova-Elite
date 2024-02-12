@@ -160,7 +160,7 @@ export default function Models() {
         const getBrands = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://localhost:8000/api/brands', {
+                const response = await fetch('http://195.35.29.110:8000/api/brands', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -188,7 +188,7 @@ export default function Models() {
         const getModels = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://localhost:8000/api/models', {
+                const response = await fetch('http://195.35.29.110:8000/api/models', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -228,7 +228,7 @@ export default function Models() {
         event.preventDefault();
         
         try {
-            const response = await fetch('http://localhost:8000/api/models', {
+            const response = await fetch('http://195.35.29.110:8000/api/models', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -281,7 +281,7 @@ export default function Models() {
 
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/models/${selectedModel.id}`, {
+            const response = await fetch(`http://195.35.29.110:8000/api/models/${selectedModel.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -311,7 +311,7 @@ export default function Models() {
 
     const handleUpdate = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/models/${selectedModel.id}`, {
+            const response = await fetch(`http://195.35.29.110:8000/api/models/${selectedModel.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/merge-patch+json',

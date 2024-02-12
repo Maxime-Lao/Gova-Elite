@@ -49,6 +49,9 @@ class Companie
     #[Groups(['car_search:read', 'user:read'])]
     private ?string $city = null;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $kbis = null;
+
     #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Car::class, orphanRemoval: true)]
     #[Groups(['user:read'])]
     private Collection $cars;
@@ -121,6 +124,18 @@ class Companie
     public function setCity(string $city): static
     {
         $this->city = $city;
+
+        return $this;
+    }
+
+    public function getKbis(): ?string
+    {
+        return $this->kbis;
+    }
+
+    public function setKbis(?string $kbis): self
+    {
+        $this->kbis = $kbis;
 
         return $this;
     }

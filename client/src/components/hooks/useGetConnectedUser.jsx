@@ -12,7 +12,7 @@ const useGetConnectedUser = () => {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/users/by-email/${email}`, {
+                const response = await fetch(`http://195.35.29.110:8000/api/users/by-email/${email}`, {
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${myToken}`,
