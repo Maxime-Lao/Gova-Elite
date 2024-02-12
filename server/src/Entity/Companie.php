@@ -3,15 +3,33 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Delete;
 use App\Repository\CompanieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use App\Controller\CompanieController;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Metadata\GetCollection;
 
 #[ORM\Entity(repositoryClass: CompanieRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new Get(),
+        new Put(),
+        new Delete(),
+        new Post(
+            controller: CompanieController::class,
+            deserialize: false // Ajoutez cette ligne si vous ne voulez pas que API Platform désérialise automatiquement les données entrantes
+        ),
+        new GetCollection()
+    ]
+)]
 class Companie
 {
     #[ORM\Id]

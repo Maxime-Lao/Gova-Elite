@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Box, Button, Grid, TextField } from '@mui/material';
 import useGetConnectedUser from '../hooks/useGetConnectedUser';
 
 function CompanieForm() {
@@ -11,7 +12,7 @@ function CompanieForm() {
         city: '',
         createdAt: new Date().toISOString(),
     });
-    const [kbisFile, setKbisFile] = useState(null); // État pour le fichier Kbis
+    const [kbisFile, setKbisFile] = useState(null);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -19,7 +20,7 @@ function CompanieForm() {
     };
 
     const handleFileChange = (e) => {
-        setKbisFile(e.target.files[0]); // Mettre à jour l'état avec le fichier sélectionné
+        setKbisFile(e.target.files[0]);
     };
 
     const handleSubmit = async (e) => {
@@ -30,13 +31,13 @@ function CompanieForm() {
             formData.append(key, companie[key]);
         });
         if (kbisFile) {
-            formData.append('kbis', kbisFile); // Ajouter le fichier Kbis à FormData
+            formData.append('kbis', kbisFile);
         }
 
         try {
             const response = await fetch('http://195.35.29.110:8000/api/companies', {
                 method: 'POST',
-                body: formData, // Utiliser FormData au lieu de JSON.stringify
+                body: formData,
             });
 
             if (!response.ok) {
@@ -51,42 +52,64 @@ function CompanieForm() {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <input 
-                type="text" 
-                name="name" 
-                value={companie.name} 
-                onChange={handleChange} 
-                placeholder="Nom de l'entreprise" 
-            />
-            <input 
-                type="text" 
-                name="address" 
-                value={companie.address} 
-                onChange={handleChange} 
-                placeholder="Adresse" 
-            />
-            <input 
-                type="text" 
-                name="zipCode" 
-                value={companie.zipCode.toString()} 
-                onChange={handleChange} 
-                placeholder="Code Postal" 
-            />
-            <input 
-                type="text" 
-                name="city" 
-                value={companie.city} 
-                onChange={handleChange} 
-                placeholder="Ville" 
-            />
-            <input 
-                type="file" 
-                name="kbis" 
-                onChange={handleFileChange} 
-            />
-            <button type="submit">Enregistrer</button>
-        </form>
+        <Grid container spacing={2} justifyContent="center">
+            <Grid item xs={12} sm={6}>
+                <Box mt={2} textAlign="center">
+                    <h1>Créer une entreprise</h1>
+                </Box>
+                <form onSubmit={handleSubmit}>
+                    <TextField
+                        name="name"
+                        value={companie.name}
+                        onChange={handleChange}
+                        label="Nom de l'entreprise"
+                        fullWidth
+                        margin="normal"
+                    />
+                    <TextField
+                        name="address"
+                        value={companie.address}
+                        onChange={handleChange}
+                        label="Adresse"
+                        fullWidth
+                        margin="normal"
+                    />
+                    <TextField
+                        name="zipCode"
+                        value={companie.zipCode}
+                        onChange={handleChange}
+                        label="Code Postal"
+                        fullWidth
+                        margin="normal"
+                    />
+                    <TextField
+                        name="city"
+                        value={companie.city}
+                        onChange={handleChange}
+                        label="Ville"
+                        fullWidth
+                        margin="normal"
+                    />
+                    <div style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+                        <input
+                            type="file"
+                            name="kbis"
+                            onChange={handleFileChange}
+                        />
+                    </div>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        size="large"
+                        style={{ marginTop: '1rem' }}
+                    >
+                        Enregistrer
+                    </Button>
+                </form>
+            </Grid>
+        </Grid>
     );
 }
 
