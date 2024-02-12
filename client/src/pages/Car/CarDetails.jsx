@@ -201,7 +201,7 @@ function CarDetails() {
               </Grid>
             </Grid>
             <Grid item xs={6}>
-              <Calendar carId={id} />
+              <Calendar carId={id} companieId={car.companie.id}/>
             </Grid>
           </Grid>
           <CardContent>

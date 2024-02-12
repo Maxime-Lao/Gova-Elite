@@ -17,12 +17,12 @@ class Brand
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['model:read'])]
+    #[Groups(['model:read', 'car:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: 'Le nom ne peut pas être vide')]
-    #[Groups(['car:read', 'car_search:read', 'user:read', 'model:read', 'rents:read', 'comments:read'])]
+    #[Groups(['car:read', 'car_search:read', 'user:read', 'model:read', 'rents:read', 'comments:read', 'rents_companie:read'])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'brand', targetEntity: Model::class, orphanRemoval: true)]

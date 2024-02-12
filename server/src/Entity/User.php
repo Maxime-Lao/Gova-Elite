@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -19,7 +19,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 
+#[ApiFilter(SearchFilter::class, properties: ['email' => 'exact'])]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[UniqueEntity('email')]
@@ -37,23 +39,6 @@ use Doctrine\Common\Collections\Collection;
         new Get(
             //security: "is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['user:read']],
-        ),
-        new Get(
-            uriTemplate: '/users/by-email/{email}',
-            name: 'getUserByEmail',
-            controller: 'App\Controller\UserController::getUserByEmail',
-            normalizationContext: ['groups' => ['user:read']],
-            openapiContext: [
-                'summary' => 'Get user by email',
-                'parameters' => [
-                    [
-                        'name' => 'email',
-                        'in' => 'path',
-                        'required' => true,
-                        'type' => 'string',
-                    ],
-                ],
-            ],
         ),
         new Put(
             uriTemplate: '/users/{id}',
@@ -80,7 +65,6 @@ use Doctrine\Common\Collections\Collection;
 )]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    #[ApiProperty(identifier: false)]
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
     #[Groups(['user:read'])]
     private ?int $id = null;
@@ -105,13 +89,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Assert\NotBlank(message: 'Le mot de passe ne peut pas être vide')]
-    #[Assert\Length(
+    #[Assert\NotBlank(groups: ['user:create'], message: 'Le mot de passe ne peut pas être vide')]
+    #[Assert\Length(groups: ['user:create'],
         min: 8,
         minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères'
     )]
     #[Groups(['user:create'])]
-    #[Assert\Regex(
+    #[Assert\Regex(groups: ['user:create'],
         pattern: '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/',
         message: 'Le mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial'
     )]
@@ -127,12 +111,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Le prénom ne peut pas être vide')]
-    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read', 'rents:read', 'comments:read'])]
+    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read', 'rents:read', 'comments:read', 'rents_companie:read'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Le nom ne peut pas être vide')]
-    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read', 'rents:read', 'comments:read'])]
+    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read', 'rents:read', 'comments:read', 'rents_companie:read'])]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -253,8 +237,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
     }

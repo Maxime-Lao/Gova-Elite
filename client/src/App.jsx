@@ -1,4 +1,5 @@
 import './App.css'
+import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import CarDetails from './pages/Car/CarDetails';
 import Bookings from './pages/Car/Bookings';
@@ -47,27 +48,91 @@ function App() {
               <Route path="/cars/:id" element={<CarDetails />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<RegisterPage />} />
-              <Route path="/admin/dashboard" element={<Dashboard />} />
-              <Route path="/bookings" element={<Bookings />} />
+              <Route path="/admin/dashboard" element={
+                <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/bookings" element={
+                <ProtectedRoute allowedRoles={['ROLE_USER']}>
+                  <Bookings />
+                </ProtectedRoute>
+              } />
               <Route path="/register" element={<RegisterPage />} />
-              <Route path="/admin/users" element={<Users />} />
-              <Route path="/admin/cars" element={<Cars />} />
-              <Route path="/admin/brands" element={<Brands />} />
-              <Route path="/admin/categories" element={<Categories />} />
-              <Route path="/admin/gears" element={<Gears />} />
-              <Route path="/admin/models" element={<Models />} />
-              <Route path="/admin/energies" element={<Energies />} />
-              <Route path="/admin/companies" element={<Companies />} />
-              <Route path="/admin/rents" element={<Rents />} />
-              <Route path="/admin/comments" element={<Comments />} />
+              <Route path="/admin/users" element={
+                <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
+                  <Users />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/cars" element={
+                <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
+                  <Cars />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/brands" element={
+                <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
+                  <Brands />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/categories" element={
+                <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
+                  <Categories />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/gears" element={
+                <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
+                  <Gears />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/models" element={
+                <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
+                  <Models />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/energies" element={
+                <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
+                  <Energies />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/companies" element={
+                <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
+                  <Companies />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/rents" element={
+                <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
+                  <Rents />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/comments" element={
+                <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
+                  <Comments />
+                </ProtectedRoute>
+              } />
               <Route path="/login/identify" element={<IdentifyEmail />} />
               <Route path="/resetpswd/:token" element={<ResetPassword />} />
-              <Route path="/account" element={<Account />} />
-              <Route path="/payment-success" element={<PaymentSuccess />} />
-              <Route path="/update-payment-success" element={<UpdatePaymentSuccess />} />
+              <Route path="/account" element={
+                <ProtectedRoute allowedRoles={['ROLE_USER', 'ROLE_ADMIN', 'ROLE_PRO']}>
+                  <Account />
+                </ProtectedRoute>
+              } />
+              <Route path="/payment-success" element={
+                <ProtectedRoute allowedRoles={['ROLE_USER']}>
+                  <PaymentSuccess />
+                </ProtectedRoute>
+              } />
+              <Route path="/update-payment-success" element={
+                <ProtectedRoute allowedRoles={['ROLE_USER']}>
+                  <UpdatePaymentSuccess />
+                </ProtectedRoute>
+              } />
               <Route path="/not-found" element={<NotFoundPage />} />
-              <Route path="/car-details/:carId" element={<CarDetailsPro/>} />
               <Route path="/createCompanie" element={<CreateCompanie />} />
+              <Route path="/car-details/:carId" element={
+                <ProtectedRoute allowedRoles={['ROLE_PRO']}>
+                  <CarDetailsPro />
+                </ProtectedRoute>
+              } />
           </Routes>
       </Router>
     </ThemeProvider>

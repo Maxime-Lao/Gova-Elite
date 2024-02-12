@@ -30,22 +30,23 @@ use ApiPlatform\Metadata\GetCollection;
         new GetCollection()
     ]
 )]
+
 class Companie
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['user:read', 'connected:read'])]
+    #[Groups(['companies:read', 'user:read', 'connected:read', 'car:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: 'Le nom de la companie ne peut pas être vide')]
-    #[Groups(['car:read', 'car_search:read', 'comments_car:read', 'user:read', 'rents_user:read', 'rents:read', 'comments:read'])]
+    #[Groups(['companies:read', 'car:read', 'car_search:read', 'comments_car:read', 'user:read', 'rents_user:read', 'rents:read', 'comments:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'L\'adresse ne peut pas être vide')]
-    #[Groups(['car_search:read', 'user:read'])]
+    #[Groups(['companies:read', 'car_search:read', 'user:read'])]
     private ?string $address = null;
 
     #[ORM\OneToMany(mappedBy: 'companie', targetEntity: User::class, orphanRemoval: true)]
@@ -59,28 +60,35 @@ class Companie
         minMessage: 'Le code postal doit avoir au moins 5 chiffres',
         maxMessage: 'Le code postal ne peut pas dépasser 10 chiffres'
     )]
-    #[Groups(['car_search:read', 'user:read'])]
+    #[Groups(['companies:read', 'car_search:read', 'user:read'])]
     private ?int $zipCode = null;
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: 'La ville ne peut pas être vide')]
-    #[Groups(['car_search:read', 'user:read'])]
+    #[Groups(['companies:read', 'car_search:read', 'user:read'])]
     private ?string $city = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $kbis = null;
 
     #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Car::class, orphanRemoval: true)]
-    #[Groups(['user:read'])]
+    #[Groups(['companies:read', 'user:read'])]
     private Collection $cars;
 
     #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Notice::class, orphanRemoval: true)]
-    #[Groups(['user:read'])]
+    #[Groups(['companies:read', 'user:read'])]
     private Collection $notices;
 
+    #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Rent::class, orphanRemoval: true)]
+    #[Groups(['companies:read', 'user:read'])]
+    private Collection $rents;
+
+
     #[ORM\Column]
+    #[Groups(['companies:read', 'user:read'])]
     private ?\DateTimeImmutable $createdAt = null;
-    #[Groups(['user:read'])]
+
+    #[Groups(['companies:read', 'user:read'])]
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
@@ -89,6 +97,7 @@ class Companie
         $this->cars = new ArrayCollection();
         $this->notices = new ArrayCollection();
         $this->users = new ArrayCollection();
+        $this->rents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -240,6 +249,35 @@ class Companie
         if ($this->cars->removeElement($user)) {
             if ($user->getCompanie() === $this) {
                 $user->setCompagnie(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Rent>
+     */
+    public function getRents(): Collection
+    {
+        return $this->rents;
+    }
+
+    public function addRent(Rent $rent): static
+    {
+        if (!$this->rents->contains($rent)) {
+            $this->rents->add($rent);
+            $rent->setCompanie($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRents(Rent $rent): static
+    {
+        if ($this->rents->removeElement($rent)) {
+            if ($rent->getCompanie() === $this) {
+                $rent->setCompanie(null);
             }
         }
 
