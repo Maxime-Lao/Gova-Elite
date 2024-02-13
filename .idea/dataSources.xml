@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="symfony@localhost" uuid="1e62f5a5-63c7-4feb-9959-6b8c775c9ed0">
+    <data-source source="LOCAL" name="symfony@localhost" uuid="3a9ca2ee-4aa9-4cf6-abdd-3e038ecb6847">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>

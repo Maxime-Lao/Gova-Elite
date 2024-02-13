@@ -19,11 +19,6 @@ const getSliderSettings = (numberOfImages) => {
         autoplay: numberOfImages > 1,
     };
 };
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import Navbar from "../navbar/Navbar.jsx";
-import HorizontalTabs from "../others/HorizontalTabs.jsx";
-import CarHistoric from "./CarHistoric.jsx";
 
 const CarDetailsPro = () => {
     const {carId} = useParams();
