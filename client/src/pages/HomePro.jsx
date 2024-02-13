@@ -33,8 +33,8 @@ const HomePro = ({user}) => {
     }
 
     const tabsData = [
+        { label: 'Mes voitures', content: <CarList cars={ user.connectedUser.companie.cars } />},
         { label: 'Ma société', content: <CompanieDetails companie={ user.connectedUser.companie }/> },
-        { label: 'Mes voitures', content: <CarList cars={ user.connectedUser.companie.cars }/>},
         { label: 'Ajouter une voiture', content: <CreateCar companieId={user.connectedUser.companie.id}/> },
         { label: 'Historique des réservations', content: <RentList companieId={user.connectedUser.companie.id}/> },
     ];

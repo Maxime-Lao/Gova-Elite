@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from "../../components/navbar/Navbar.jsx";
 import Calendar from "../../components/Calendar";
 import { Grid, Typography, List, ListItem, ListItemText, ListItemIcon, Card, CardContent, IconButton } from '@mui/material';
-import { CarRental, DirectionsCar, ArrowForwardIos, ArrowBackIos } from '@mui/icons-material';
+import { CarRental, ArrowForwardIos, ArrowBackIos } from '@mui/icons-material';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import Slider from "react-slick";
@@ -18,13 +18,31 @@ import BedroomBabyIcon from '@mui/icons-material/BedroomBaby';
 import AirlineSeatReclineExtraIcon from '@mui/icons-material/AirlineSeatReclineExtra';
 import EuroIcon from '@mui/icons-material/Euro';
 import CarCrashIcon from '@mui/icons-material/CarCrash';
-import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import BusinessIcon from '@mui/icons-material/Business';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 
 const cardStyle = {
   marginBottom: "2em",
   position: "relative",
+};
+
+const getSliderSettings = (numberOfImages) => {
+  return {
+    dots: true,
+    infinite: numberOfImages > 1,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: numberOfImages > 1,
+    nextArrow: <NextArrow />,
+    prevArrow: <PrevArrow />,
+  };
+};
+
+export const imageStyle = {
+  width: "100%",
+  height: "500px",
+  objectFit: "cover",
 };
 
 function NextArrow(props) {
@@ -59,25 +77,6 @@ function CarDetails() {
   const navigate = useNavigate();
   const [car, setCar] = useState(null);
   const [comments, setComments] = useState([]);
-
-  const getSliderSettings = (numberOfImages) => {
-    return {
-      dots: true,
-      infinite: numberOfImages > 1,
-      speed: 500,
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      autoplay: numberOfImages > 1,
-      nextArrow: <NextArrow />,
-      prevArrow: <PrevArrow />,
-    };
-  };
-
-  const imageStyle = {
-    width: "100%",
-    height: "500px",
-    objectFit: "cover",
-  };
 
   useEffect(() => {
     fetch(`http://195.35.29.110:8000/api/cars/${id}/comments`)

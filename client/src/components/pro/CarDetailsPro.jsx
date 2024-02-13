@@ -6,6 +6,19 @@ import 'react-datepicker/dist/react-datepicker.css';
 import Navbar from "../navbar/Navbar.jsx";
 import HorizontalTabs from "../others/HorizontalTabs.jsx";
 import CarHistoric from "./CarHistoric.jsx";
+import Slider from "react-slick";
+import {imageStyle} from "../../pages/Car/CarDetails.jsx";
+
+const getSliderSettings = (numberOfImages) => {
+    return {
+        dots: true,
+        infinite: numberOfImages > 1,
+        speed: 500,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        autoplay: numberOfImages > 1,
+    };
+};
 
 const CarDetailsPro = () => {
     const {carId} = useParams();
@@ -114,11 +127,17 @@ const CarDetailsPro = () => {
                 </h2>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <img
-                            src={car.media.length > 0 ? `http://195.35.29.110:8000/media/${car.media[0].filePath}` : 'https://source.unsplash.com/random'}
-                            alt="Car Image"
-                            className="w-full h-auto"
-                        />
+                        <Slider {...getSliderSettings(car.media.length)}>
+                            {car.media.length > 0 ? car.media.map((media, index) => (
+                                <div key={index}>
+                                    <img src={`http://195.35.29.110:8000/media/${media.filePath}`} alt={`Image de voiture ${index + 1}`} style={imageStyle} />
+                                </div>
+                            )) : (
+                                <div>
+                                    <img src="https://source.unsplash.com/random" alt="Image par défaut" style={imageStyle} />
+                                </div>
+                            )}
+                        </Slider>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div>

@@ -100,12 +100,14 @@ const CreateCar = ({companieId}) => {
                     },
                 });
 
-                console.log('Media object created:', mediaResponse.data);
             }
 
             console.log('Voiture créée avec succès', carResponse.data);
             setSuccess('Voiture créée avec succès');
             setError('');
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
         } catch (error) {
             console.error('Erreur lors de la création de la voiture', error);
             setSuccess('');
