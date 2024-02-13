@@ -20,7 +20,7 @@ class VerifyUserController extends AbstractController
     {
         $user = $em->getRepository(User::class)->findOneBy(['token' => $token]);
         if ($user) {
-            $user->setVerified(true);
+            $user->setIsVerified(true);
             $user->setToken('');
             $em->flush();
             return new RedirectResponse($_ENV['FRONT_SERVER'] . 'login');
