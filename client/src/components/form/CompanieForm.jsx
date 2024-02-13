@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Box, Button, Grid, TextField } from '@mui/material';
 import useGetConnectedUser from '../hooks/useGetConnectedUser';
+import { useNavigate } from 'react-router-dom';
 
 function CompanieForm() {
     const user = useGetConnectedUser();
+    const navigate = useNavigate(); 
 
     const [companie, setCompanie] = useState({
         name: '',
@@ -50,7 +52,7 @@ function CompanieForm() {
             }
 
             const data = await response.json();
-            console.log('Companie Created:', data);
+            navigate('/');
         } catch (error) {
             console.error('Error creating companie:', error);
         }
