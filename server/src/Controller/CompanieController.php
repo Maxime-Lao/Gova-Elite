@@ -10,11 +10,15 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use App\Entity\Notification;
 
 class CompanieController extends AbstractController
 {
     #[Route('/api/companies', name: 'create_companie', methods: ['POST'])]
-    public function __invoke(Request $request, FileUploader $fileUploader, EntityManagerInterface $em, LoggerInterface $logger): Response
+    public function __invoke(Request $request, FileUploader $fileUploader, EntityManagerInterface $em, LoggerInterface $logger, MailerInterface $mailer, UrlGeneratorInterface $urlGenerator): Response
     {
         $companie = new Companie();
         $companie->setName($request->request->get('name'));
@@ -39,6 +43,41 @@ class CompanieController extends AbstractController
         }
 
         $em->persist($companie);
+        $em->flush();
+
+        $adminUsers = $em->getRepository(User::class)->findByRole('ROLE_ADMIN');
+
+        $kbisPath = $request->files->get('kbis') ? $fileUploader->getTargetDirectory().'/'.$companie->getKbis() : null;
+
+        foreach ($adminUsers as $adminUser) {
+            $email = (new Email())
+                ->from('mmo@kanieba.com')
+                ->to($adminUser->getEmail())
+                ->subject('Une nouvelle entreprise a été créée')
+                ->html("<p>Une nouvelle entreprise a été créée. Veuillez vérifier les détails.</p>");
+
+            if ($kbisPath) {
+                $email->attachFromPath($kbisPath, 'Document Kbis');
+            }
+
+            $mailer->send($email);
+        }
+
+        foreach ($adminUsers as $adminUser) {
+            $notification = new Notification();
+    
+            $message = 'Une nouvelle entreprise a été créée. ';
+            if ($kbisPath) {
+                $kbisName = $companie->getKbis();
+                $message .= "Document Kbis disponible ici: http://localhost:8000/public/uploads/kbis/" . $kbisName;
+            }
+    
+            $notification->setMessage($message);
+            $notification->setUser($adminUser); 
+    
+            $em->persist($notification);
+        }
+    
         $em->flush();
 
         return $this->json([
