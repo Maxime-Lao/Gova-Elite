@@ -3,15 +3,34 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Delete;
 use App\Repository\CompanieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use App\Controller\CompanieController;
 use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Metadata\GetCollection;
 
 #[ORM\Entity(repositoryClass: CompanieRepository::class)]
-#[ApiResource(normalizationContext: ['groups' => ['companies:read']])]
+#[ApiResource(
+    operations: [
+        new Get(),
+        new Put(),
+        new Delete(),
+        new Post(
+            controller: CompanieController::class,
+            deserialize: false // Ajoutez cette ligne si vous ne voulez pas que API Platform désérialise automatiquement les données entrantes
+        ),
+        new GetCollection()
+    ]
+)]
+
 class Companie
 {
     #[ORM\Id]
@@ -48,6 +67,9 @@ class Companie
     #[Assert\NotBlank(message: 'La ville ne peut pas être vide')]
     #[Groups(['companies:read', 'car_search:read', 'user:read'])]
     private ?string $city = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $kbis = null;
 
     #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Car::class, orphanRemoval: true)]
     #[Groups(['companies:read', 'user:read'])]
@@ -129,6 +151,18 @@ class Companie
     public function setCity(string $city): static
     {
         $this->city = $city;
+
+        return $this;
+    }
+
+    public function getKbis(): ?string
+    {
+        return $this->kbis;
+    }
+
+    public function setKbis(?string $kbis): self
+    {
+        $this->kbis = $kbis;
 
         return $this;
     }

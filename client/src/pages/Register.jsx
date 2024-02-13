@@ -17,8 +17,6 @@ const Register = () => {
     const [firstname, setFirstname] = useState('');
     const [lastname, setLastname] = useState('');
     const [role, setRole] = useState('');
-    const [kbis, setKbis] = useState('');
-    const [showKbis, setShowKbis] = useState(false);
     const [phone, setPhone] = useState('');
     const navigate = useNavigate();
     const [error, setError] = useState('');
@@ -49,12 +47,6 @@ const Register = () => {
 
     const handleRoleChange = (e) => {
         setRole(e.target.value);
-        if (e.target.value === 'professionnel') {
-            setShowKbis(true);
-        } else {
-            setShowKbis(false);
-            setKbis('');
-        }
     };
 
     const linkStyle = {
@@ -133,17 +125,6 @@ const Register = () => {
                             <MenuItem value="professionnel">Professionnel</MenuItem>
                         </Select>
                     </FormControl>
-                    {showKbis && (
-                        <FormControl fullWidth margin="normal">
-                            <InputLabel htmlFor="kbis-file">KBIS</InputLabel>
-                            <Input
-                                id="kbis-file"
-                                type="file"
-                                onChange={(e) => setKbisFile(e.target.files[0])}
-                                fullWidth
-                            />
-                        </FormControl>
-                    )}
                     {
                         error.length ? (
                             <Box mt={2} textAlign="center">

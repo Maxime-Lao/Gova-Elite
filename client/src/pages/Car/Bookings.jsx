@@ -20,6 +20,7 @@ function Bookings() {
     const fetchUserData = async () => {
       try {
         const response = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}/rents`);
+
         const data = await response.json();
         setUserData(data);
       } catch (error) {
@@ -34,6 +35,7 @@ function Bookings() {
     const fetchUserCommentsData = async () => {
       try {
         const response = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}/comments`);
+
         const data = await response.json();
         setUserCommentsData(data);
       } catch (error) {

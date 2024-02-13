@@ -13,6 +13,7 @@ const useGetConnectedUser = () => {
         const fetchUsers = async () => {
             try {
                 const response = await fetch(`http://localhost:8000/api/users?email=${email}`, {
+
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${myToken}`,
