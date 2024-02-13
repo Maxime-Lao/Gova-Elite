@@ -35,6 +35,7 @@ const CarItem = ({ car }) => {
             }, {headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                 }});
+            window.location.reload()
         } catch (error) {
             console.log(error);
         }
