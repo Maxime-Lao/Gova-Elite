@@ -34,27 +34,27 @@ const CreateCar = ({companieId}) => {
     const user = useGetConnectedUser();
 
     useEffect(() => {
-        fetch(`http://localhost:8000/api/gears`)
+        fetch(`http://195.35.29.110:8000/api/gears`)
             .then(response => response.json())
             .then(data => setMyGears(data))
             .catch(error => console.error(error));
 
-        fetch(`http://localhost:8000/api/models`)
+        fetch(`http://195.35.29.110:8000/api/models`)
             .then(response => response.json())
             .then(data => setAllModels(data))
             .catch(error => console.error(error));
 
-        fetch(`http://localhost:8000/api/brands`)
+        fetch(`http://195.35.29.110:8000/api/brands`)
             .then(response => response.json())
             .then(data => setMyBrands(data))
             .catch(error => console.error(error));
 
-        fetch(`http://localhost:8000/api/energies`)
+        fetch(`http://195.35.29.110:8000/api/energies`)
             .then(response => response.json())
             .then(data => setMyEnergies(data))
             .catch(error => console.error(error));
 
-        fetch(`http://localhost:8000/api/categories`)
+        fetch(`http://195.35.29.110:8000/api/categories`)
             .then(response => response.json())
             .then(data => setMyCategories(data))
             .catch(error => console.error(error));
@@ -79,7 +79,7 @@ const CreateCar = ({companieId}) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const carResponse = await axios.post(`http://localhost:8000/api/cars`, carData, {
+            const carResponse = await axios.post(`http://195.35.29.110:8000/api/cars`, carData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -94,7 +94,7 @@ const CreateCar = ({companieId}) => {
                 formData.append('car_id', carId);
                 formData.append('user_id', user.connectedUser.id);
 
-                const mediaResponse = await axios.post('http://localhost:8000/api/media_objects', formData, {
+                const mediaResponse = await axios.post('http://195.35.29.110:8000/api/media_objects', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },

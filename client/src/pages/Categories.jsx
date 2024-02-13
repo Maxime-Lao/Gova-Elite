@@ -160,7 +160,7 @@ export default function Categories() {
         const getCategories = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://localhost:8000/api/categories', {
+                const response = await fetch('http://195.35.29.110:8000/api/categories', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -200,7 +200,7 @@ export default function Categories() {
         event.preventDefault();
         
         try {
-            const response = await fetch('http://localhost:8000/api/categories', {
+            const response = await fetch('http://195.35.29.110:8000/api/categories', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -251,7 +251,7 @@ export default function Categories() {
 
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/categories/${selectedCategory.id}`, {
+            const response = await fetch(`http://195.35.29.110:8000/api/categories/${selectedCategory.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -280,7 +280,7 @@ export default function Categories() {
 
     const handleUpdate = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/categories/${selectedCategory.id}`, {
+            const response = await fetch(`http://195.35.29.110:8000/api/categories/${selectedCategory.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/merge-patch+json',
