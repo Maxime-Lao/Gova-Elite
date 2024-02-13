@@ -2,40 +2,42 @@ import React from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-const CarSchedule = ({ rents }) => {
+const CarSchedule = ({ car }) => {
+    const dayClassName = (date) => {
+        const formattedDate = date.toISOString().split('T')[0];
 
-    const highlightDates = () => {
-        const highlighted = [];
+        if (car.rents?.some((rent) => formattedDate >= rent.dateStart && formattedDate <= rent.dateEnd)) {
+            return 'bg-yellow-500';
+        }
 
-        rents.forEach((rent) => {
-            const startDate = new Date(rent.dateStart);
-            const endDate = new Date(rent.dateEnd);
+        if (car.unavailability?.some((unavailability) => formattedDate >= unavailability.date_start && formattedDate <= unavailability.date_end)) {
+            return 'bg-red-500';
+        }
 
-            const currentDate = new Date(startDate);
-            while (currentDate <= endDate) {
-                highlighted.push(new Date(currentDate));
-                currentDate.setDate(currentDate.getDate() + 1);
-            }
-        });
-
-        return highlighted;
+        return '';
     };
 
     return (
-        <div>
-            <DatePicker
-                inline
-                highlightDates={highlightDates()}
-            />
-            <div className='flex'>
-                <div className={`w-4 h-4 inline-block bg-green-400 mr-1 border-black border-2`}/>
-                <p>Voiture indiponible</p>
+        car.unavailability && car.rents && (
+            <div>
+                <DatePicker
+                    inline
+                    dayClassName={dayClassName}
+                />
+                <div className='flex'>
+                    <div className={`w-4 h-4 inline-block ${dayClassName} mr-1 border-black border-2 bg-yellow-500`}/>
+                    <p>Voiture en location</p>
+                </div>
+                <div className='flex'>
+                    <div className={`w-4 h-4 inline-block ${dayClassName} border-black mr-1 border-2 bg-red-500`}/>
+                    <p>Voiture indisponible (révision ou autres)</p>
+                </div>
+                <div className='flex'>
+                    <div className={`w-4 h-4 inline-block border-black mr-1 border-2`}/>
+                    <p>Voiture disponible</p>
+                </div>
             </div>
-            <div className='flex'>
-                <div className={`w-4 h-4 inline-block bg-white border-black mr-1 border-2`}/>
-                <p>Voiture disponible</p>
-            </div>
-        </div>
+        )
     );
 };
 

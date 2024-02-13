@@ -8,8 +8,9 @@ import CreateCar from "../components/pro/CreateCar.jsx";
 import RentList from "../components/pro/RentList.jsx";
 
 const HomePro = ({user}) => {
+    console.log(user.connectedUser.companie)
     if(user.connectedUser.companie){
-        if (!user.connectedUser.companie.kbis) {
+        if (!user.connectedUser.companie.isVerified) {
             return (
                 <div className="flex items-center justify-center h-screen">
                     <div className="text-center">

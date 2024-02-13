@@ -141,13 +141,6 @@ const CreateCar = ({companieId}) => {
                 <Box mt={2} textAlign="center">
                     <h1>Ajouter une voiture</h1>
                 </Box>
-                {
-                    success.length ? (
-                        <Box mt={2} textAlign="center">
-                            <p style={{color: 'green'}}>{success}</p>
-                        </Box>
-                    ) : null
-                }
                 <form onSubmit={handleSubmit}>
                     <TextField
                         label="Année"
@@ -325,6 +318,20 @@ const CreateCar = ({companieId}) => {
                             </div>
                         ))}
                     </div>
+                    {
+                        error.length ? (
+                            <Box mt={2} textAlign="center">
+                                <p style={{color: 'red'}}>{error}</p>
+                            </Box>
+                        ) : null
+                    }
+                    {
+                        success.length ? (
+                            <Box mt={2} textAlign="center">
+                                <p style={{color: 'green'}}>{success}</p>
+                            </Box>
+                        ) : null
+                    }
                     <Button
                         type="submit"
                         variant="contained"
@@ -335,13 +342,6 @@ const CreateCar = ({companieId}) => {
                     >
                         Ajouter
                     </Button>
-                    {
-                        error.length ? (
-                            <Box mt={2} textAlign="center">
-                                <p style={{color: 'red'}}>{error}</p>
-                            </Box>
-                        ) : null
-                    }
                 </form>
             </Grid>
         </Grid>
