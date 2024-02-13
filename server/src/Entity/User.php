@@ -89,13 +89,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Assert\NotBlank(message: 'Le mot de passe ne peut pas être vide')]
-    #[Assert\Length(
+    #[Assert\NotBlank(groups: ['user:create'], message: 'Le mot de passe ne peut pas être vide')]
+    #[Assert\Length(groups: ['user:create'],
         min: 8,
         minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères'
     )]
     #[Groups(['user:create'])]
-    #[Assert\Regex(
+    #[Assert\Regex(groups: ['user:create'],
         pattern: '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/',
         message: 'Le mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial'
     )]
@@ -111,12 +111,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Le prénom ne peut pas être vide')]
-    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read', 'rents:read', 'comments:read'])]
+    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read', 'rents:read', 'comments:read', 'rents_companie:read'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Le nom ne peut pas être vide')]
-    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read', 'rents:read', 'comments:read'])]
+    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read', 'rents:read', 'comments:read', 'rents_companie:read'])]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -237,8 +237,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
     }

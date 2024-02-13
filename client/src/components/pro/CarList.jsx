@@ -1,5 +1,5 @@
 import React from 'react';
-import CarItem from './CarItem'; // Assure-toi d'importer le composant CarItem
+import CarItem from './CarItem';
 
 const CarList = ({ cars }) => {
     const containerStyle = {

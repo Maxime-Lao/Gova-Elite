@@ -13,17 +13,27 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import CardActions from "@mui/material/CardActions";
 import { Link } from 'react-router-dom';
+import EditCar from './EditCar';
 
 const CarItem = ({ car }) => {
-
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [openEditDialog, setOpenEditDialog] = useState(false);
+
+    const openEditDialogHandler = () => {
+        setOpenEditDialog(true);
+    };
+    
+    const closeEditDialogHandler = () => {
+        setOpenEditDialog(false);
+    };
+
 
     const handleDelete = async () => {
         try {
             await fetch(`http://localhost:8000/api/cars/${car.id}`, {
                 method: 'DELETE',
             }, {headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
                 }});
         } catch (error) {
             console.log(error);
@@ -31,9 +41,11 @@ const CarItem = ({ car }) => {
         setOpenDeleteDialog(false);
     };
 
+
     const openDeleteConfirmation = () => {
         setOpenDeleteDialog(true);
     };
+
 
     const closeDeleteConfirmation = () => {
         setOpenDeleteDialog(false);
@@ -45,6 +57,8 @@ const CarItem = ({ car }) => {
         alignItems: 'center',
         marginTop: 'auto',
     };
+
+    console.log(car.media);
 
     return (
         <Card style={{ display: 'flex' }}>
@@ -78,13 +92,16 @@ const CarItem = ({ car }) => {
                     <Link to={`/car-details/${car.id}`} className="hover:text-blue-500">
                         Plus de détails...
                     </Link>
-                    <IconButton aria-label="Modifier">
+                    <IconButton aria-label="Modifier" onClick={openEditDialogHandler}>
                         <EditIcon />
                     </IconButton>
                     <IconButton aria-label="Supprimer" onClick={openDeleteConfirmation}>
                         <DeleteIcon />
                     </IconButton>
                 </CardActions>
+                <Dialog open={openEditDialog} onClose={closeEditDialogHandler}>
+                    <EditCar carId={car.id}/>
+                </Dialog>
                 <Dialog open={openDeleteDialog} onClose={closeDeleteConfirmation}>
                     <DialogTitle>Confirmation de suppression</DialogTitle>
                     <DialogContent>

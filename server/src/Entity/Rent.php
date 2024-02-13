@@ -31,46 +31,59 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [new GetCollection()],
     normalizationContext: ['groups' => ['rents_user:read']],
 )]
+#[ApiResource(
+    uriTemplate: '/companies/{companieId}/rents',
+    uriVariables: [
+        'companieId' => new Link(fromClass: Companie::class, toProperty: 'companie'),
+    ],
+    operations: [new GetCollection()],
+    normalizationContext: ['groups' => ['rents_companie:read']],
+)]
 class Rent
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read', 'car:read', 'comments_user:read'])]
+    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read', 'car:read', 'comments_user:read', 'rents_companie:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Assert\NotBlank(message: 'La date de début de la réservation ne peut pas être vide')]
-    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read', 'car:read', 'user:read'])]
+    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read', 'car:read', 'user:read', 'rents_companie:read'])]
     private ?\DateTimeImmutable $dateStart = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     #[Assert\NotBlank(message: 'La date de fin de la réservation ne peut pas être vide')]
-    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read', 'car:read', 'user:read'])]
+    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read', 'car:read', 'user:read', 'rents_companie:read'])]
 
     private ?\DateTimeImmutable $dateEnd = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le prix total ne peut pas être vide')]
-    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read'])]
+    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read', 'rents_companie:read'])]
     private ?float $totalPrice = null;
 
     #[ORM\Column]
-    #[Groups(['rents_car:read', 'rents_user:read'])]
+    #[Groups(['rents_car:read', 'rents_user:read', 'rents_companie:read'])]
     private ?string $paymentMethodId;
 
     #[ORM\ManyToOne(inversedBy: 'rents')]
-    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read'])]
+    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read', 'rents_companie:read'])]
     private ?Car $car = null;
 
     #[ORM\ManyToOne(inversedBy: 'rents')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read'])]
+    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read', 'rents_companie:read'])]
     private ?User $user = null;
 
     #[ORM\OneToMany(mappedBy: 'rent', targetEntity: Comment::class, orphanRemoval: true)]
     #[Groups(['rents:read', 'user:read'])]
     private Collection $comments;
+
+    #[ORM\ManyToOne(inversedBy: 'rents')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['rents:read', 'rents_car:read'])]
+    private ?Companie $companie = null;
 
     #[ORM\Column]
     #[Groups('rents:read')]
@@ -183,6 +196,17 @@ class Rent
             }
         }
 
+        return $this;
+    }
+
+    public function getCompanie(): ?Companie
+    {
+        return $this->companie;
+    }
+
+    public function setCompanie(?Companie $companie): static
+    {
+        $this->companie = $companie;
         return $this;
     }
 

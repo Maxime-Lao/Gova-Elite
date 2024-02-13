@@ -5,19 +5,21 @@ import Navbar from "../../components/navbar/Navbar.jsx";
 import CurrentBookingsCard from "../../components/CurrentBookingsCard.jsx";
 import PastBookingsCard from "../../components/PastBookingsCard.jsx";
 import CircularProgress from '@mui/material/CircularProgress';
+import useGetConnectedUser from "../../components/hooks/useGetConnectedUser.jsx";
 import Box from '@mui/material/Box';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 
 function Bookings() {
   const [userData, setUserData] = useState(null);
+  const user = useGetConnectedUser();
   const [userCommentsData, setUserCommentsData] = useState(null);
   const [tabValue, setTabValue] = useState(0);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/users/21/rents`);
+        const response = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}/rents`);
         const data = await response.json();
         setUserData(data);
       } catch (error) {
@@ -26,12 +28,12 @@ function Bookings() {
     };
 
     fetchUserData();
-  }, []);
+  }, [user.connectedUser.id]);
 
   useEffect(() => {
     const fetchUserCommentsData = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/users/21/comments`);
+        const response = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}/comments`);
         const data = await response.json();
         setUserCommentsData(data);
       } catch (error) {
@@ -40,7 +42,7 @@ function Bookings() {
     };
 
     fetchUserCommentsData();
-  }, []);
+  }, [user.connectedUser.id]);
 
   const commentedRentIds = new Set();
   if (userCommentsData) {
@@ -81,7 +83,7 @@ function Bookings() {
 
   const refreshBookings = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/users/21/rents`);
+      const response = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}/rents`);
       const data = await response.json();
       setUserData(data);
     } catch (error) {
@@ -91,7 +93,7 @@ function Bookings() {
 
   const refreshPastBookings = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/users/21/comments`);
+      const response = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}/comments`);
       const data = await response.json();
       setUserCommentsData(data);
     } catch (error) {
@@ -115,7 +117,7 @@ function Bookings() {
           {tabValue === 0 && (
             currentBookings.map((rent, index) => (
               <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
-                <CurrentBookingsCard rent={rent} user={21} onDelete={handleBookingDeletion} onBookingChange={refreshBookings}/>
+                <CurrentBookingsCard rent={rent} user={user.connectedUser.id} onDelete={handleBookingDeletion} onBookingChange={refreshBookings}/>
               </Grid>
             ))
           )}
@@ -123,7 +125,7 @@ function Bookings() {
           {tabValue === 1 && (
             pastBookings.map((rent, index) => (
               <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
-                <PastBookingsCard rent={rent} user={21} onPastBookingChange={refreshPastBookings}/>
+                <PastBookingsCard rent={rent} user={user.connectedUser.id} onPastBookingChange={refreshPastBookings}/>
               </Grid>
             ))
           )}

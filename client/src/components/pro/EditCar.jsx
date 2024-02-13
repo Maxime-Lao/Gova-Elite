@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import {
     Box,
-    Button,
+    Button, CardMedia,
     FormControl,
     Grid, IconButton,
     InputLabel,
@@ -13,14 +13,13 @@ import {
 import axios from "axios";
 import useGetConnectedUser from "../hooks/useGetConnectedUser.jsx";
 import {convertBytesToMegaBytes} from "../../FileSizeHelper.jsx";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const EditCar = ({ carId }) => {
     const [carData, setCarData] = useState({
     });
 
-    const [photos, setPhotos] = useState([]);
     const [gear, setGear] = useState();
-    const [brand, setBrand] = useState();
     const [selectedBrandId, setSelectedBrandId] = useState();
     const [myGears, setMyGears] = useState();
     const [allModels, setAllModels] = useState();
@@ -41,6 +40,8 @@ const EditCar = ({ carId }) => {
     const [error, setError] = useState('');
     const [description, setDescription] = useState();
     const [errorPhoto, setErrorPhoto] = useState('');
+    const [files, setFiles] = useState([]);
+    const [newFiles, setNewFiles] = useState([]);
 
     const token = localStorage.getItem('token');
     const user = useGetConnectedUser();
@@ -52,7 +53,19 @@ const EditCar = ({ carId }) => {
         setPrice(carData.price);
         setMileage(carData.mileage);
         setDoors(carData.nbDoors);
-    }, []);
+        setDescription(carData.description);
+        setGear(carData.gear?.id);
+        setSelectedBrandId(carData.model?.brand.id);
+        setEnergy(carData.energy?.id);
+        setCategory(carData.category?.id);
+        setFiles(carData.media?.map(media => media));
+    }, [carData]);
+
+
+
+    useEffect(() => {
+        setModel(carData.model?.id);
+    }, [selectedBrandId]);
 
     useEffect(() => {
         fetch(`http://localhost:8000/api/gears`)
@@ -94,36 +107,63 @@ const EditCar = ({ carId }) => {
         fetchCarData();
     }, [carId]);
 
+    console.log(gear, model, energy, category)
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const carDataPayload = {
+            year,
+            horses,
+            nbSeats: seats,
+            price,
+            mileage,
+            nbDoors: doors,
+            model: `/api/models/${model}`,
+            gear: `/api/gears/${gear}`,
+            energy: `/api/energies/${energy}`,
+            category: `/api/categories/${category}`,
+            description,
+        };
+
         try {
-            const response = await axios.put(`http://localhost:8000/api/cars/${carId}`, carData, {
+            const response = await axios.patch(`http://localhost:8000/api/cars/${carId}`, carDataPayload, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/merge-patch+json',
                 },
             });
 
-            const carId = carResponse.data.id;
+            if (newFiles.length) {
+                for (const photo of newFiles) {
+                    const formData = new FormData();
+                    formData.append('file', photo);
+                    formData.append('car_id', carId);
+                    formData.append('user_id', user.connectedUser.id);
 
-            for (const photo of photos) {
-                const formData = new FormData();
-                formData.append('file', photo);
-                formData.append('car_id', carId);
-                formData.append('user_id', user.connectedUser.id);
+                    const mediaResponse = await axios.post('http://localhost:8000/api/media_objects', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
 
-                const mediaResponse = await axios.post('http://localhost:8000/api/media_objects', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-
-                console.log('Media object created:', mediaResponse.data);
+                }
             }
-            // Handle success, close the dialog, or any other necessary actions
+
+            const carMediaIds = carData.media?.map(media => media.id) || [];
+            for (const photo of carMediaIds) {
+                if (!files.some(file => file.id === photo)) {
+                    const response = await axios.delete(`http://localhost:8000/api/media_objects/${photo}`, {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        },
+                    });
+                }
+            }
+
+            setSuccess('Voiture modifiée avec succès');
         } catch (error) {
-            console.error('Error updating car', error);
-            // Handle error, show error message, etc.
+            setError('Erreur lors de la modification de la voiture');
         }
     };
 
@@ -136,29 +176,26 @@ const EditCar = ({ carId }) => {
     }
 
     const deletePhoto = (index) => {
-        const updatedPhotos = [...photos.slice(0, index), ...photos.slice(index + 1)];
-        setPhotos(updatedPhotos);
+        const updatedPhotos = [...files.slice(0, index), ...files.slice(index + 1)];
+        setFiles(updatedPhotos);
     };
+
+    const deleteNewPhoto = (index) => {
+        const updatedPhotos = [...newFiles.slice(0, index), ...newFiles.slice(index + 1)];
+        setNewFiles(updatedPhotos);
+    }
 
     const handlePhoto = (event) => {
         if (convertBytesToMegaBytes(event.target.files[0].size) > 5) {
             setErrorPhoto(`Votre photo: ${event.target.files[0].name} est volumineuse, veuilleez choisir des photos qui ne dépassent pas 5MO`)
         } else {
-            setPhotos(prevPhotos => [...prevPhotos, ...event.target.files])
+            setNewFiles(prevPhotos => [...prevPhotos, ...event.target.files])
             setErrorPhoto('')
         }
     }
 
-    // Handle input changes
-    const handleChange = (e) => {
-        setCarData({
-            ...carData,
-            [e.target.name]: e.target.value,
-        });
-    };
-
     return (
-        carData.year ? <Grid container spacing={2} justifyContent="center">
+        selectedBrandId ? <Grid container spacing={2} justifyContent="center">
                 <Grid item xs={12} sm={6}>
                     <Box mt={2} textAlign="center">
                         <h1>Modifier la voiture</h1>
@@ -244,7 +281,7 @@ const EditCar = ({ carId }) => {
                             <InputLabel id="brand-label">Marque *</InputLabel>
                             <Select
                                 labelId="brand-label"
-                                value={brand}
+                                value={selectedBrandId}
                                 onChange={handleBrandChange}
                                 required
                             >
@@ -259,7 +296,7 @@ const EditCar = ({ carId }) => {
                             <InputLabel id="model-label">Modèle *</InputLabel>
                             <Select
                                 labelId="model-label"
-                                value={brand}
+                                value={model}
                                 onChange={(e) => setModel(e.target.value)}
                                 required
                             >
@@ -320,7 +357,6 @@ const EditCar = ({ carId }) => {
                                 onChange={() => handlePhoto(event)}
                                 multiple
                                 hidden
-                                required
                             />
                         </Button>
                         {
@@ -330,22 +366,44 @@ const EditCar = ({ carId }) => {
                                 </Box>
                             ) : null
                         }
+                        {files.length ? <h3>Photos actuelles</h3> : null}
                         <div className="flex space-x-4 mt-4">
-                            {photos.map((photo, index) => (
-                                <div key={`photo-container-${index}`} className="border-2">
-                                    <img
-                                        key={`uploaded-photo-${index}`}
-                                        src={URL.createObjectURL(photo)}
-                                        alt={`Uploaded Photo ${index + 1}`}
-                                        className="max-h-28 max-w-28"
-                                    />
-                                    <div className="flex justify-end">
-                                        <IconButton aria-label="Supprimer" onClick={() => deletePhoto(index)}>
-                                            <DeleteIcon/>
-                                        </IconButton>
+                            {
+                                files.map((path, index) => (
+                                    <div key={`photo-container-${index}`} className="border-2">
+                                        <CardMedia
+                                            component="img"
+                                            src={`http://localhost:8000/media/${path.filePath}`}
+                                            style={{width: '70px'}}
+                                        />
+                                        <div className="flex justify-end">
+                                            <IconButton aria-label="Supprimer" onClick={() => deletePhoto(index)}>
+                                                <DeleteIcon/>
+                                            </IconButton>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))
+                            }
+                        </div>
+                        {newFiles.length ? <h3>Nouvelles photos</h3> : null}
+                        <div className="flex space-x-4 mt-4">
+                            {
+                                newFiles.map((photo, index) => (
+                                    <div key={`photo-container-${index}`} className="border-2">
+                                        <img
+                                            key={`uploaded-photo-${index}`}
+                                            src={URL.createObjectURL(photo)}
+                                            alt={`Uploaded Photo ${index + 1}`}
+                                            className="max-h-28 max-w-28"
+                                        />
+                                        <div className="flex justify-end">
+                                            <IconButton aria-label="Supprimer" onClick={() => deleteNewPhoto(index)}>
+                                                <DeleteIcon/>
+                                            </IconButton>
+                                        </div>
+                                    </div>
+                                ))
+                            }
                         </div>
                         <Button
                             type="submit"
@@ -367,7 +425,8 @@ const EditCar = ({ carId }) => {
                     </form>
                 </Grid>
             </Grid>
-            : null
+            : <div>
+            </div>
     );
 };
 

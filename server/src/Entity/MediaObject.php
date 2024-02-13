@@ -5,6 +5,7 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
@@ -44,12 +45,17 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
                     ])
                 )
             )
+        ),
+        new Delete(
+            uriTemplate: '/media_objects/{id}',
         )
+
     ]
 )]
 class MediaObject
 {
     #[ORM\Id, ORM\Column, ORM\GeneratedValue]
+    #[Groups(['car:read'])]
     private ?int $id = null;
 
     #[ApiProperty(types: ['https://schema.org/contentUrl'])]
@@ -67,7 +73,7 @@ class MediaObject
 
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'car:read'])]
     public ?string $filePath = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
