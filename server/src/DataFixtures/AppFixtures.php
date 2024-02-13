@@ -57,7 +57,7 @@ class AppFixtures extends Fixture
             $companie->setAddress($faker->address);
             $companie->setZipCode((int)$faker->postcode);
             $companie->setCity($faker->city);
-            $companie->setIsVerified($faker->boolean);
+            $companie->setIsVerified(false);
             $companie->setCreatedAt(\DateTimeImmutable::createFromMutable($faker->dateTime()));
             $manager->persist($companie);
             $companies[] = $companie;
