@@ -50,6 +50,7 @@ const ResetPassword = () => {
                                 type="password"
                                 label="Nouveau mot de passe"
                                 fullWidth
+                                autoComplete="new-password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                             />
@@ -59,6 +60,7 @@ const ResetPassword = () => {
                                 type="password"
                                 label="Confirmer le mot de passe"
                                 fullWidth
+                                autoComplete="confirm-new-password"
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                             />

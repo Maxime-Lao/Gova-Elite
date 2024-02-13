@@ -58,8 +58,6 @@ const CarItem = ({ car }) => {
         marginTop: 'auto',
     };
 
-    console.log(car.media);
-
     return (
         <Card style={{ display: 'flex' }}>
             <CardMedia

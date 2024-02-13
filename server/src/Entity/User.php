@@ -66,7 +66,7 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'companies:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'users')]
@@ -76,7 +76,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Assert\NotBlank(message: 'L\'adresse e-mail ne peut pas être vide')]
     #[Assert\Email(message: 'L\'adresse e-mail doit être valide')]
-    #[Groups(['user:read', 'user:create', 'user:update'])]
+    #[Groups(['user:read', 'user:create', 'user:update', 'companies:read'])]
     #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
@@ -111,17 +111,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Le prénom ne peut pas être vide')]
-    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read', 'rents:read', 'comments:read', 'rents_companie:read'])]
+    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read', 'rents:read', 'comments:read', 'rents_companie:read', 'companies:read'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Le nom ne peut pas être vide')]
-    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read', 'rents:read', 'comments:read', 'rents_companie:read'])]
+    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read', 'rents:read', 'comments:read', 'rents_companie:read', 'companies:read'])]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Le numéro de téléphone ne peut pas être vide')]
-    #[Groups(['user:read', 'user:create', 'user:update'])]
+    #[Groups(['user:read', 'user:create', 'user:update', 'companies:read'])]
     private ?string $phone = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
@@ -129,10 +129,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $passwordResetToken = null;
-
-    #[ORM\Column(nullable: true)]
-    #[Groups(['user:read'])]
-    private ?bool $isValidKbis = null;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Rent::class, orphanRemoval: true)]
     #[Groups('user:read')]
@@ -143,7 +139,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $comments;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: MediaObject::class, orphanRemoval: true)]
-    #[Groups('user:read')]
+    #[Groups('user:read', 'companies:read')]
     private Collection $media;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Notice::class, orphanRemoval: true)]
@@ -259,18 +255,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): static
     {
         $this->password = $password;
-
-        return $this;
-    }
-
-    public function getIsValidKbis(): ?bool
-    {
-        return $this->isValidKbis;
-    }
-
-    public function setIsValidKbis(?bool $isValidKbis): static
-    {
-        $this->isValidKbis = $isValidKbis;
 
         return $this;
     }
@@ -448,18 +432,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getVerified(): ?bool
-    {
-        return $this->isVerified;
-    }
-
-    public function setVerified(bool $isVerified): static
-    {
-        $this->isVerified = $isVerified;
-
-        return $this;
-    }
-    
     public function setMedia(?MediaObject $media): self {
         if ($media === null && $this->media !== null) {
             $this->media->setUser(null);
