@@ -37,9 +37,10 @@ const AvatarDialog = ({ firstName, lastName, handleLogout }) => {
                     horizontal: 'left',
                 }}
             >
-                <Typography sx={{ p: 2 }}>
-                    <p>{lastName} {firstName}</p>
+                <Typography sx={{ p: 2 }} component="div">
+                    {lastName} {firstName}
                 </Typography>
+
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '8px', alignItems: "center" }}>
                     <Link href="/account" underline="hover">Mon compte</Link>
                     <Button onClick={handleLogout} variant="contained" color="secondary">
