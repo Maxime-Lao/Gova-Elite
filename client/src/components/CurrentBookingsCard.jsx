@@ -215,6 +215,24 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
     setIsStripeModalOpen(true);
   };
 
+  const handleStartDateChange = (date) => {
+    if (endDate && date > endDate) {
+      setError('La date de début ne peut pas être après la date de fin.');
+    } else {
+      setStartDate(date);
+      setError('');
+    }
+  };
+  
+  const handleEndDateChange = (date) => {
+    if (startDate && date < startDate) {
+      setError('La date de fin ne peut pas être avant la date de début.');
+    } else {
+      setEndDate(date);
+      setError('');
+    }
+  };
+
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardHeader
@@ -312,7 +330,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
             <Grid item xs={12}>
               <DatePicker
                 selected={startDate}
-                onChange={date => setStartDate(date)}
+                onChange={handleStartDateChange}
                 showTimeSelect
                 timeFormat="HH:mm"
                 timeIntervals={60}
@@ -338,7 +356,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
             <Grid item xs={12}>
               <DatePicker
                 selected={endDate}
-                onChange={date => setEndDate(date)}
+                onChange={handleEndDateChange}
                 showTimeSelect
                 timeFormat="HH:mm"
                 timeIntervals={60}
