@@ -155,7 +155,7 @@ export default function Providers() {
         const getProviders = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://195.35.29.110:8000/api/companies', {
+                const response = await fetch('http://localhost:8000/api/companies', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -193,7 +193,7 @@ export default function Providers() {
 
     const handleConfirmAction = async () => {
         try {
-            const response = await fetch(`http://195.35.29.110:8000/api/companies/${selectedProvider.id}`, {
+            const response = await fetch(`http://localhost:8000/api/companies/${selectedProvider.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/merge-patch+json',

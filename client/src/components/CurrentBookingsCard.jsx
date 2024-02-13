@@ -82,7 +82,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
   useEffect(() => {
     const fetchRentedTimes = async () => {
       try {
-        const response = await fetch(`http://195.35.29.110:8000/api/cars/${rent.car.id}/rents`);
+        const response = await fetch(`http://localhost:8000/api/cars/${rent.car.id}/rents`);
         if (response.ok) {
           const carRentsData = await response.json();
           setRentedTimes(carRentsData);
@@ -112,7 +112,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
 
   const fetchUpdatedRentedTimes = async (carId) => {
     try {
-      const response = await fetch(`http://195.35.29.110:8000/api/cars/${carId}/rents`);
+      const response = await fetch(`http://localhost:8000/api/cars/${carId}/rents`);
       if (response.ok) {
         const carRentsData = await response.json();
         setRentedTimes(carRentsData);
@@ -133,7 +133,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
 
   const handleCancel = async (id) => {
     try {
-      const response = await fetch(`http://195.35.29.110:8000/api/rents/${id}`, {
+      const response = await fetch(`http://localhost:8000/api/rents/${id}`, {
         method: 'DELETE',
       });
       if (response.ok) {
@@ -163,7 +163,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
       };
 
       try {
-        const response = await fetch(`http://195.35.29.110:8000/api/rents/${rentId}`, {
+        const response = await fetch(`http://localhost:8000/api/rents/${rentId}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/merge-patch+json',

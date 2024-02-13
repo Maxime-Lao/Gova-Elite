@@ -160,7 +160,7 @@ function PastBookings({ rent, user, onPastBookingChange }) {
         car,
       };
 
-      const response = await fetch('http://195.35.29.110:8000/api/comments', {
+      const response = await fetch('http://localhost:8000/api/comments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json+ld',

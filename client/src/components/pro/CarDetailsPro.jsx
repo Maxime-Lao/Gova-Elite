@@ -54,7 +54,7 @@ const CarDetailsPro = () => {
             return;
         }
         try {
-            const response = await fetch('http://195.35.29.110:8000/api/unavailabilities', {
+            const response = await fetch('http://localhost:8000/api/unavailabilities', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ const CarDetailsPro = () => {
     useEffect(() => {
         const fetchCar = async () => {
             try {
-                const response = await fetch(`http://195.35.29.110:8000/api/cars/${carId}`);
+                const response = await fetch(`http://localhost:8000/api/cars/${carId}`);
                 if (!response.ok) {
                     throw new Error('An error occurred');
                 }
@@ -115,7 +115,7 @@ const CarDetailsPro = () => {
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <img
-                            src={car.media.length > 0 ? `http://195.35.29.110:8000/media/${car.media[0].filePath}` : 'https://source.unsplash.com/random'}
+                            src={car.media.length > 0 ? `http://localhost:8000/media/${car.media[0].filePath}` : 'https://source.unsplash.com/random'}
                             alt="Car Image"
                             className="w-full h-auto"
                         />

@@ -69,7 +69,7 @@ class CompanieController extends AbstractController
             $message = 'Une nouvelle entreprise a été créée. ';
             if ($kbisPath) {
                 $kbisName = $companie->getKbis();
-                $message .= "Document Kbis disponible ici: http://195.35.29.110:8000/public/uploads/kbis/" . $kbisName;
+                $message .= "Document Kbis disponible ici: http://localhost:8000/public/uploads/kbis/" . $kbisName;
             }
     
             $notification->setMessage($message);
