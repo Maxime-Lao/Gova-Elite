@@ -127,7 +127,11 @@ function App() {
                 </ProtectedRoute>
               } />
               <Route path="/not-found" element={<NotFoundPage />} />
-              <Route path="/createCompanie" element={<CreateCompanie />} />
+              <Route path="/createCompanie" element={
+                <ProtectedRoute allowedRoles={['ROLE_PRO']}>
+                  <CreateCompanie />
+                </ProtectedRoute>
+              } />
               <Route path="/car-details/:carId" element={
                 <ProtectedRoute allowedRoles={['ROLE_PRO']}>
                   <CarDetailsPro />

@@ -34,6 +34,11 @@ function CompanieForm() {
             formData.append('kbis', kbisFile);
         }
 
+        console.log(user);
+        if (user && user.connectedUser.id) {
+            formData.append('userId', user.connectedUser.id);
+        }        
+
         try {
             const response = await fetch('http://195.35.29.110:8000/api/companies', {
                 method: 'POST',
