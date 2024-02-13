@@ -107,6 +107,10 @@ class Car
     #[Groups(['car:read', 'user:read', 'comments_user:read'])]
     private Collection $rents;
 
+    #[ORM\OneToMany(mappedBy: 'car', targetEntity: Unavailability::class, orphanRemoval: true)]
+    #[Groups(['car:read'])]
+    private Collection $unavailability;
+
     #[ORM\OneToMany(mappedBy: 'car', targetEntity: Comment::class, orphanRemoval: true)]
     #[Groups(['user:read'])]
     private Collection $comments;
@@ -123,6 +127,7 @@ class Car
     {
         $this->media = new ArrayCollection();
         $this->rents = new ArrayCollection();
+        $this->unavailability = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -324,6 +329,34 @@ class Car
             // set the owning side to null (unless already changed)
             if ($rent->getCar() === $this) {
                 $rent->setCar(null);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Unavailability>
+     */
+    public function getUnavailability(): Collection
+    {
+        return $this->unavailability;
+    }
+
+    public function addUnavailability(Unavailability $unavailability): static
+    {
+        if (!$this->unavailability->contains($unavailability)) {
+            $this->unavailability->add($unavailability);
+            $unavailability->setCar($this);
+        }
+        return $this;
+    }
+
+    public function removeUnavailability(Unavailability $unavailability): static
+    {
+        if ($this->unavailability->removeElement($unavailability)) {
+            // set the owning side to null (unless already changed)
+            if ($unavailability->getCar() === $this) {
+                $unavailability->setCar(null);
             }
         }
         return $this;

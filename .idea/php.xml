@@ -158,6 +158,10 @@
       <path value="$PROJECT_DIR$/server/vendor/symfonycasts/verify-email-bundle" />
       <path value="$PROJECT_DIR$/server/vendor/doctrine/doctrine-fixtures-bundle" />
       <path value="$PROJECT_DIR$/server/vendor/stripe/stripe-php" />
+      <path value="$PROJECT_DIR$/server/vendor/symfony/messenger" />
+      <path value="$PROJECT_DIR$/server/vendor/symfony/mailjet-mailer" />
+      <path value="$PROJECT_DIR$/server/vendor/symfony/mailer-send-mailer" />
+      <path value="$PROJECT_DIR$/server/vendor/symfony/postmark-mailer" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.1" />

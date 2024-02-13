@@ -96,7 +96,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     )]
     #[Groups(['user:create'])]
     #[Assert\Regex(groups: ['user:create'],
-        pattern: '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/',
+        pattern: '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&-])[A-Za-z\d@$!%*?&-]{8,}$/',
         message: 'Le mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial'
     )]
     private ?string $password = null;
@@ -111,12 +111,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Le prénom ne peut pas être vide')]
-    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read', 'rents:read', 'comments:read', 'rents_companie:read', 'companies:read'])]
+    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read', 'rents:read', 'comments:read', 'rents_companie:read', 'car:read', 'companies:read'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Le nom ne peut pas être vide')]
-    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read', 'rents:read', 'comments:read', 'rents_companie:read', 'companies:read'])]
+    #[Groups(['user:read', 'user:create', 'user:update', 'comments_car:read', 'rents:read', 'comments:read', 'rents_companie:read', 'car:read', 'companies:read'])]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255, nullable: true)]

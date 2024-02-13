@@ -6,7 +6,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use App\Repository\RentRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -60,7 +59,7 @@ class Rent
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le prix total ne peut pas être vide')]
-    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read', 'rents_companie:read'])]
+    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read', 'rents_companie:read', 'car:read'])]
     private ?float $totalPrice = null;
 
     #[ORM\Column]
@@ -73,7 +72,7 @@ class Rent
 
     #[ORM\ManyToOne(inversedBy: 'rents')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read', 'rents_companie:read'])]
+    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read', 'rents_companie:read', 'car:read'])]
     private ?User $user = null;
 
     #[ORM\OneToMany(mappedBy: 'rent', targetEntity: Comment::class, orphanRemoval: true)]

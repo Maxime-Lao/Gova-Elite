@@ -119,6 +119,9 @@
       <excludeFolder url="file://$MODULE_DIR$/server/vendor/webonyx/graphql-php" />
       <excludeFolder url="file://$MODULE_DIR$/server/vendor/doctrine/doctrine-fixtures-bundle" />
       <excludeFolder url="file://$MODULE_DIR$/server/vendor/stripe/stripe-php" />
+      <excludeFolder url="file://$MODULE_DIR$/server/vendor/symfony/mailer-send-mailer" />
+      <excludeFolder url="file://$MODULE_DIR$/server/vendor/symfony/mailjet-mailer" />
+      <excludeFolder url="file://$MODULE_DIR$/server/vendor/symfony/postmark-mailer" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
