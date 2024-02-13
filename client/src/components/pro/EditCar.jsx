@@ -107,18 +107,16 @@ const EditCar = ({ carId }) => {
         fetchCarData();
     }, [carId]);
 
-    console.log(gear, model, energy, category)
-
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         const carDataPayload = {
-            year,
-            horses,
-            nbSeats: seats,
-            price,
-            mileage,
-            nbDoors: doors,
+            year: Number(year),
+            horses: Number(horses),
+            nbSeats: Number(seats),
+            price: Number(price),
+            mileage: Number(mileage),
+            nbDoors: Number(doors),
             model: `/api/models/${model}`,
             gear: `/api/gears/${gear}`,
             energy: `/api/energies/${energy}`,

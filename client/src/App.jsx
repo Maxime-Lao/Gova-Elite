@@ -1,4 +1,6 @@
 import './App.css'
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import CarDetails from './pages/Car/CarDetails';
@@ -11,6 +13,7 @@ import RegisterPage from "./pages/Register.jsx";
 import Login from "./pages/Login.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Users from "./pages/Users.jsx";
+import Providers from './pages/Providers.jsx';
 import Brands from './pages/Brands.jsx';
 import Categories from './pages/Categories.jsx';
 import Gears from './pages/Gears.jsx';
@@ -61,6 +64,11 @@ function App() {
               <Route path="/admin/users" element={
                 <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
                   <Users />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/providers" element={
+                <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
+                  <Providers />
                 </ProtectedRoute>
               } />
               <Route path="/admin/cars" element={
@@ -131,6 +139,7 @@ function App() {
                   <CarDetailsPro />
                 </ProtectedRoute>
               } />
+               <Route path="*" element={<NotFoundPage />} />
           </Routes>
       </Router>
     </ThemeProvider>
