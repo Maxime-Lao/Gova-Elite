@@ -30,7 +30,7 @@ const CarItem = ({ car }) => {
 
     const handleDelete = async () => {
         try {
-            await fetch(`http://195.35.29.110:8000/api/cars/${car.id}`, {
+            await fetch(`http://localhost:8000/api/cars/${car.id}`, {
                 method: 'DELETE',
             }, {headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,

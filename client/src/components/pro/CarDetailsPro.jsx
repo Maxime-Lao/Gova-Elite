@@ -10,7 +10,7 @@ const CarDetailsPro = () => {
     useEffect(() => {
         const fetchCar = async () => {
             try {
-                const response = await fetch(`http://195.35.29.110:8000/api/cars/${carId}`);
+                const response = await fetch(`http://localhost:8000/api/cars/${carId}`);
                 if (!response.ok) {
                     throw new Error('An error occurred');
                 }

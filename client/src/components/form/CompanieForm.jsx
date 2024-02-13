@@ -42,7 +42,7 @@ function CompanieForm() {
         }        
 
         try {
-            const response = await fetch('http://195.35.29.110:8000/api/companies', {
+            const response = await fetch('http://localhost:8000/api/companies', {
                 method: 'POST',
                 body: formData,
             });

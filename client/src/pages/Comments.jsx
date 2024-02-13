@@ -156,7 +156,7 @@ export default function Comments() {
         const getComments = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://195.35.29.110:8000/api/comments', {
+                const response = await fetch('http://localhost:8000/api/comments', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -187,7 +187,7 @@ export default function Comments() {
 
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(`http://195.35.29.110:8000/api/comments/${selectedComment.id}`, {
+            const response = await fetch(`http://localhost:8000/api/comments/${selectedComment.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
