@@ -18,6 +18,7 @@ import ClassIcon from '@mui/icons-material/Class';
 import BusinessIcon from '@mui/icons-material/Business';
 import BallotIcon from '@mui/icons-material/Ballot';
 import MessageIcon from '@mui/icons-material/Message';
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import HomeIcon from '@mui/icons-material/Home';
 
 export const MainListItems = () => {
@@ -52,6 +53,15 @@ export const MainListItems = () => {
                 </ListItemIcon>
                 <ListItemText primary="Utilisateurs" />
             </ListItemButton>
+            <ListItemButton
+                onClick={() => handleListItemClick('/admin/providers')}
+                selected={isSelected('/admin/providers')}
+            >
+                <ListItemIcon>
+                    <GroupAddIcon />
+                </ListItemIcon>
+                <ListItemText primary="Prestataires" />
+            </ListItemButton>
             <ListItemButton 
                 onClick={() => handleListItemClick('/admin/brands')}
                 selected={isSelected('/admin/brands')}
@@ -60,15 +70,6 @@ export const MainListItems = () => {
                     <BrandingWatermarkIcon />
                 </ListItemIcon>
                 <ListItemText primary="Marques" />
-            </ListItemButton>
-            <ListItemButton
-                onClick={() => handleListItemClick('/admin/cars')}
-                selected={isSelected('/admin/cars')}
-            >
-                <ListItemIcon>
-                    <DirectionsCarIcon />
-                </ListItemIcon>
-                <ListItemText primary="Voitures" />
             </ListItemButton>
             <ListItemButton
                 onClick={() => handleListItemClick('/admin/gears')}
@@ -133,12 +134,6 @@ export const MainListItems = () => {
                 </ListItemIcon>
                 <ListItemText primary="Commentaires" />
             </ListItemButton>
-            <ListItemButton onClick={ () => navigate('/') }>
-                <ListItemIcon>
-                    <HomeIcon />
-                </ListItemIcon>
-                <ListItemText primary="Page d'accueil" />
-            </ListItemButton>
         </React.Fragment>
     )
 };
@@ -153,18 +148,6 @@ export const secondaryListItems = (
                 <AssignmentIcon />
             </ListItemIcon>
             <ListItemText primary="Current month" />
-        </ListItemButton>
-        <ListItemButton>
-            <ListItemIcon>
-                <AssignmentIcon />
-            </ListItemIcon>
-            <ListItemText primary="Last quarter" />
-        </ListItemButton>
-        <ListItemButton>
-            <ListItemIcon>
-                <AssignmentIcon />
-            </ListItemIcon>
-            <ListItemText primary="Year-end sale" />
         </ListItemButton>
     </React.Fragment>
 );

@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from "../../components/navbar/Navbar.jsx";
 import Calendar from "../../components/Calendar";
-import { Grid, Typography, List, ListItem, ListItemText, ListItemIcon, TextField, Card, CardMedia, CardContent } from '@mui/material';
-import { CarRental, DirectionsCar } from '@mui/icons-material';
+import { Grid, Typography, List, ListItem, ListItemText, ListItemIcon, Card, CardContent, IconButton } from '@mui/material';
+import { CarRental, DirectionsCar, ArrowForwardIos, ArrowBackIos } from '@mui/icons-material';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import Slider from "react-slick";
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import format from 'date-fns/format';
@@ -21,11 +22,62 @@ import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutli
 import BusinessIcon from '@mui/icons-material/Business';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 
+const cardStyle = {
+  marginBottom: "2em",
+  position: "relative",
+};
+
+function NextArrow(props) {
+  const { className, style, onClick } = props;
+  return (
+    <IconButton
+      className={className}
+      style={{ ...style, display: "block", color: "black", right: "-25px" }}
+      onClick={onClick}
+    >
+      <ArrowForwardIos />
+    </IconButton>
+  );
+}
+
+function PrevArrow(props) {
+  const { className, style, onClick } = props;
+  return (
+    <IconButton
+      className={className}
+      style={{ ...style, display: "block", color: "black", left: "-25px", zIndex: 1 }}
+      onClick={onClick}
+    >
+      <ArrowBackIos />
+    </IconButton>
+  );
+}
+
+
 function CarDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [car, setCar] = useState(null);
   const [comments, setComments] = useState([]);
+
+  const getSliderSettings = (numberOfImages) => {
+    return {
+      dots: true,
+      infinite: numberOfImages > 1,
+      speed: 500,
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      autoplay: numberOfImages > 1,
+      nextArrow: <NextArrow />,
+      prevArrow: <PrevArrow />,
+    };
+  };
+
+  const imageStyle = {
+    width: "100%",
+    height: "500px",
+    objectFit: "cover",
+  };
 
   useEffect(() => {
     fetch(`http://localhost:8000/api/cars/${id}/comments`)
@@ -88,14 +140,19 @@ function CarDetails() {
     <div>
       <Navbar />
       <Grid container spacing={2} justifyContent="center" sx={{marginTop: "2em"}}>
-        <Grid item xs={6}>
-        <Card sx={{marginBottom: "2em"}}>
-            <CardMedia
-              component="img"
-              height="200"
-              image="https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              alt="Image de voiture"
-            />
+      <Grid item xs={12} sm={8} md={6}>
+          <Card sx={cardStyle}>
+            <Slider {...getSliderSettings(car.media.length)}>
+              {car.media.length > 0 ? car.media.map((media, index) => (
+                <div key={index}>
+                  <img src={`http://localhost:8000/media/${media.filePath}`} alt={`Image de voiture ${index + 1}`} style={imageStyle} />
+                </div>
+              )) : (
+                <div>
+                  <img src="https://source.unsplash.com/random" alt="Image par défaut" style={imageStyle} />
+                </div>
+              )}
+            </Slider>
           </Card>
           <Grid container spacing={2}>
             <Grid item xs={6}>

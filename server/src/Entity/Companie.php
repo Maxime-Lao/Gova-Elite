@@ -49,6 +49,7 @@ class Companie
     #[Groups(['companies:read', 'car_search:read', 'user:read'])]
     private ?string $address = null;
 
+    #[Groups(['companies:read'])]
     #[ORM\OneToMany(mappedBy: 'companie', targetEntity: User::class, orphanRemoval: true)]
     private Collection $users;
 
@@ -67,6 +68,10 @@ class Companie
     #[Assert\NotBlank(message: 'La ville ne peut pas être vide')]
     #[Groups(['companies:read', 'car_search:read', 'user:read'])]
     private ?string $city = null;
+
+    #[ORM\Column(nullable: false)]
+    #[Groups(['companies:read', 'user:read'])]
+    private bool $isVerified = false;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $kbis = null;
@@ -154,6 +159,15 @@ class Companie
 
         return $this;
     }
+
+    public function getIsVerified(): ?bool
+    {
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
 
     public function getKbis(): ?string
     {

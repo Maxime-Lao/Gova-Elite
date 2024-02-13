@@ -12,43 +12,36 @@ import Tab from '@mui/material/Tab';
 
 function Bookings() {
   const [userData, setUserData] = useState(null);
-  const user = useGetConnectedUser();
   const [userCommentsData, setUserCommentsData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const user = useGetConnectedUser();
   const [tabValue, setTabValue] = useState(0);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const response = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}/rents`);
-
-        const data = await response.json();
-        setUserData(data);
+        const userData = await response.json();
+        const commentsResponse = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}/comments`);
+        const commentsData = await commentsResponse.json();
+        setUserData(userData);
+        setUserCommentsData(commentsData);
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error('Error:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
+    if (user.connectedUser.id) {
+      fetchUserData();
+    }
     fetchUserData();
   }, [user.connectedUser.id]);
 
-  useEffect(() => {
-    const fetchUserCommentsData = async () => {
-      try {
-        const response = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}/comments`);
-
-        const data = await response.json();
-        setUserCommentsData(data);
-      } catch (error) {
-        console.error('Error fetching user comments data:', error);
-      }
-    };
-
-    fetchUserCommentsData();
-  }, [user.connectedUser.id]);
-
   const commentedRentIds = new Set();
-  if (userCommentsData) {
-    userCommentsData.forEach(comment => {
+    if (userCommentsData) {
+      userCommentsData.forEach(comment => {
       commentedRentIds.add(comment.rent.id);
     });
   }
@@ -57,7 +50,7 @@ function Bookings() {
     setTabValue(newValue);
   };
 
-  if (!userData || !userCommentsData) {
+  if (isLoading) {
     return (
       <>
         <Navbar />
@@ -109,7 +102,7 @@ function Bookings() {
       {userData && (
         <Grid container spacing={2} justifyContent="center" sx={{marginTop: "2em"}}>
           <Grid item xs={12}>
-            <Typography variant="h4">Réservations de voiture pour {userData.firstname} {userData.lastname}</Typography>
+            <Typography variant="h4">Réservations de voiture pour {user.connectedUser.firstname} {user.connectedUser.lastname}</Typography>
             <Tabs value={tabValue} onChange={handleTabChange} aria-label="Réservations tabs">
               <Tab label="En cours" />
               <Tab label="Historique" />

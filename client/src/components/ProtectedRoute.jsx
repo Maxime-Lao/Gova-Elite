@@ -9,11 +9,15 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     return <div>Chargement...</div>;
   }
 
+  if (!connectedUser || connectedUser.length === 0) {
+    return <Navigate to="/login" replace />;
+  }
+
   const userRoles = connectedUser && connectedUser.roles ? connectedUser.roles : [];
   const hasPermission = userRoles.some(role => allowedRoles.includes(role));
 
   if (!hasPermission) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return children;
