@@ -168,7 +168,8 @@ export default function Providers() {
                 }
 
                 const data = await response.json();
-                setProviders(data);
+                const filteredProviders = data.filter(provider => provider.users.length > 0);
+                setProviders(filteredProviders);
                 setIsLoading(false);
             } catch (error) {
                 console.error(error);

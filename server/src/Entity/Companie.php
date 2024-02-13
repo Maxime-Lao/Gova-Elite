@@ -26,7 +26,7 @@ use ApiPlatform\Metadata\GetCollection;
         new Delete(),
         new Post(
             controller: CompanieController::class,
-            deserialize: false // Ajoutez cette ligne si vous ne voulez pas que API Platform désérialise automatiquement les données entrantes
+            deserialize: false
         ),
         new GetCollection()
     ]
