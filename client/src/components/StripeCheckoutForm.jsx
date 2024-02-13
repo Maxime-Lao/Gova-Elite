@@ -32,7 +32,7 @@ const StripeCheckoutForm = ({ onPaymentSuccess, carPrice }) => {
       setError(error.message);
       setLoading(false);
     } else {      
-      fetch('http://localhost:8000/create-payment-intent', {
+      fetch('http://195.35.29.110:8000/create-payment-intent', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

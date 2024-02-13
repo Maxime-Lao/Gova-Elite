@@ -20,9 +20,9 @@ function Bookings() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}/rents`);
+        const response = await fetch(`http://195.35.29.110:8000/api/users/${user.connectedUser.id}/rents`);
         const userData = await response.json();
-        const commentsResponse = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}/comments`);
+        const commentsResponse = await fetch(`http://195.35.29.110:8000/api/users/${user.connectedUser.id}/comments`);
         const commentsData = await commentsResponse.json();
         setUserData(userData);
         setUserCommentsData(commentsData);
@@ -78,7 +78,7 @@ function Bookings() {
 
   const refreshBookings = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}/rents`);
+      const response = await fetch(`http://195.35.29.110:8000/api/users/${user.connectedUser.id}/rents`);
       const data = await response.json();
       setUserData(data);
     } catch (error) {
@@ -88,7 +88,7 @@ function Bookings() {
 
   const refreshPastBookings = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}/comments`);
+      const response = await fetch(`http://195.35.29.110:8000/api/users/${user.connectedUser.id}/comments`);
       const data = await response.json();
       setUserCommentsData(data);
     } catch (error) {

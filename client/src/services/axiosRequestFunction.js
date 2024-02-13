@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {jwtDecode} from "jwt-decode";
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'http://195.35.29.110:8000';
 
 const axiosInstance = axios.create({
     baseURL: API_BASE_URL,

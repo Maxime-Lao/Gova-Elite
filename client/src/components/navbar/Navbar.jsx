@@ -17,7 +17,7 @@ const Navbar = () => {
     const navigate = useNavigate();
     const handleLogout = useCallback(() => {
         try {
-            const response = fetch('http://localhost:8000/logout', {
+            const response = fetch('http://195.35.29.110:8000/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

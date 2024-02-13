@@ -32,7 +32,7 @@ const StripeCheckoutFormUpdate = ({ onPaymentSuccess, rentId, originalPaymentInt
       setError(error.message);
       setLoading(false);
     } else {      
-      fetch('http://localhost:8000/update-payment-intent', {
+      fetch('http://195.35.29.110:8000/update-payment-intent', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
