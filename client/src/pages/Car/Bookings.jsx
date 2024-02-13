@@ -36,11 +36,12 @@ function Bookings() {
     if (user.connectedUser.id) {
       fetchUserData();
     }
+    fetchUserData();
   }, [user.connectedUser.id]);
 
   const commentedRentIds = new Set();
-  if (userCommentsData) {
-    userCommentsData.forEach(comment => {
+    if (userCommentsData) {
+      userCommentsData.forEach(comment => {
       commentedRentIds.add(comment.rent.id);
     });
   }

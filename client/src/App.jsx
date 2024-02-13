@@ -25,6 +25,7 @@ import Account from "./components/account/Account.jsx";
 import PaymentSuccess from './pages/PaymentSuccess.jsx';
 import UpdatePaymentSuccess from './pages/UpdatePaymentSucces.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
+import CreateCompanie from "./pages/CreateCompanie.jsx";
 import Rents from './pages/Rents.jsx';
 import Comments from './pages/Comments.jsx';
 import Cars from './pages/Cars.jsx';
@@ -134,6 +135,11 @@ function App() {
                 </ProtectedRoute>
               } />
               <Route path="/not-found" element={<NotFoundPage />} />
+              <Route path="/createCompanie" element={
+                <ProtectedRoute allowedRoles={['ROLE_PRO']}>
+                  <CreateCompanie />
+                </ProtectedRoute>
+              } />
               <Route path="/car-details/:carId" element={
                 <ProtectedRoute allowedRoles={['ROLE_PRO']}>
                   <CarDetailsPro />

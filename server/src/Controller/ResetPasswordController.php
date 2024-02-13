@@ -51,6 +51,7 @@ class ResetPasswordController extends AbstractController
 
         if ($newPassword) {
             $user->setPassword($this->passwordEncoder->hashPassword($user, $newPassword));
+            $user->setPasswordResetToken('');
             $this->entityManager->flush();
 
             return new Response('Password reset successful', Response::HTTP_OK);

@@ -13,7 +13,6 @@ use Doctrine\ORM\EntityManagerInterface;
 final class UserPasswordHasher implements ProcessorInterface
 {
     private MailerInterface $mailer;
-    private EntityManagerInterface $entityManager;
 
     public function __construct(
         private readonly ProcessorInterface $processor,
@@ -36,10 +35,10 @@ final class UserPasswordHasher implements ProcessorInterface
             UrlGeneratorInterface::ABSOLUTE_URL);
 
         $currentEmail = (new Email())
-            ->from('bedda.ayman.sio@gmail.com')
+            ->from('mmo@kanieba.com')
             ->to($user->getEmail())
-            ->subject('Time for Symfony Mailer!')
-            ->text('Sending emails is fun again!')
+            ->subject('Bienvenue sur La Gova !')
+            ->text('')
             ->html("<p>Please verify your account by clicking <a href=\"{$verificationUrl}\">here</a>.</p>");
 
         $this->mailer->send($currentEmail);
@@ -69,9 +68,9 @@ final class UserPasswordHasher implements ProcessorInterface
             UrlGeneratorInterface::ABSOLUTE_URL);
 
         $currentEmail = (new Email())
-            ->from('bedda.ayman.sio@gmail.com')
+            ->from('mmo@kanieba.com')
             ->to($user->getEmail())
-            ->subject('Email verification')
+            ->subject('Modification de mot de passe')
             ->text('')
             ->html("<p>Cliquez ici pour changer votre mot de passe <a href=\"http://localhost:3000/resetpswd/" . $user->getPasswordResetToken() . "\">ici</a>.</p>");
 

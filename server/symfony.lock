@@ -196,6 +196,24 @@
             "config/packages/mailer.yaml"
         ]
     },
+    "symfony/mailer-send-mailer": {
+        "version": "6.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "6.3",
+            "ref": "a8120b79052d6ced86bae5025fd7b9e203fdccf8"
+        }
+    },
+    "symfony/mailjet-mailer": {
+        "version": "6.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "5.2",
+            "ref": "037c3256baa3334fd4cc3092a63209ae523696ff"
+        }
+    },
     "symfony/maker-bundle": {
         "version": "1.51",
         "recipe": {
@@ -243,6 +261,15 @@
             "phpunit.xml.dist",
             "tests/bootstrap.php"
         ]
+    },
+    "symfony/postmark-mailer": {
+        "version": "6.3",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "4.4",
+            "ref": "631f81f2fbf58126ae699a04b1d0984442613a19"
+        }
     },
     "symfony/routing": {
         "version": "6.3",
