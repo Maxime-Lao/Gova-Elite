@@ -168,7 +168,8 @@ class Companie
     public function setIsVerified(bool $isVerified): static
     {
         $this->isVerified = $isVerified;
-
+    }
+    
     public function getKbis(): ?string
     {
         return $this->kbis;
