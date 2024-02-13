@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Metadata\GetCollection;
 
 #[ORM\Entity(repositoryClass: CompanieRepository::class)]
+#[ApiResource(normalizationContext: ['groups' => ['companies:read']])]
 #[ApiResource(
     operations: [
         new Get(),
