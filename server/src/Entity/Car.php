@@ -108,7 +108,7 @@ class Car
     private Collection $rents;
 
     #[ORM\OneToMany(mappedBy: 'car', targetEntity: Unavailability::class, orphanRemoval: true)]
-    #[Groups(['car:read'])]
+    #[Groups(['car:read', 'rents_user:read'])]
     private Collection $unavailability;
 
     #[ORM\OneToMany(mappedBy: 'car', targetEntity: Comment::class, orphanRemoval: true)]

@@ -25,9 +25,12 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import format from 'date-fns/format';
+import { fr } from 'date-fns/locale';
 import {createTheme, styled, ThemeProvider, useTheme} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
+import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 import Divider from '@mui/material/Divider';
@@ -36,10 +39,11 @@ import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import {MainListItems, secondaryListItems} from '../components/dashboard/ListItems.jsx';
+import {MainListItems, secondaryListItems} from '../../components/dashboard/ListItems.jsx';
 import { useMediaQuery } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
-import NavbarPro from "../components/navbar/NavbarPro.jsx";
+import Navbar from "../../components/navbar/Navbar.jsx";
+import NavbarPro from "../../components/navbar/NavbarPro.jsx";
 
 export function Copyright() {
     return (
@@ -52,6 +56,51 @@ export function Copyright() {
         </Typography>
     );
 }
+
+const drawerWidth = 240;
+
+const AppBar = styled(MuiAppBar, {
+    shouldForwardProp: (prop) => prop !== 'open',
+})(({ theme, open }) => ({
+    zIndex: theme.zIndex.drawer + 1,
+    transition: theme.transitions.create(['width', 'margin'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+    }),
+    ...(open && {
+        marginLeft: drawerWidth,
+        width: `calc(100% - ${drawerWidth}px)`,
+        transition: theme.transitions.create(['width', 'margin'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+    }),
+}));
+
+
+const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
+    '& .MuiDrawer-paper': {
+        position: 'relative',
+        whiteSpace: 'nowrap',
+        width: drawerWidth,
+        transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+        boxSizing: 'border-box',
+        ...(!open && {
+            overflowX: 'hidden',
+            transition: theme.transitions.create('width', {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen,
+            }),
+            width: theme.spacing(7),
+            [theme.breakpoints.up('sm')]: {
+                width: theme.spacing(9),
+            },
+        }),
+    },
+}));
 
 const defaultTheme = createTheme({
     palette: {
@@ -82,30 +131,24 @@ const defaultTheme = createTheme({
     },
 });
 
-export default function Users() {
+export default function Categories() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [open, setOpen] = useState(!isMobile);
     const [isLoading, setIsLoading] = useState(true);
-    const [users, setUsers] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [openCreateDialog, setOpenCreateDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedCategory, setSelectedCategory] = useState(null);
     const token = localStorage.getItem('token');
-    const emailLoggedUser = localStorage.getItem('email');
     const [formErrors, setFormErrors] = useState({});
 
     const toggleDrawer = () => {
         setOpen(!open);
     };
 
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [firstname, setFirstname] = useState('');
-    const [lastname, setLastname] = useState('');
-    const [role, setRole] = useState('');
-    const [phone, setPhone] = useState('');
+    const [libelle, setLibelle] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
@@ -114,10 +157,10 @@ export default function Users() {
     }, [isMobile]);
 
     useEffect(() => {
-        const getUsers = async () => {
+        const getCategories = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://localhost:8000/api/users', {
+                const response = await fetch('http://localhost:8000/api/categories', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -130,7 +173,7 @@ export default function Users() {
                 }
 
                 const data = await response.json();
-                setUsers(data.filter(user => user.email !== emailLoggedUser));
+                setCategories(data);
                 setIsLoading(false);
             } catch (error) {
                 console.error(error);
@@ -138,50 +181,39 @@ export default function Users() {
             }
         };
 
-        getUsers();
-    }, [token, emailLoggedUser]);
+        getCategories();
+    }, [token]);
 
 
-    const handleDelete = (user) => {
-        setSelectedUser(user);
+    const handleDelete = (category) => {
+        setSelectedCategory(category);
         setOpenDeleteDialog(true);
     };
 
     useEffect(() => {
-        if (selectedUser) {
-            setEmail(selectedUser.email);
-            setFirstname(selectedUser.firstname)
-            setLastname(selectedUser.lastname)
-            setPassword(selectedUser.password)
-            setPhone(selectedUser.phone)
-            setRole(selectedUser.roles)
+        if (selectedCategory) {
+            setLibelle(selectedCategory.libelle);
         }
-    }, [selectedUser]);    
+    }, [selectedCategory]);    
 
     const handleCreate = async () => {
         event.preventDefault();
         
         try {
-            const response = await fetch('http://localhost:8000/api/users', {
+            const response = await fetch('http://localhost:8000/api/categories', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    email: email,
-                    plainPassword: password,
-                    firstname: firstname,
-                    lastname: lastname,
-                    phone: phone,
-                    password: password,
-                    roles: role === 'professionnel' ? ['ROLE_PRO'] : role === 'particulier' ? ['ROLE_USER'] : ['ROLE_ADMIN'],
-                    isVerified: true
+                    libelle: libelle,
+                    createdAt: new Date().toISOString(),
                 }),
             });
 
             if (!response.ok) {
-            setFormErrors({});
+                setFormErrors({});
 
                 const data = await response.json();
 
@@ -192,29 +224,24 @@ export default function Users() {
                     });
                     setFormErrors(errors);
                 } else {
-                    setError('Une erreur s\'est produite lors de la création de l\'utilisateur.');
+                    setError('Une erreur s\'est produite lors de la création de la catégorie.');
                 }
                 return;
             } else {
                 const data = await response.json();
                 setError('');
-                setUsers([...users, data]);
+                setCategories([...categories, data]);
                 setOpenCreateDialog(false);
-                setSuccess('Utilisateur créé avec succès !');
+                setSuccess('Catégorie créée avec succès !');
             }
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la création de l\'utilisateur.');
+            setError('Une erreur s\'est produite lors de la création de la catégorie.');
         }
     };
 
     const handleOpenCreateDialog = () => {
         setFormErrors({});
-        setEmail('');
-        setFirstname('')
-        setLastname('')
-        setPassword('')
-        setPhone('')
-        setRole('')
+        setLibelle('');
         setOpenCreateDialog(true);
     };
     
@@ -222,13 +249,9 @@ export default function Users() {
         setOpenCreateDialog(false);
     };
 
-    const handleRoleChange = (e) => {
-        setRole(e.target.value);
-    };
-
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/users/${selectedUser.id}`, {
+            const response = await fetch(`http://localhost:8000/api/categories/${selectedCategory.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -240,60 +263,69 @@ export default function Users() {
                 throw new Error(`Erreur HTTP! Statut: ${response.status}`);
             }
 
-            const updatedUsers = users.filter(user => user.id !== selectedUser.id);
+            const updatedCategories = categories.filter(category => category.id !== selectedCategory.id);
             setError('');
-            setUsers(updatedUsers);
+            setCategories(updatedCategories);
             setOpenDeleteDialog(false);
-            setSuccess('Utilisateur supprimé avec succès !');
+            setSuccess('Catégorie supprimée avec succès !');
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la suppression de l\'utilisateur.');
+            setError('Une erreur s\'est produite lors de la suppression de la catégorie.');
         }
     };
 
-    const handleEdit = (user) => {
-        setSelectedUser(user);
+    const handleEdit = (category) => {
+        setSelectedCategory(category);
         setOpenEditDialog(true);
     };
 
     const handleUpdate = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/users/${selectedUser.id}`, {
+            const response = await fetch(`http://localhost:8000/api/categories/${selectedCategory.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/merge-patch+json',
                     Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    email: email,
-                    firstname: firstname,
-                    lastname: lastname,
-                    phone: phone,
+                    libelle: libelle,
+                    updatedAt: new Date().toISOString(),
                 }),
             });
 
             if (!response.ok) {
-                throw new Error(`Erreur HTTP! Statut: ${response.status}`);
-            }
+                setFormErrors({});
+    
+                const data = await response.json();
 
-            const updatedUsers = users.map(user => {
-                if (user.id === selectedUser.id) {
-                    return {
-                        ...user,
-                        email: email,
-                        firstname: firstname,
-                        lastname: lastname,
-                        phone: phone,
-                    };
+                if (data.violations) {
+                    const errors = {};
+                    data.violations.forEach(violation => {
+                        errors[violation.propertyPath] = violation.message;
+                    });
+                    setFormErrors(errors);
+                } else {
+                    setError('Une erreur s\'est produite lors de la création de la catégorie.');
                 }
-                return user;
-            });
-
-            setError('');
-            setUsers(updatedUsers);
-            setOpenEditDialog(false);
-            setSuccess('Utilisateur modifié avec succès !');
+                return;
+            } else {
+                const updatedCategories = categories.map(category => {
+                    if (category.id === selectedCategory.id) {
+                        return {
+                            ...category,
+                            libelle: libelle,
+                            updatedAt: new Date().toISOString(),
+                        };
+                    }
+                    return category;
+                });
+    
+                setError('');
+                setCategories(updatedCategories);
+                setOpenEditDialog(false);
+                setSuccess('Catégorie modifiée avec succès !');
+            }
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la mise à jour de l\'utilisateur.');
+            setError('Une erreur s\'est produite lors de la mise à jour de la catégorie.');
         }
     };
 
@@ -303,7 +335,37 @@ export default function Users() {
             <ThemeProvider theme={defaultTheme}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
-                <NavbarPro />
+                <AppBar position="absolute" open={open}>
+                    <Toolbar sx={{ pr: '24px' }}>
+                        <IconButton
+                            edge="start"
+                            color="inherit"
+                            aria-label="open drawer"
+                            onClick={toggleDrawer}
+                            sx={{
+                                marginRight: '36px',
+                                ...(open && { display: 'none' }),
+                            }}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                        <Typography
+                            component="h1"
+                            variant="h6"
+                            color="inherit"
+                            noWrap
+                            sx={{ flexGrow: 1 }}
+                        >
+                            Dashboard
+                        </Typography>
+                        <IconButton color="inherit">
+                            <Badge badgeContent={4} color="secondary">
+                                <NotificationsIcon />
+                            </Badge>
+                        </IconButton>
+                    </Toolbar>
+                </AppBar>
+
                 <Box
                     component="main"
                     sx={{
@@ -326,7 +388,7 @@ export default function Users() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des utilisateurs
+                            Liste des catégories
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
@@ -342,11 +404,14 @@ export default function Users() {
         );
     }
 
-    if (!users.length) {
+    if (!categories.length) {
         return (
 
             <ThemeProvider theme={defaultTheme}>
             <Box sx={{ display: 'flex' }}>
+                <CssBaseline />
+                <NavbarPro />
+
                 <Box
                     component="main"
                     sx={{
@@ -369,174 +434,7 @@ export default function Users() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des utilisateurs
-                        </Typography>
-                        <Grid container spacing={3} justifyContent="center">
-                        <Grid item xs={12}>
-                                {
-                                    success.length ? (
-                                        <Box mt={2} textAlign="center">
-                                            <p style={{color: 'green'}}>{success}</p>
-                                        </Box>
-                                    ) : null
-                                }
-                                {
-                                    error.length ? (
-                                        <Box mt={2} textAlign="center">
-                                            <p style={{color: 'red'}}>{error}</p>
-                                        </Box>
-                                    ) : null
-                                }
-                                
-                                <Box sx={{ mb: 2 }}>
-                                    <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
-                                        Créer un nouvel utilisateur
-                                    </Button>
-                                </Box>
-
-                                <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
-                                    <DialogTitle>Créer un nouvel utilisateur</DialogTitle>
-                                    <form onSubmit={handleCreate}>
-                                        <DialogContent>
-                                            <TextField
-                                                label="Nom"
-                                                value={firstname}
-                                                onChange={(e) => setFirstname(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.firstname}
-                                                required
-                                            />
-                                            <TextField
-                                                label="Prénom"
-                                                value={lastname}
-                                                onChange={(e) => setLastname(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.lastname}
-                                                required
-                                            />
-                                            <TextField
-                                                label="Email"
-                                                type="email"
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                autoComplete="email"
-                                                error={!!formErrors.email}
-                                                required
-                                            />
-                                            <TextField
-                                                label="Mot de passe"
-                                                type="password"
-                                                value={password}
-                                                onChange={(e) => setPassword(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.password}
-                                                autoComplete="new-password"
-                                                required
-                                            />
-                                            <TextField
-                                                label="Téléphone"
-                                                type="tel"
-                                                value={phone}
-                                                pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
-                                                onChange={(e) => setPhone(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.phone}
-                                                required
-                                            />
-                                            <FormControl fullWidth margin="normal">
-                                                <InputLabel id="role-label">Rôle *</InputLabel>
-                                                <Select
-                                                    labelId="role-label"
-                                                    value={role}
-                                                    onChange={handleRoleChange}
-                                                    error={!!formErrors.role}
-                                                    required
-                                                >
-                                                    <MenuItem value="particulier">Particulier</MenuItem>
-                                                    <MenuItem value="professionnel">Professionnel</MenuItem>
-                                                    <MenuItem value="administrateur">Administrateur</MenuItem>
-                                                </Select>
-                                            </FormControl>
-                                        </DialogContent>
-                                        <DialogActions>
-                                            <Button onClick={handleCloseCreateDialog}>Annuler</Button>
-                                            <Button type="submit">Créer</Button>
-                                        </DialogActions>
-                                    </form>
-                                    {Object.keys(formErrors).length > 0 && (
-                                        <Box sx={{ margin: 2 }}>
-                                            {Object.values(formErrors).map((error, index) => (
-                                                <Typography key={index} color="error">
-                                                    - {error}
-                                                </Typography>
-                                            ))}
-                                        </Box>
-                                    )}
-                                </Dialog>
-
-                                <TableContainer component={Paper}>
-                                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                                        <TableHead>
-                                            <TableRow style={{background: '#556cd6'}}>
-                                                <TableCell style={{color: 'white'}}>Nom</TableCell>
-                                                <TableCell style={{color: 'white'}}>Prénom</TableCell>
-                                                <TableCell style={{color: 'white'}}>Email</TableCell>
-                                                <TableCell style={{color: 'white'}}>Téléphone</TableCell>
-                                                <TableCell style={{color: 'white'}}>Rôle</TableCell>
-                                                <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            <TableRow
-                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                            >
-                                                <TableCell component="th" scope="row" colSpan={8} align="center">
-                                                    Aucun utilisateur trouvé
-                                                </TableCell>
-                                            </TableRow>
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                            </Grid>
-                        </Grid>
-                    </Box>
-                </Box>
-            </Box>
-        </ThemeProvider>
-        );
-    }
-
-    return (
-        <ThemeProvider theme={defaultTheme}>
-            <Box sx={{ display: 'flex' }}>
-                <NavbarPro />
-                <Box
-                    component="main"
-                    sx={{
-                        backgroundColor: (theme) =>
-                            theme.palette.mode === 'light'
-                                ? theme.palette.grey[100]
-                                : theme.palette.grey[900],
-                        flexGrow: 1,
-                    }}
-                >
-                    <Toolbar />
-                    <Box
-                        sx={{
-                            mt: 4,
-                            mb: 4,
-                            flexGrow: 1,
-                            paddingX: 5,
-                        }}
-                    >
-                        <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des utilisateurs
+                            Liste des catégories
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                             <Grid item xs={12}>
@@ -557,79 +455,23 @@ export default function Users() {
                                 
                                 <Box sx={{ mb: 2 }}>
                                     <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
-                                        Créer un nouvel utilisateur
+                                        Créer une nouvelle catégorie
                                     </Button>
                                 </Box>
 
                                 <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
-                                    <DialogTitle>Créer un nouvel utilisateur</DialogTitle>
+                                    <DialogTitle>Créer une nouvelle catégorie</DialogTitle>
                                     <form onSubmit={handleCreate}>
                                         <DialogContent>
                                             <TextField
-                                                label="Nom"
-                                                value={firstname}
-                                                onChange={(e) => setFirstname(e.target.value)}
+                                                label="Libelle"
+                                                value={libelle}
+                                                onChange={(e) => setLibelle(e.target.value)}
                                                 fullWidth
                                                 margin="normal"
-                                                error={!!formErrors.firstname}
+                                                error={!!formErrors.libelle}
                                                 required
                                             />
-                                            <TextField
-                                                label="Prénom"
-                                                value={lastname}
-                                                onChange={(e) => setLastname(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.lastname}
-                                                required
-                                            />
-                                            <TextField
-                                                label="Email"
-                                                type="email"
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                autoComplete="email"
-                                                error={!!formErrors.email}
-                                                required
-                                            />
-                                            <TextField
-                                                label="Mot de passe"
-                                                type="password"
-                                                value={password}
-                                                onChange={(e) => setPassword(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.password}
-                                                autoComplete="new-password"
-                                                required
-                                            />
-                                            <TextField
-                                                label="Téléphone"
-                                                type="tel"
-                                                value={phone}
-                                                pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
-                                                onChange={(e) => setPhone(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.phone}
-                                                required
-                                            />
-                                            <FormControl fullWidth margin="normal">
-                                                <InputLabel id="role-label">Rôle *</InputLabel>
-                                                <Select
-                                                    labelId="role-label"
-                                                    value={role}
-                                                    onChange={handleRoleChange}
-                                                    error={!!formErrors.role}
-                                                    required
-                                                >
-                                                    <MenuItem value="particulier">Particulier</MenuItem>
-                                                    <MenuItem value="professionnel">Professionnel</MenuItem>
-                                                    <MenuItem value="administrateur">Administrateur</MenuItem>
-                                                </Select>
-                                            </FormControl>
                                         </DialogContent>
                                         <DialogActions>
                                             <Button onClick={handleCloseCreateDialog}>Annuler</Button>
@@ -652,86 +494,170 @@ export default function Users() {
                                         <TableHead>
                                             <TableRow style={{background: '#556cd6'}}>
                                                 <TableCell style={{color: 'white'}}>Nom</TableCell>
-                                                <TableCell style={{color: 'white'}}>Prénom</TableCell>
-                                                <TableCell style={{color: 'white'}}>Email</TableCell>
-                                                <TableCell style={{color: 'white'}}>Téléphone</TableCell>
-                                                <TableCell style={{color: 'white'}}>Rôle</TableCell>
+                                                <TableCell style={{color: 'white'}}>Crée à</TableCell>
+                                                <TableCell style={{color: 'white'}}>Modifié à</TableCell>
                                                 <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {users.map((user) => (
+                                            <TableRow
+                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                            >
+                                                <TableCell component="th" scope="row" colSpan={8} align="center">
+                                                    Aucune catégorie trouvée
+                                                </TableCell>
+                                            </TableRow>
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Grid>
+                        </Grid>
+                    </Box>
+                </Box>
+            </Box>
+        </ThemeProvider>
+        );
+    }
+
+    return (
+        <ThemeProvider theme={defaultTheme}>
+            <Box sx={{ display: 'flex' }}>
+                <CssBaseline />
+                <NavbarPro />
+
+                <Box
+                    component="main"
+                    sx={{
+                        backgroundColor: (theme) =>
+                            theme.palette.mode === 'light'
+                                ? theme.palette.grey[100]
+                                : theme.palette.grey[900],
+                        flexGrow: 1
+                    }}
+                >
+                    <Toolbar />
+                    <Box
+                        sx={{
+                            mt: 4,
+                            mb: 4,
+                            flexGrow: 1,
+                            paddingX: 5,
+                        }}
+                    >
+                        <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
+                            Liste des catégories
+                        </Typography>
+                        <Grid container spacing={3} justifyContent="center">
+                            <Grid item xs={12}>
+                                {
+                                    success.length ? (
+                                        <Box mt={2} textAlign="center">
+                                            <p style={{color: 'green'}}>{success}</p>
+                                        </Box>
+                                    ) : null
+                                }
+                                {
+                                    error.length ? (
+                                        <Box mt={2} textAlign="center">
+                                            <p style={{color: 'red'}}>{error}</p>
+                                        </Box>
+                                    ) : null
+                                }
+                                
+                                <Box sx={{ mb: 2 }}>
+                                    <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
+                                        Créer une nouvelle catégorie
+                                    </Button>
+                                </Box>
+
+                                <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
+                                    <DialogTitle>Créer une nouvelle catégorie</DialogTitle>
+                                    <form onSubmit={handleCreate}>
+                                        <DialogContent>
+                                            <TextField
+                                                label="Libelle"
+                                                value={libelle}
+                                                onChange={(e) => setLibelle(e.target.value)}
+                                                fullWidth
+                                                margin="normal"
+                                                error={!!formErrors.libelle}
+                                                required
+                                            />
+                                        </DialogContent>
+                                        <DialogActions>
+                                            <Button onClick={handleCloseCreateDialog}>Annuler</Button>
+                                            <Button type="submit">Créer</Button>
+                                        </DialogActions>
+                                    </form>
+                                    {Object.keys(formErrors).length > 0 && (
+                                        <Box sx={{ margin: 2 }}>
+                                            {Object.values(formErrors).map((error, index) => (
+                                                <Typography key={index} color="error">
+                                                    - {error}
+                                                </Typography>
+                                            ))}
+                                        </Box>
+                                    )}
+                                </Dialog>
+
+                                <TableContainer component={Paper}>
+                                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                                        <TableHead>
+                                            <TableRow style={{background: '#556cd6'}}>
+                                                <TableCell style={{color: 'white'}}>Nom</TableCell>
+                                                <TableCell style={{color: 'white'}}>Crée à</TableCell>
+                                                <TableCell style={{color: 'white'}}>Modifié à</TableCell>
+                                                <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {categories.map((category) => (
                                                 <TableRow
-                                                    key={user.id}
+                                                    key={category.id}
                                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                 >
                                                     <TableCell component="th" scope="row">
-                                                        {user.lastname}
+                                                        {category.libelle}
                                                     </TableCell>
-                                                    <TableCell>{user.firstname}</TableCell>
-                                                    <TableCell>{user.email}</TableCell>
-                                                    <TableCell>{user.phone}</TableCell>
-                                                    <TableCell>{
-                                                        user.roles[0] === 'ROLE_PRO' ? 'Préstataire' : user.roles[0] === 'ROLE_USER' ? 'Particulier' : user.roles[0] === 'ROLE_ADMIN' ? 'Administrateur' : ''
-                                                    }</TableCell>
+                                                    <TableCell>{category.createdAt ? format(new Date(category.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
+                                                    <TableCell>{category.updatedAt ? format(new Date(category.updatedAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
                                                     <TableCell align="right">
-                                                        <IconButton onClick={() => handleEdit(user)}>
+                                                        <IconButton onClick={() => handleEdit(category)}>
                                                             <EditIcon />
                                                         </IconButton>
-                                                        <IconButton onClick={() => handleDelete(user)}>
+                                                        <IconButton onClick={() => handleDelete(category)}>
                                                             <DeleteIcon />
                                                         </IconButton>
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>
-                           
+                               
                                         <Dialog
                                             open={openDeleteDialog}
                                             onClose={() => setOpenDeleteDialog(false)}
                                         >
                                             <DialogTitle>Confirmation</DialogTitle>
                                             <DialogContent>
-                                                Êtes-vous sûr de vouloir supprimer cet utilisateur ?
+                                                Êtes-vous sûr de vouloir supprimer cette catégorie ?
                                             </DialogContent>
                                             <DialogActions>
                                                 <Button onClick={() => setOpenDeleteDialog(false)}>Annuler</Button>
                                                 <Button onClick={handleConfirmDelete} autoFocus>Supprimer</Button>
                                             </DialogActions>
                                         </Dialog>
-                                
+                                 
                                         <Dialog
                                             open={openEditDialog}
                                             onClose={() => setOpenEditDialog(false)}
                                         >
-                                            <DialogTitle>Modifier l'utilisateur</DialogTitle>
+                                            <DialogTitle>Modifier la catégorie</DialogTitle>
                                             <DialogContent>
                                                 <TextField
-                                                    label="Email"
-                                                    type="email"
-                                                    value={email}
-                                                    onChange={(e) => setEmail(e.target.value)}
-                                                    fullWidth
-                                                    margin="normal"
-                                                />
-                                                <TextField
-                                                    label="Nom"
-                                                    value={firstname}
-                                                    onChange={(e) => setFirstname(e.target.value)}
-                                                    fullWidth
-                                                    margin="normal"
-                                                />
-                                                <TextField
-                                                    label="Prénom"
-                                                    value={lastname}
-                                                    onChange={(e) => setLastname(e.target.value)}
-                                                    fullWidth
-                                                    margin="normal"
-                                                />
-                                                <TextField
-                                                    label="Téléphone"
-                                                    value={phone}
-                                                    onChange={(e) => setPhone(e.target.value)}
+                                                    label="Libelle"
+                                                    type="text"
+                                                    value={libelle}
+                                                    onChange={(e) => setLibelle(e.target.value)}
                                                     fullWidth
                                                     margin="normal"
                                                 />
@@ -740,6 +666,15 @@ export default function Users() {
                                                 <Button onClick={() => setOpenEditDialog(false)}>Annuler</Button>
                                                 <Button onClick={handleUpdate} autoFocus>Enregistrer</Button>
                                             </DialogActions>
+                                            {Object.keys(formErrors).length > 0 && (
+                                                <Box sx={{ margin: 2 }}>
+                                                    {Object.values(formErrors).map((error, index) => (
+                                                        <Typography key={index} color="error">
+                                                            - {error}
+                                                        </Typography>
+                                                    ))}
+                                                </Box>
+                                            )}
                                         </Dialog>
                                     </Table>
                                 </TableContainer>

@@ -39,11 +39,10 @@ import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import {MainListItems, secondaryListItems} from '../components/dashboard/ListItems.jsx';
+import {MainListItems, secondaryListItems} from '../../components/dashboard/ListItems.jsx';
 import { useMediaQuery } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
-import Navbar from "../components/navbar/Navbar.jsx";
-import NavbarPro from "../components/navbar/NavbarPro.jsx";
+import NavbarPro from "../../components/navbar/NavbarPro.jsx";
 
 export function Copyright() {
     return (
@@ -131,16 +130,16 @@ const defaultTheme = createTheme({
     },
 });
 
-export default function Categories() {
+export default function Gears() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [open, setOpen] = useState(!isMobile);
     const [isLoading, setIsLoading] = useState(true);
-    const [categories, setCategories] = useState([]);
+    const [gears, setGears] = useState([]);
     const [openCreateDialog, setOpenCreateDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [selectedGear, setSelectedGear] = useState(null);
     const token = localStorage.getItem('token');
     const [formErrors, setFormErrors] = useState({});
 
@@ -148,7 +147,7 @@ export default function Categories() {
         setOpen(!open);
     };
 
-    const [libelle, setLibelle] = useState('');
+    const [name, setName] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
@@ -157,10 +156,10 @@ export default function Categories() {
     }, [isMobile]);
 
     useEffect(() => {
-        const getCategories = async () => {
+        const getGears = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://localhost:8000/api/categories', {
+                const response = await fetch('http://localhost:8000/api/gears', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -173,7 +172,7 @@ export default function Categories() {
                 }
 
                 const data = await response.json();
-                setCategories(data);
+                setGears(data);
                 setIsLoading(false);
             } catch (error) {
                 console.error(error);
@@ -181,33 +180,33 @@ export default function Categories() {
             }
         };
 
-        getCategories();
+        getGears();
     }, [token]);
 
 
-    const handleDelete = (category) => {
-        setSelectedCategory(category);
+    const handleDelete = (gear) => {
+        setSelectedGear(gear);
         setOpenDeleteDialog(true);
     };
 
     useEffect(() => {
-        if (selectedCategory) {
-            setLibelle(selectedCategory.libelle);
+        if (selectedGear) {
+            setName(selectedGear.name);
         }
-    }, [selectedCategory]);    
+    }, [selectedGear]);    
 
     const handleCreate = async () => {
         event.preventDefault();
         
         try {
-            const response = await fetch('http://localhost:8000/api/categories', {
+            const response = await fetch('http://localhost:8000/api/gears', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    libelle: libelle,
+                    name: name,
                     createdAt: new Date().toISOString(),
                 }),
             });
@@ -224,24 +223,24 @@ export default function Categories() {
                     });
                     setFormErrors(errors);
                 } else {
-                    setError('Une erreur s\'est produite lors de la création de la catégorie.');
+                    setError('Une erreur s\'est produite lors de la création de la boîte de vitesse.');
                 }
                 return;
             } else {
                 const data = await response.json();
                 setError('');
-                setCategories([...categories, data]);
+                setGears([...gears, data]);
                 setOpenCreateDialog(false);
-                setSuccess('Catégorie créée avec succès !');
+                setSuccess('Boîte de vitesse créée avec succès !');
             }
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la création de la catégorie.');
+            setError('Une erreur s\'est produite lors de la création de la boîte de vitesse.');
         }
     };
 
     const handleOpenCreateDialog = () => {
         setFormErrors({});
-        setLibelle('');
+        setName('');
         setOpenCreateDialog(true);
     };
     
@@ -251,7 +250,7 @@ export default function Categories() {
 
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/categories/${selectedCategory.id}`, {
+            const response = await fetch(`http://localhost:8000/api/gears/${selectedGear.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -263,38 +262,39 @@ export default function Categories() {
                 throw new Error(`Erreur HTTP! Statut: ${response.status}`);
             }
 
-            const updatedCategories = categories.filter(category => category.id !== selectedCategory.id);
+            const updatedGears = gears.filter(gear => gear.id !== selectedGear.id);
             setError('');
-            setCategories(updatedCategories);
+            setGears(updatedGears);
             setOpenDeleteDialog(false);
-            setSuccess('Catégorie supprimée avec succès !');
+            setSuccess('Boîte de vitesse supprimée avec succès !');
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la suppression de la catégorie.');
+            setError('Une erreur s\'est produite lors de la suppression de la boîte de vitesse.');
         }
     };
 
-    const handleEdit = (category) => {
-        setSelectedCategory(category);
+    const handleEdit = (gear) => {
+        setFormErrors({});
+        setSelectedGear(gear);
         setOpenEditDialog(true);
     };
 
     const handleUpdate = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/categories/${selectedCategory.id}`, {
+            const response = await fetch(`http://localhost:8000/api/gears/${selectedGear.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/merge-patch+json',
                     Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    libelle: libelle,
+                    name: name,
                     updatedAt: new Date().toISOString(),
                 }),
             });
 
             if (!response.ok) {
                 setFormErrors({});
-    
+
                 const data = await response.json();
 
                 if (data.violations) {
@@ -304,28 +304,28 @@ export default function Categories() {
                     });
                     setFormErrors(errors);
                 } else {
-                    setError('Une erreur s\'est produite lors de la création de la catégorie.');
+                    setError('Une erreur s\'est produite lors de la création de la boîte de vitesse.');
                 }
                 return;
             } else {
-                const updatedCategories = categories.map(category => {
-                    if (category.id === selectedCategory.id) {
+                const updatedGears = gears.map(gear => {
+                    if (gear.id === selectedGear.id) {
                         return {
-                            ...category,
-                            libelle: libelle,
+                            ...gear,
+                            name: name,
                             updatedAt: new Date().toISOString(),
                         };
                     }
-                    return category;
+                    return gear;
                 });
     
                 setError('');
-                setCategories(updatedCategories);
+                setGears(updatedGears);
                 setOpenEditDialog(false);
-                setSuccess('Catégorie modifiée avec succès !');
+                setSuccess('Boîte de vitesse modifiée avec succès !');
             }
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la mise à jour de la catégorie.');
+            setError('Une erreur s\'est produite lors de la mise à jour de la boîte de vitesse.');
         }
     };
 
@@ -388,7 +388,7 @@ export default function Categories() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des catégories
+                            Liste des boîtes de vitesse
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
@@ -404,13 +404,42 @@ export default function Categories() {
         );
     }
 
-    if (!categories.length) {
+    if (!gears.length) {
         return (
 
             <ThemeProvider theme={defaultTheme}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
-                <NavbarPro />
+                <AppBar position="absolute" open={open}>
+                    <Toolbar sx={{ pr: '24px' }}>
+                        <IconButton
+                            edge="start"
+                            color="inherit"
+                            aria-label="open drawer"
+                            onClick={toggleDrawer}
+                            sx={{
+                                marginRight: '36px',
+                                ...(open && { display: 'none' }),
+                            }}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                        <Typography
+                            component="h1"
+                            variant="h6"
+                            color="inherit"
+                            noWrap
+                            sx={{ flexGrow: 1 }}
+                        >
+                            Dashboard
+                        </Typography>
+                        <IconButton color="inherit">
+                            <Badge badgeContent={4} color="secondary">
+                                <NotificationsIcon />
+                            </Badge>
+                        </IconButton>
+                    </Toolbar>
+                </AppBar>
 
                 <Box
                     component="main"
@@ -434,10 +463,10 @@ export default function Categories() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des catégories
+                            Liste des boîtes de vitesse
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
-                            <Grid item xs={12}>
+                        <Grid item xs={12}>
                                 {
                                     success.length ? (
                                         <Box mt={2} textAlign="center">
@@ -455,21 +484,21 @@ export default function Categories() {
                                 
                                 <Box sx={{ mb: 2 }}>
                                     <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
-                                        Créer une nouvelle catégorie
+                                        Créer une nouvelle boîte de vitesse
                                     </Button>
                                 </Box>
 
                                 <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
-                                    <DialogTitle>Créer une nouvelle catégorie</DialogTitle>
+                                    <DialogTitle>Créer une nouvelle boîte de vitesse</DialogTitle>
                                     <form onSubmit={handleCreate}>
                                         <DialogContent>
                                             <TextField
-                                                label="Libelle"
-                                                value={libelle}
-                                                onChange={(e) => setLibelle(e.target.value)}
+                                                label="Name"
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
                                                 fullWidth
                                                 margin="normal"
-                                                error={!!formErrors.libelle}
+                                                error={!!formErrors.name}
                                                 required
                                             />
                                         </DialogContent>
@@ -496,7 +525,7 @@ export default function Categories() {
                                                 <TableCell style={{color: 'white'}}>Nom</TableCell>
                                                 <TableCell style={{color: 'white'}}>Crée à</TableCell>
                                                 <TableCell style={{color: 'white'}}>Modifié à</TableCell>
-                                                <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
+                                                <TableCell  style={{color: 'white'}}align="right">Actions</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -504,7 +533,7 @@ export default function Categories() {
                                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                             >
                                                 <TableCell component="th" scope="row" colSpan={8} align="center">
-                                                    Aucune catégorie trouvée
+                                                    Aucune boîte de vitesse trouvée
                                                 </TableCell>
                                             </TableRow>
                                         </TableBody>
@@ -545,7 +574,7 @@ export default function Categories() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des catégories
+                            Liste des boîtes de vitesse
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                             <Grid item xs={12}>
@@ -566,21 +595,21 @@ export default function Categories() {
                                 
                                 <Box sx={{ mb: 2 }}>
                                     <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
-                                        Créer une nouvelle catégorie
+                                        Créer une nouvelle boîte de vitesse
                                     </Button>
                                 </Box>
 
                                 <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
-                                    <DialogTitle>Créer une nouvelle catégorie</DialogTitle>
+                                    <DialogTitle>Créer une nouvelle boîte de vitesse</DialogTitle>
                                     <form onSubmit={handleCreate}>
                                         <DialogContent>
                                             <TextField
-                                                label="Libelle"
-                                                value={libelle}
-                                                onChange={(e) => setLibelle(e.target.value)}
+                                                label="Name"
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
                                                 fullWidth
                                                 margin="normal"
-                                                error={!!formErrors.libelle}
+                                                error={!!formErrors.name}
                                                 required
                                             />
                                         </DialogContent>
@@ -607,25 +636,25 @@ export default function Categories() {
                                                 <TableCell style={{color: 'white'}}>Nom</TableCell>
                                                 <TableCell style={{color: 'white'}}>Crée à</TableCell>
                                                 <TableCell style={{color: 'white'}}>Modifié à</TableCell>
-                                                <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
+                                                <TableCell  style={{color: 'white'}}align="right">Actions</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {categories.map((category) => (
+                                            {gears.map((gear) => (
                                                 <TableRow
-                                                    key={category.id}
+                                                    key={gear.id}
                                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                 >
                                                     <TableCell component="th" scope="row">
-                                                        {category.libelle}
+                                                        {gear.name}
                                                     </TableCell>
-                                                    <TableCell>{category.createdAt ? format(new Date(category.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
-                                                    <TableCell>{category.updatedAt ? format(new Date(category.updatedAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
+                                                    <TableCell>{gear.createdAt ? format(new Date(gear.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
+                                                    <TableCell>{gear.updatedAt ? format(new Date(gear.updatedAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
                                                     <TableCell align="right">
-                                                        <IconButton onClick={() => handleEdit(category)}>
+                                                        <IconButton onClick={() => handleEdit(gear)}>
                                                             <EditIcon />
                                                         </IconButton>
-                                                        <IconButton onClick={() => handleDelete(category)}>
+                                                        <IconButton onClick={() => handleDelete(gear)}>
                                                             <DeleteIcon />
                                                         </IconButton>
                                                     </TableCell>
@@ -639,7 +668,7 @@ export default function Categories() {
                                         >
                                             <DialogTitle>Confirmation</DialogTitle>
                                             <DialogContent>
-                                                Êtes-vous sûr de vouloir supprimer cette catégorie ?
+                                                Êtes-vous sûr de vouloir supprimer cette boîte de vitesse ?
                                             </DialogContent>
                                             <DialogActions>
                                                 <Button onClick={() => setOpenDeleteDialog(false)}>Annuler</Button>
@@ -651,13 +680,13 @@ export default function Categories() {
                                             open={openEditDialog}
                                             onClose={() => setOpenEditDialog(false)}
                                         >
-                                            <DialogTitle>Modifier la catégorie</DialogTitle>
+                                            <DialogTitle>Modifier la boîte de vitesse</DialogTitle>
                                             <DialogContent>
                                                 <TextField
-                                                    label="Libelle"
+                                                    label="Name"
                                                     type="text"
-                                                    value={libelle}
-                                                    onChange={(e) => setLibelle(e.target.value)}
+                                                    value={name}
+                                                    onChange={(e) => setName(e.target.value)}
                                                     fullWidth
                                                     margin="normal"
                                                 />

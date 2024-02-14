@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Patch;
@@ -16,7 +17,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 use App\Controller\CompanieController;
 use Symfony\Component\Validator\Constraints as Assert;
-use ApiPlatform\Metadata\GetCollection;
 
 #[ORM\Entity(repositoryClass: CompanieRepository::class)]
 #[ApiResource(
@@ -36,7 +36,6 @@ use ApiPlatform\Metadata\GetCollection;
             controller: CompanieController::class,
             deserialize: false
         ),
-        new GetCollection()
     ]
 )]
 

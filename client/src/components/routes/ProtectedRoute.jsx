@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import useGetConnectedUser from "../components/hooks/useGetConnectedUser.jsx";
+import useGetConnectedUser from "../hooks/useGetConnectedUser.jsx";
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { connectedUser, loading } = useGetConnectedUser();
@@ -13,11 +13,15 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     return <Navigate to="/login" replace />;
   }
 
-  const userRoles = connectedUser && connectedUser.roles ? connectedUser.roles : [];
+  if (connectedUser.roles.includes('ROLE_PRO') && connectedUser.companie) {
+    return <Navigate to="/" replace />;
+  }
+
+  const userRoles = connectedUser.roles ? connectedUser.roles : [];
   const hasPermission = userRoles.some(role => allowedRoles.includes(role));
 
   if (!hasPermission) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return children;

@@ -24,8 +24,6 @@ import {
     Input
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import format from 'date-fns/format';
-import { fr } from 'date-fns/locale';
 import EditIcon from "@mui/icons-material/Edit";
 import {createTheme, styled, ThemeProvider, useTheme} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -33,16 +31,19 @@ import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
+import format from 'date-fns/format';
+import { fr } from 'date-fns/locale';
 import Divider from '@mui/material/Divider';
 import Badge from '@mui/material/Badge';
 import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import {MainListItems, secondaryListItems} from '../components/dashboard/ListItems.jsx';
+import {MainListItems, secondaryListItems} from '../../components/dashboard/ListItems.jsx';
 import { useMediaQuery } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
-import NavbarPro from "../components/navbar/NavbarPro.jsx";
+import Navbar from "../../components/navbar/Navbar.jsx";
+import NavbarPro from "../../components/navbar/NavbarPro.jsx";
 
 export function Copyright() {
     return (
@@ -57,6 +58,24 @@ export function Copyright() {
 }
 
 const drawerWidth = 240;
+
+const AppBar = styled(MuiAppBar, {
+    shouldForwardProp: (prop) => prop !== 'open',
+})(({ theme, open }) => ({
+    zIndex: theme.zIndex.drawer + 1,
+    transition: theme.transitions.create(['width', 'margin'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+    }),
+    ...(open && {
+        marginLeft: drawerWidth,
+        width: `calc(100% - ${drawerWidth}px)`,
+        transition: theme.transitions.create(['width', 'margin'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+    }),
+}));
 
 
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
@@ -112,16 +131,16 @@ const defaultTheme = createTheme({
     },
 });
 
-export default function Brands() {
+export default function Energies() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [open, setOpen] = useState(!isMobile);
     const [isLoading, setIsLoading] = useState(true);
-    const [brands, setBrands] = useState([]);
+    const [energies, setEnergies] = useState([]);
     const [openCreateDialog, setOpenCreateDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [selectedBrand, setSelectedBrand] = useState(null);
+    const [selectedEnergy, setSelectedEnergy] = useState(null);
     const token = localStorage.getItem('token');
     const [formErrors, setFormErrors] = useState({});
 
@@ -138,10 +157,10 @@ export default function Brands() {
     }, [isMobile]);
 
     useEffect(() => {
-        const getBrands = async () => {
+        const getEnergies = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://localhost:8000/api/brands', {
+                const response = await fetch('http://localhost:8000/api/energies', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -154,7 +173,7 @@ export default function Brands() {
                 }
 
                 const data = await response.json();
-                setBrands(data);
+                setEnergies(data);
                 setIsLoading(false);
             } catch (error) {
                 console.error(error);
@@ -162,25 +181,26 @@ export default function Brands() {
             }
         };
 
-        getBrands();
+        getEnergies();
     }, [token]);
-    
-    const handleDelete = (brand) => {
-        setSelectedBrand(brand);
+
+
+    const handleDelete = (energy) => {
+        setSelectedEnergy(energy);
         setOpenDeleteDialog(true);
     };
 
     useEffect(() => {
-        if (selectedBrand) {
-            setName(selectedBrand.name);
+        if (selectedEnergy) {
+            setName(selectedEnergy.name);
         }
-    }, [selectedBrand]);    
+    }, [selectedEnergy]);    
 
     const handleCreate = async () => {
         event.preventDefault();
         
         try {
-            const response = await fetch('http://localhost:8000/api/brands', {
+            const response = await fetch('http://localhost:8000/api/energies', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -204,18 +224,18 @@ export default function Brands() {
                     });
                     setFormErrors(errors);
                 } else {
-                    setError('Une erreur s\'est produite lors de la création de la marque.');
+                    setError('Une erreur s\'est produite lors de la création de l\'énergie.');
                 }
                 return;
             } else {
                 const data = await response.json();
                 setError('');
-                setBrands([...brands, data]);
+                setEnergies([...energies, data]);
                 setOpenCreateDialog(false);
-                setSuccess('Marque créée avec succès !');
+                setSuccess('Energie créée avec succès !');
             }
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la création de la marque.');
+            setError('Une erreur s\'est produite lors de la création de l\'énergie.');
         }
     };
 
@@ -231,7 +251,7 @@ export default function Brands() {
 
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/brands/${selectedBrand.id}`, {
+            const response = await fetch(`http://localhost:8000/api/energies/${selectedEnergy.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -243,25 +263,25 @@ export default function Brands() {
                 throw new Error(`Erreur HTTP! Statut: ${response.status}`);
             }
 
-            const updatedBrands = brands.filter(brand => brand.id !== selectedBrand.id);
+            const updatedEnergies = energies.filter(energy => energy.id !== selectedEnergy.id);
             setError('');
-            setBrands(updatedBrands);
+            setEnergies(updatedEnergies);
             setOpenDeleteDialog(false);
-            setSuccess('Marque supprimée avec succès !');
+            setSuccess('Energie supprimée avec succès !');
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la suppression de la marque.');
+            setError('Une erreur s\'est produite lors de la suppression de l\'énergie.');
         }
     };
 
-    const handleEdit = (brand) => {
+    const handleEdit = (energy) => {
         setFormErrors({});
-        setSelectedBrand(brand);
+        setSelectedEnergy(energy);
         setOpenEditDialog(true);
     };
 
     const handleUpdate = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/brands/${selectedBrand.id}`, {
+            const response = await fetch(`http://localhost:8000/api/energies/${selectedEnergy.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/merge-patch+json',
@@ -285,28 +305,28 @@ export default function Brands() {
                     });
                     setFormErrors(errors);
                 } else {
-                    setError('Une erreur s\'est produite lors de la création de la marque.');
+                    setError('Une erreur s\'est produite lors de la création de l\'énergie.');
                 }
                 return;
             } else {
-                const updatedBrands = brands.map(brand => {
-                    if (brand.id === selectedBrand.id) {
+                const updatedEnergies = energies.map(energy => {
+                    if (energy.id === selectedEnergy.id) {
                         return {
-                            ...brand,
+                            ...energy,
                             name: name,
                             updatedAt: new Date().toISOString(),
                         };
                     }
-                    return brand;
+                    return energy;
                 });
     
                 setError('');
-                setBrands(updatedBrands);
+                setEnergies(updatedEnergies);
                 setOpenEditDialog(false);
-                setSuccess('Marque modifiée avec succès !');
+                setSuccess('Energie modifiée avec succès !');
             }
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la mise à jour de la marque.');
+            setError('Une erreur s\'est produite lors de la mise à jour de l\'énergie.');
         }
     };
 
@@ -316,7 +336,37 @@ export default function Brands() {
             <ThemeProvider theme={defaultTheme}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
-                <NavbarPro />
+                <AppBar position="absolute" open={open}>
+                    <Toolbar sx={{ pr: '24px' }}>
+                        <IconButton
+                            edge="start"
+                            color="inherit"
+                            aria-label="open drawer"
+                            onClick={toggleDrawer}
+                            sx={{
+                                marginRight: '36px',
+                                ...(open && { display: 'none' }),
+                            }}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                        <Typography
+                            component="h1"
+                            variant="h6"
+                            color="inherit"
+                            noWrap
+                            sx={{ flexGrow: 1 }}
+                        >
+                            Dashboard
+                        </Typography>
+                        <IconButton color="inherit">
+                            <Badge badgeContent={4} color="secondary">
+                                <NotificationsIcon />
+                            </Badge>
+                        </IconButton>
+                    </Toolbar>
+                </AppBar>
+
                 <Box
                     component="main"
                     sx={{
@@ -339,7 +389,7 @@ export default function Brands() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des marques
+                            Liste des énergies
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
@@ -355,13 +405,43 @@ export default function Brands() {
         );
     }
 
-    if (!brands.length) {
+    if (!energies.length) {
         return (
 
             <ThemeProvider theme={defaultTheme}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
-                <NavbarPro />
+                <AppBar position="absolute" open={open}>
+                    <Toolbar sx={{ pr: '24px' }}>
+                        <IconButton
+                            edge="start"
+                            color="inherit"
+                            aria-label="open drawer"
+                            onClick={toggleDrawer}
+                            sx={{
+                                marginRight: '36px',
+                                ...(open && { display: 'none' }),
+                            }}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                        <Typography
+                            component="h1"
+                            variant="h6"
+                            color="inherit"
+                            noWrap
+                            sx={{ flexGrow: 1 }}
+                        >
+                            Dashboard
+                        </Typography>
+                        <IconButton color="inherit">
+                            <Badge badgeContent={4} color="secondary">
+                                <NotificationsIcon />
+                            </Badge>
+                        </IconButton>
+                    </Toolbar>
+                </AppBar>
+
                 <Box
                     component="main"
                     sx={{
@@ -369,7 +449,9 @@ export default function Brands() {
                             theme.palette.mode === 'light'
                                 ? theme.palette.grey[100]
                                 : theme.palette.grey[900],
-                        flexGrow: 1
+                        flexGrow: 1,
+                        height: '100vh',
+                        overflow: 'auto',
                     }}
                 >
                     <Toolbar />
@@ -382,7 +464,7 @@ export default function Brands() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des marques
+                            Liste des énergies
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                         <Grid item xs={12}>
@@ -403,12 +485,12 @@ export default function Brands() {
                                 
                                 <Box sx={{ mb: 2 }}>
                                     <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
-                                        Créer une nouvelle marque
+                                        Créer une nouvelle énergie
                                     </Button>
                                 </Box>
 
                                 <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
-                                    <DialogTitle>Créer une nouvelle marque</DialogTitle>
+                                    <DialogTitle>Créer une nouvelle énergie</DialogTitle>
                                     <form onSubmit={handleCreate}>
                                         <DialogContent>
                                             <TextField
@@ -452,7 +534,7 @@ export default function Brands() {
                                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                             >
                                                 <TableCell component="th" scope="row" colSpan={8} align="center">
-                                                    Aucune marque trouvée
+                                                    Aucune énergie trouvée
                                                 </TableCell>
                                             </TableRow>
                                         </TableBody>
@@ -472,6 +554,7 @@ export default function Brands() {
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
                 <NavbarPro />
+
                 <Box
                     component="main"
                     sx={{
@@ -492,7 +575,7 @@ export default function Brands() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des marques
+                            Liste des énergies
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                             <Grid item xs={12}>
@@ -513,12 +596,12 @@ export default function Brands() {
                                 
                                 <Box sx={{ mb: 2 }}>
                                     <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
-                                        Créer une nouvelle marque
+                                        Créer une nouvelle énergie
                                     </Button>
                                 </Box>
 
                                 <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
-                                    <DialogTitle>Créer une nouvelle marque</DialogTitle>
+                                    <DialogTitle>Créer une nouvelle énergie</DialogTitle>
                                     <form onSubmit={handleCreate}>
                                         <DialogContent>
                                             <TextField
@@ -558,21 +641,21 @@ export default function Brands() {
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {brands.map((brand) => (
+                                            {energies.map((energy) => (
                                                 <TableRow
-                                                    key={brand.id}
+                                                    key={energy.id}
                                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                 >
                                                     <TableCell component="th" scope="row">
-                                                        {brand.name}
+                                                        {energy.name}
                                                     </TableCell>
-                                                    <TableCell>{brand.createdAt ? format(new Date(brand.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
-                                                    <TableCell>{brand.updatedAt ? format(new Date(brand.updatedAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
+                                                    <TableCell>{energy.createdAt ? format(new Date(energy.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
+                                                    <TableCell>{energy.updatedAt ? format(new Date(energy.updatedAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
                                                     <TableCell align="right">
-                                                        <IconButton onClick={() => handleEdit(brand)}>
+                                                        <IconButton onClick={() => handleEdit(energy)}>
                                                             <EditIcon />
                                                         </IconButton>
-                                                        <IconButton onClick={() => handleDelete(brand)}>
+                                                        <IconButton onClick={() => handleDelete(energy)}>
                                                             <DeleteIcon />
                                                         </IconButton>
                                                     </TableCell>
@@ -586,7 +669,7 @@ export default function Brands() {
                                         >
                                             <DialogTitle>Confirmation</DialogTitle>
                                             <DialogContent>
-                                                Êtes-vous sûr de vouloir supprimer cette marque ?
+                                                Êtes-vous sûr de vouloir supprimer cette énergie ?
                                             </DialogContent>
                                             <DialogActions>
                                                 <Button onClick={() => setOpenDeleteDialog(false)}>Annuler</Button>
@@ -598,7 +681,7 @@ export default function Brands() {
                                             open={openEditDialog}
                                             onClose={() => setOpenEditDialog(false)}
                                         >
-                                            <DialogTitle>Modifier la marque</DialogTitle>
+                                            <DialogTitle>Modifier l'énergie</DialogTitle>
                                             <DialogContent>
                                                 <TextField
                                                     label="Name"
