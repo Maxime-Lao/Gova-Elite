@@ -1,14 +1,14 @@
 import React from 'react';
-import Navbar from '../components/navbar/Navbar';
+import Navbar from '../../components/navbar/Navbar';
 import { Typography, Box, Button, Container } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { useNavigate } from 'react-router-dom';
 
-const UpdatePaymentSuccess = () => {
+const PaymentSuccess = () => {
     const navigate = useNavigate();
 
     const handlebackHome = () => {
-        navigate('/bookings');
+        navigate('/');
     };
 
     return (
@@ -31,7 +31,7 @@ const UpdatePaymentSuccess = () => {
                 Paiement réussi
                 </Typography>
                 <Typography variant="body1">
-                Votre paiement a été traité avec succès. Merci pour votre achat.
+                Votre paiement a été traité avec succès. Merci pour votre réservation.
                 </Typography>
                 <Button
                 variant="contained"
@@ -39,7 +39,7 @@ const UpdatePaymentSuccess = () => {
                 onClick={handlebackHome}
                 sx={{ mt: 3, mb: 2 }}
                 >
-                Retour à mes réservations
+                Retour à l'accueil
                 </Button>
             </Box>
             </Container>
@@ -47,4 +47,4 @@ const UpdatePaymentSuccess = () => {
     );
 };
 
-export default UpdatePaymentSuccess;
+export default PaymentSuccess;

@@ -27,13 +27,22 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import format from 'date-fns/format';
 import { fr } from 'date-fns/locale';
-import {createTheme, ThemeProvider, useTheme} from '@mui/material/styles';
+import {createTheme, styled, ThemeProvider, useTheme} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import MuiDrawer from '@mui/material/Drawer';
+import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
+import List from '@mui/material/List';
+import Divider from '@mui/material/Divider';
+import Badge from '@mui/material/Badge';
 import Link from '@mui/material/Link';
+import MenuIcon from '@mui/icons-material/Menu';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import {MainListItems, secondaryListItems} from '../../components/dashboard/ListItems.jsx';
 import { useMediaQuery } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
-import NavbarPro from "../components/navbar/NavbarPro.jsx";
+import NavbarPro from "../../components/navbar/NavbarPro.jsx";
 
 export function Copyright() {
     return (
@@ -46,6 +55,51 @@ export function Copyright() {
         </Typography>
     );
 }
+
+const drawerWidth = 240;
+
+const AppBar = styled(MuiAppBar, {
+    shouldForwardProp: (prop) => prop !== 'open',
+})(({ theme, open }) => ({
+    zIndex: theme.zIndex.drawer + 1,
+    transition: theme.transitions.create(['width', 'margin'], {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.leavingScreen,
+    }),
+    ...(open && {
+        marginLeft: drawerWidth,
+        width: `calc(100% - ${drawerWidth}px)`,
+        transition: theme.transitions.create(['width', 'margin'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+    }),
+}));
+
+
+const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
+    '& .MuiDrawer-paper': {
+        position: 'relative',
+        whiteSpace: 'nowrap',
+        width: drawerWidth,
+        transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+        boxSizing: 'border-box',
+        ...(!open && {
+            overflowX: 'hidden',
+            transition: theme.transitions.create('width', {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.leavingScreen,
+            }),
+            width: theme.spacing(7),
+            [theme.breakpoints.up('sm')]: {
+                width: theme.spacing(9),
+            },
+        }),
+    },
+}));
 
 const defaultTheme = createTheme({
     palette: {
@@ -76,16 +130,15 @@ const defaultTheme = createTheme({
     },
 });
 
-export default function Categories() {
+export default function Companies() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [open, setOpen] = useState(!isMobile);
     const [isLoading, setIsLoading] = useState(true);
-    const [categories, setCategories] = useState([]);
-    const [openCreateDialog, setOpenCreateDialog] = useState(false);
+    const [companies, setCompanies] = useState([]);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState(null);
+    const [selectedCompany, setSelectedCompany] = useState(null);
     const token = localStorage.getItem('token');
     const [formErrors, setFormErrors] = useState({});
 
@@ -93,7 +146,10 @@ export default function Categories() {
         setOpen(!open);
     };
 
-    const [libelle, setLibelle] = useState('');
+    const [name, setName] = useState('');
+    const [address, setAddress] = useState('');
+    const [zipCode, setZipCode] = useState('');
+    const [city, setCity] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
@@ -102,10 +158,10 @@ export default function Categories() {
     }, [isMobile]);
 
     useEffect(() => {
-        const getCategories = async () => {
+        const getCompanies = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://localhost:8000/api/categories', {
+                const response = await fetch('http://localhost:8000/api/companies', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -118,7 +174,7 @@ export default function Categories() {
                 }
 
                 const data = await response.json();
-                setCategories(data);
+                setCompanies(data);
                 setIsLoading(false);
             } catch (error) {
                 console.error(error);
@@ -126,77 +182,28 @@ export default function Categories() {
             }
         };
 
-        getCategories();
+        getCompanies();
     }, [token]);
 
 
-    const handleDelete = (category) => {
-        setSelectedCategory(category);
+    const handleDelete = (company) => {
+        setSelectedCompany(company);
         setOpenDeleteDialog(true);
     };
 
     useEffect(() => {
-        if (selectedCategory) {
-            setLibelle(selectedCategory.libelle);
+        if (selectedCompany) {
+            setName(selectedCompany.name);
+            setAddress(selectedCompany.address);
+            setZipCode(selectedCompany.zipCode);
+            setCity(selectedCompany.city);
         }
-    }, [selectedCategory]);    
+    }, [selectedCompany]);    
 
-    const handleCreate = async () => {
-        event.preventDefault();
-        
-        try {
-            const response = await fetch('http://localhost:8000/api/categories', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    libelle: libelle,
-                    createdAt: new Date().toISOString(),
-                }),
-            });
-
-            if (!response.ok) {
-                setFormErrors({});
-
-                const data = await response.json();
-
-                if (data.violations) {
-                    const errors = {};
-                    data.violations.forEach(violation => {
-                        errors[violation.propertyPath] = violation.message;
-                    });
-                    setFormErrors(errors);
-                } else {
-                    setError('Une erreur s\'est produite lors de la création de la catégorie.');
-                }
-                return;
-            } else {
-                const data = await response.json();
-                setError('');
-                setCategories([...categories, data]);
-                setOpenCreateDialog(false);
-                setSuccess('Catégorie créée avec succès !');
-            }
-        } catch (error) {
-            setError('Une erreur s\'est produite lors de la création de la catégorie.');
-        }
-    };
-
-    const handleOpenCreateDialog = () => {
-        setFormErrors({});
-        setLibelle('');
-        setOpenCreateDialog(true);
-    };
     
-    const handleCloseCreateDialog = () => {
-        setOpenCreateDialog(false);
-    };
-
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/categories/${selectedCategory.id}`, {
+            const response = await fetch(`http://localhost:8000/api/companies/${selectedCompany.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -208,38 +215,42 @@ export default function Categories() {
                 throw new Error(`Erreur HTTP! Statut: ${response.status}`);
             }
 
-            const updatedCategories = categories.filter(category => category.id !== selectedCategory.id);
+            const updatedCompanies = companies.filter(company => company.id !== selectedCompany.id);
             setError('');
-            setCategories(updatedCategories);
+            setCompanies(updatedCompanies);
             setOpenDeleteDialog(false);
-            setSuccess('Catégorie supprimée avec succès !');
+            setSuccess('Compagnie supprimée avec succès !');
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la suppression de la catégorie.');
+            setError('Une erreur s\'est produite lors de la suppression de la compagnie.');
         }
     };
 
-    const handleEdit = (category) => {
-        setSelectedCategory(category);
+    const handleEdit = (company) => {
+        setFormErrors({});
+        setSelectedCompany(company);
         setOpenEditDialog(true);
     };
 
     const handleUpdate = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/categories/${selectedCategory.id}`, {
+            const response = await fetch(`http://localhost:8000/api/companies/${selectedCompany.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/merge-patch+json',
                     Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    libelle: libelle,
+                    name: name,
+                    address: address,
+                    zipCode: parseInt(zipCode),
+                    city: city,
                     updatedAt: new Date().toISOString(),
                 }),
             });
 
             if (!response.ok) {
                 setFormErrors({});
-    
+
                 const data = await response.json();
 
                 if (data.violations) {
@@ -249,28 +260,31 @@ export default function Categories() {
                     });
                     setFormErrors(errors);
                 } else {
-                    setError('Une erreur s\'est produite lors de la création de la catégorie.');
+                    setError('Une erreur s\'est produite lors de la création de la compagnie.');
                 }
                 return;
             } else {
-                const updatedCategories = categories.map(category => {
-                    if (category.id === selectedCategory.id) {
+                const updatedCompanies = companies.map(company => {
+                    if (company.id === selectedCompany.id) {
                         return {
-                            ...category,
-                            libelle: libelle,
+                            ...company,
+                            name: name,
+                            address: address,
+                            zipCode: zipCode,
+                            city: city,
                             updatedAt: new Date().toISOString(),
                         };
                     }
-                    return category;
+                    return company;
                 });
     
                 setError('');
-                setCategories(updatedCategories);
+                setCompanies(updatedCompanies);
                 setOpenEditDialog(false);
-                setSuccess('Catégorie modifiée avec succès !');
+                setSuccess('Compagnie modifiée avec succès !');
             }
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la mise à jour de la catégorie.');
+            setError('Une erreur s\'est produite lors de la mise à jour de la compagnie.');
         }
     };
 
@@ -280,165 +294,8 @@ export default function Categories() {
             <ThemeProvider theme={defaultTheme}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
-                <NavbarPro />
-                <Box
-                    component="main"
-                    sx={{
-                        backgroundColor: (theme) =>
-                            theme.palette.mode === 'light'
-                                ? theme.palette.grey[100]
-                                : theme.palette.grey[900],
-                        flexGrow: 1,
-                        height: '100vh',
-                        overflow: 'auto',
-                    }}
-                >
-                    <Toolbar />
-                    <Box
-                        sx={{
-                            mt: 4,
-                            mb: 4,
-                            flexGrow: 1,
-                            paddingX: 5,
-                        }}
-                    >
-                        <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des catégories
-                        </Typography>
-                        <Grid container spacing={3} justifyContent="center">
-                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-                                <Box sx={{ display: 'flex' }}>
-                                    <CircularProgress />
-                                </Box>
-                            </div>
-                        </Grid>
-                    </Box>
-                </Box>
-            </Box>
-        </ThemeProvider>
-        );
-    }
+                
 
-    if (!categories.length) {
-        return (
-
-            <ThemeProvider theme={defaultTheme}>
-            <Box sx={{ display: 'flex' }}>
-                <CssBaseline />
-                <NavbarPro />
-
-                <Box
-                    component="main"
-                    sx={{
-                        backgroundColor: (theme) =>
-                            theme.palette.mode === 'light'
-                                ? theme.palette.grey[100]
-                                : theme.palette.grey[900],
-                        flexGrow: 1,
-                        height: '100vh',
-                        overflow: 'auto',
-                    }}
-                >
-                    <Toolbar />
-                    <Box
-                        sx={{
-                            mt: 4,
-                            mb: 4,
-                            flexGrow: 1,
-                            paddingX: 5,
-                        }}
-                    >
-                        <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des catégories
-                        </Typography>
-                        <Grid container spacing={3} justifyContent="center">
-                            <Grid item xs={12}>
-                                {
-                                    success.length ? (
-                                        <Box mt={2} textAlign="center">
-                                            <p style={{color: 'green'}}>{success}</p>
-                                        </Box>
-                                    ) : null
-                                }
-                                {
-                                    error.length ? (
-                                        <Box mt={2} textAlign="center">
-                                            <p style={{color: 'red'}}>{error}</p>
-                                        </Box>
-                                    ) : null
-                                }
-                                
-                                <Box sx={{ mb: 2 }}>
-                                    <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
-                                        Créer une nouvelle catégorie
-                                    </Button>
-                                </Box>
-
-                                <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
-                                    <DialogTitle>Créer une nouvelle catégorie</DialogTitle>
-                                    <form onSubmit={handleCreate}>
-                                        <DialogContent>
-                                            <TextField
-                                                label="Libelle"
-                                                value={libelle}
-                                                onChange={(e) => setLibelle(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.libelle}
-                                                required
-                                            />
-                                        </DialogContent>
-                                        <DialogActions>
-                                            <Button onClick={handleCloseCreateDialog}>Annuler</Button>
-                                            <Button type="submit">Créer</Button>
-                                        </DialogActions>
-                                    </form>
-                                    {Object.keys(formErrors).length > 0 && (
-                                        <Box sx={{ margin: 2 }}>
-                                            {Object.values(formErrors).map((error, index) => (
-                                                <Typography key={index} color="error">
-                                                    - {error}
-                                                </Typography>
-                                            ))}
-                                        </Box>
-                                    )}
-                                </Dialog>
-
-                                <TableContainer component={Paper}>
-                                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                                        <TableHead>
-                                            <TableRow style={{background: '#556cd6'}}>
-                                                <TableCell style={{color: 'white'}}>Nom</TableCell>
-                                                <TableCell style={{color: 'white'}}>Crée à</TableCell>
-                                                <TableCell style={{color: 'white'}}>Modifié à</TableCell>
-                                                <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            <TableRow
-                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                            >
-                                                <TableCell component="th" scope="row" colSpan={8} align="center">
-                                                    Aucune catégorie trouvée
-                                                </TableCell>
-                                            </TableRow>
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                            </Grid>
-                        </Grid>
-                    </Box>
-                </Box>
-            </Box>
-        </ThemeProvider>
-        );
-    }
-
-    return (
-        <ThemeProvider theme={defaultTheme}>
-            <Box sx={{ display: 'flex' }}>
-                <CssBaseline />
-                <NavbarPro />
                 <Box
                     component="main"
                     sx={{
@@ -459,7 +316,129 @@ export default function Categories() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des catégories
+                            Liste des compagnies
+                        </Typography>
+                        <Grid container spacing={3} justifyContent="center">
+                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+                                <Box sx={{ display: 'flex' }}>
+                                    <CircularProgress />
+                                </Box>
+                            </div>
+                        </Grid>
+                    </Box>
+                </Box>
+            </Box>
+        </ThemeProvider>
+        );
+    }
+
+    if (!companies.length) {
+        return (
+
+            <ThemeProvider theme={defaultTheme}>
+            <Box sx={{ display: 'flex' }}>
+                <CssBaseline />
+                <NavbarPro />
+
+                <Box
+                    component="main"
+                    sx={{
+                        backgroundColor: (theme) =>
+                            theme.palette.mode === 'light'
+                                ? theme.palette.grey[100]
+                                : theme.palette.grey[900],
+                        flexGrow: 1
+                    }}
+                >
+                    <Toolbar />
+                    <Box
+                        sx={{
+                            mt: 4,
+                            mb: 4,
+                            flexGrow: 1,
+                            paddingX: 5,
+                        }}
+                    >
+                        <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
+                            Liste des compagnies
+                        </Typography>
+                        <Grid container spacing={3} justifyContent="center">
+                        <Grid item xs={12}>
+                                {
+                                    success.length ? (
+                                        <Box mt={2} textAlign="center">
+                                            <p style={{color: 'green'}}>{success}</p>
+                                        </Box>
+                                    ) : null
+                                }
+                                {
+                                    error.length ? (
+                                        <Box mt={2} textAlign="center">
+                                            <p style={{color: 'red'}}>{error}</p>
+                                        </Box>
+                                    ) : null
+                                }
+
+                                <TableContainer component={Paper}>
+                                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                                        <TableHead>
+                                            <TableRow style={{background: '#556cd6'}}>
+                                                <TableCell style={{color: 'white'}}>Nom</TableCell>
+                                                <TableCell style={{color: 'white'}}>Adresse</TableCell>
+                                                <TableCell style={{color: 'white'}}>Code postal</TableCell>
+                                                <TableCell style={{color: 'white'}}>Ville</TableCell>
+                                                <TableCell style={{color: 'white'}}>Crée à</TableCell>
+                                                <TableCell style={{color: 'white'}}>Modifié à</TableCell>
+                                                <TableCell  style={{color: 'white'}} align="right">Actions</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            <TableRow
+                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                            >
+                                                <TableCell component="th" scope="row" colSpan={8} align="center">
+                                                    Aucune compagnie trouvée
+                                                </TableCell>
+                                            </TableRow>
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Grid>
+                        </Grid>
+                    </Box>
+                </Box>
+            </Box>
+        </ThemeProvider>
+        );
+    }
+
+    return (
+        <ThemeProvider theme={defaultTheme}>
+            <Box sx={{ display: 'flex' }}>
+                <CssBaseline />
+                <NavbarPro />
+
+                <Box
+                    component="main"
+                    sx={{
+                        backgroundColor: (theme) =>
+                            theme.palette.mode === 'light'
+                                ? theme.palette.grey[100]
+                                : theme.palette.grey[900],
+                        flexGrow: 1
+                    }}
+                >
+                    <Toolbar />
+                    <Box
+                        sx={{
+                            mt: 4,
+                            mb: 4,
+                            flexGrow: 1,
+                            paddingX: 5,
+                        }}
+                    >
+                        <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
+                            Liste des compagnies
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                             <Grid item xs={12}>
@@ -477,69 +456,39 @@ export default function Categories() {
                                         </Box>
                                     ) : null
                                 }
-                                
-                                <Box sx={{ mb: 2 }}>
-                                    <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
-                                        Créer une nouvelle catégorie
-                                    </Button>
-                                </Box>
-
-                                <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
-                                    <DialogTitle>Créer une nouvelle catégorie</DialogTitle>
-                                    <form onSubmit={handleCreate}>
-                                        <DialogContent>
-                                            <TextField
-                                                label="Libelle"
-                                                value={libelle}
-                                                onChange={(e) => setLibelle(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.libelle}
-                                                required
-                                            />
-                                        </DialogContent>
-                                        <DialogActions>
-                                            <Button onClick={handleCloseCreateDialog}>Annuler</Button>
-                                            <Button type="submit">Créer</Button>
-                                        </DialogActions>
-                                    </form>
-                                    {Object.keys(formErrors).length > 0 && (
-                                        <Box sx={{ margin: 2 }}>
-                                            {Object.values(formErrors).map((error, index) => (
-                                                <Typography key={index} color="error">
-                                                    - {error}
-                                                </Typography>
-                                            ))}
-                                        </Box>
-                                    )}
-                                </Dialog>
 
                                 <TableContainer component={Paper}>
                                     <Table sx={{ minWidth: 650 }} aria-label="simple table">
                                         <TableHead>
                                             <TableRow style={{background: '#556cd6'}}>
                                                 <TableCell style={{color: 'white'}}>Nom</TableCell>
+                                                <TableCell style={{color: 'white'}}>Adresse</TableCell>
+                                                <TableCell style={{color: 'white'}}>Code postal</TableCell>
+                                                <TableCell style={{color: 'white'}}>Ville</TableCell>
                                                 <TableCell style={{color: 'white'}}>Crée à</TableCell>
                                                 <TableCell style={{color: 'white'}}>Modifié à</TableCell>
-                                                <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
+                                                <TableCell  style={{color: 'white'}} align="right">Actions</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {categories.map((category) => (
+                                            {companies.map((company) => (
                                                 <TableRow
-                                                    key={category.id}
+                                                    key={company.id}
                                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                 >
                                                     <TableCell component="th" scope="row">
-                                                        {category.libelle}
+                                                        {company.name}
                                                     </TableCell>
-                                                    <TableCell>{category.createdAt ? format(new Date(category.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
-                                                    <TableCell>{category.updatedAt ? format(new Date(category.updatedAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
+                                                    <TableCell>{company.address}</TableCell>
+                                                    <TableCell>{company.zipCode}</TableCell>
+                                                    <TableCell>{company.city}</TableCell>
+                                                    <TableCell>{company.createdAt ? format(new Date(company.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
+                                                    <TableCell>{company.updatedAt ? format(new Date(company.updatedAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
                                                     <TableCell align="right">
-                                                        <IconButton onClick={() => handleEdit(category)}>
+                                                        <IconButton onClick={() => handleEdit(company)}>
                                                             <EditIcon />
                                                         </IconButton>
-                                                        <IconButton onClick={() => handleDelete(category)}>
+                                                        <IconButton onClick={() => handleDelete(company)}>
                                                             <DeleteIcon />
                                                         </IconButton>
                                                     </TableCell>
@@ -553,7 +502,7 @@ export default function Categories() {
                                         >
                                             <DialogTitle>Confirmation</DialogTitle>
                                             <DialogContent>
-                                                Êtes-vous sûr de vouloir supprimer cette catégorie ?
+                                                Êtes-vous sûr de vouloir supprimer cette compagnie ?
                                             </DialogContent>
                                             <DialogActions>
                                                 <Button onClick={() => setOpenDeleteDialog(false)}>Annuler</Button>
@@ -565,15 +514,44 @@ export default function Categories() {
                                             open={openEditDialog}
                                             onClose={() => setOpenEditDialog(false)}
                                         >
-                                            <DialogTitle>Modifier la catégorie</DialogTitle>
+                                            <DialogTitle>Modifier la compagnie</DialogTitle>
                                             <DialogContent>
                                                 <TextField
-                                                    label="Libelle"
+                                                    label="Name"
                                                     type="text"
-                                                    value={libelle}
-                                                    onChange={(e) => setLibelle(e.target.value)}
+                                                    value={name}
+                                                    onChange={(e) => setName(e.target.value)}
                                                     fullWidth
                                                     margin="normal"
+                                                    required
+                                                />
+                                                <TextField
+                                                    label="Address"
+                                                    type="text"
+                                                    value={address}
+                                                    onChange={(e) => setAddress(e.target.value)}
+                                                    fullWidth
+                                                    margin="normal"
+                                                    error={!!formErrors.address}
+                                                    required
+                                                />
+                                                <TextField
+                                                    label="Zip code"
+                                                    value={zipCode}
+                                                    onChange={(e) => setZipCode(e.target.value)}
+                                                    fullWidth
+                                                    margin="normal"
+                                                    type="number"
+                                                    required
+                                                />
+                                                <TextField
+                                                    label="City"
+                                                    type="text"
+                                                    value={city}
+                                                    onChange={(e) => setCity(e.target.value)}
+                                                    fullWidth
+                                                    margin="normal"
+                                                    required
                                                 />
                                             </DialogContent>
                                             <DialogActions>

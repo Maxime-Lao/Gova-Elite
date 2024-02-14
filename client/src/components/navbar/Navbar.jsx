@@ -41,6 +41,10 @@ const Navbar = () => {
         navigate('/register');
     };
 
+    const redirectToBookings = () => {
+        navigate('/bookings');
+    };
+
     return (
         <AppBar position="static" sx={{ backgroundColor: 'white', color: 'black' }}>
             <Toolbar>
@@ -62,6 +66,7 @@ const Navbar = () => {
                                 {(user.connectedUser?.roles[0] === 'ROLE_ADMIN' || user.connectedUser?.roles[0] === 'ROLE_PRO') && (
                                     <li><NotificationButton /></li>
                                 )}
+                                <li><Button onClick={redirectToBookings}>Réservations</Button></li>
                                 <li>
                                     <AvatarDialog firstName={user.connectedUser?.firstname} lastName={user.connectedUser?.lastname} handleLogout={handleLogout} />
                                 </li>

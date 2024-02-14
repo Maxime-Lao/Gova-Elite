@@ -39,10 +39,10 @@ import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import {MainListItems, secondaryListItems} from '../components/dashboard/ListItems.jsx';
+import {MainListItems, secondaryListItems} from '../../components/dashboard/ListItems.jsx';
 import { useMediaQuery } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
-import NavbarPro from "../components/navbar/NavbarPro.jsx";
+import NavbarPro from "../../components/navbar/NavbarPro.jsx";
 
 export function Copyright() {
     return (
@@ -57,24 +57,6 @@ export function Copyright() {
 }
 
 const drawerWidth = 240;
-
-const AppBar = styled(MuiAppBar, {
-    shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme, open }) => ({
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(['width', 'margin'], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-    }),
-    ...(open && {
-        marginLeft: drawerWidth,
-        width: `calc(100% - ${drawerWidth}px)`,
-        transition: theme.transitions.create(['width', 'margin'], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-    }),
-}));
 
 
 const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
@@ -130,16 +112,16 @@ const defaultTheme = createTheme({
     },
 });
 
-export default function Models() {
+export default function Brands() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [open, setOpen] = useState(!isMobile);
     const [isLoading, setIsLoading] = useState(true);
-    const [models, setModels] = useState([]);
+    const [brands, setBrands] = useState([]);
     const [openCreateDialog, setOpenCreateDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [selectedModel, setSelectedModel] = useState(null);
+    const [selectedBrand, setSelectedBrand] = useState(null);
     const token = localStorage.getItem('token');
     const [formErrors, setFormErrors] = useState({});
 
@@ -148,8 +130,6 @@ export default function Models() {
     };
 
     const [name, setName] = useState('');
-    const [brands, setBrands] = useState([]);
-    const [selectedBrand, setSelectedBrand] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
@@ -184,52 +164,23 @@ export default function Models() {
 
         getBrands();
     }, [token]);
-
-    useEffect(() => {
-        const getModels = async () => {
-            setIsLoading(true);
-            try {
-                const response = await fetch('http://localhost:8000/api/models', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Erreur HTTP! Statut: ${response.status}`);
-                }
-
-                const data = await response.json();
-                setModels(data);
-                setIsLoading(false);
-            } catch (error) {
-                console.error(error);
-                setIsLoading(false);
-            }
-        };
-
-        getModels();
-    }, [token]);
     
-    const handleDelete = (model) => {
-        setSelectedModel(model);
+    const handleDelete = (brand) => {
+        setSelectedBrand(brand);
         setOpenDeleteDialog(true);
     };
 
     useEffect(() => {
-        if (selectedModel) {
-            setName(selectedModel.name);
-            setSelectedBrand(selectedModel.brand.id);
+        if (selectedBrand) {
+            setName(selectedBrand.name);
         }
-    }, [selectedModel]);    
+    }, [selectedBrand]);    
 
     const handleCreate = async () => {
         event.preventDefault();
         
         try {
-            const response = await fetch('http://localhost:8000/api/models', {
+            const response = await fetch('http://localhost:8000/api/brands', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -237,7 +188,6 @@ export default function Models() {
                 },
                 body: JSON.stringify({
                     name: name,
-                    brand: `/api/brands/${selectedBrand}`,
                     createdAt: new Date().toISOString(),
                 }),
             });
@@ -254,25 +204,24 @@ export default function Models() {
                     });
                     setFormErrors(errors);
                 } else {
-                    setError('Une erreur s\'est produite lors de la création du modèle.');
+                    setError('Une erreur s\'est produite lors de la création de la marque.');
                 }
                 return;
             } else {
                 const data = await response.json();
                 setError('');
-                setModels([...models, data]);
+                setBrands([...brands, data]);
                 setOpenCreateDialog(false);
-                setSuccess('Modèle créé avec succès !');
+                setSuccess('Marque créée avec succès !');
             }
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la création du modèle.');
+            setError('Une erreur s\'est produite lors de la création de la marque.');
         }
     };
 
     const handleOpenCreateDialog = () => {
         setFormErrors({});
         setName('');
-        setSelectedBrand('');
         setOpenCreateDialog(true);
     };
     
@@ -282,7 +231,7 @@ export default function Models() {
 
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/models/${selectedModel.id}`, {
+            const response = await fetch(`http://localhost:8000/api/brands/${selectedBrand.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -294,25 +243,25 @@ export default function Models() {
                 throw new Error(`Erreur HTTP! Statut: ${response.status}`);
             }
 
-            const updatedModels = models.filter(model => model.id !== selectedModel.id);
+            const updatedBrands = brands.filter(brand => brand.id !== selectedBrand.id);
             setError('');
-            setModels(updatedModels);
+            setBrands(updatedBrands);
             setOpenDeleteDialog(false);
-            setSuccess('Modèle supprimé avec succès !');
+            setSuccess('Marque supprimée avec succès !');
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la suppression du modèle.');
+            setError('Une erreur s\'est produite lors de la suppression de la marque.');
         }
     };
 
-    const handleEdit = (model) => {
+    const handleEdit = (brand) => {
         setFormErrors({});
-        setSelectedModel(model);
+        setSelectedBrand(brand);
         setOpenEditDialog(true);
     };
 
     const handleUpdate = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/models/${selectedModel.id}`, {
+            const response = await fetch(`http://localhost:8000/api/brands/${selectedBrand.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/merge-patch+json',
@@ -320,7 +269,6 @@ export default function Models() {
                 },
                 body: JSON.stringify({
                     name: name,
-                    brand: `/api/brands/${selectedBrand}`,
                     updatedAt: new Date().toISOString(),
                 }),
             });
@@ -337,25 +285,28 @@ export default function Models() {
                     });
                     setFormErrors(errors);
                 } else {
-                    setError('Une erreur s\'est produite lors de la création du modèle.');
+                    setError('Une erreur s\'est produite lors de la création de la marque.');
                 }
                 return;
             } else {
-                const updatedModel = await response.json();
-                const updatedModels = models.map(model => {
-                if (model.id === selectedModel.id) {
-                    return updatedModel;
-                }
-                return model;
-            });
+                const updatedBrands = brands.map(brand => {
+                    if (brand.id === selectedBrand.id) {
+                        return {
+                            ...brand,
+                            name: name,
+                            updatedAt: new Date().toISOString(),
+                        };
+                    }
+                    return brand;
+                });
     
                 setError('');
-                setModels(updatedModels);
+                setBrands(updatedBrands);
                 setOpenEditDialog(false);
-                setSuccess('Modèle modifié avec succès !');
+                setSuccess('Marque modifiée avec succès !');
             }
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la mise à jour du modèle.');
+            setError('Une erreur s\'est produite lors de la mise à jour de la marque.');
         }
     };
 
@@ -366,80 +317,6 @@ export default function Models() {
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
                 <NavbarPro />
-
-                <Box
-                    component="main"
-                    sx={{
-                        backgroundColor: (theme) =>
-                            theme.palette.mode === 'light'
-                                ? theme.palette.grey[100]
-                                : theme.palette.grey[900],
-                        flexGrow: 1
-                    }}
-                >
-                    <Toolbar />
-                    <Box
-                        sx={{
-                            mt: 4,
-                            mb: 4,
-                            flexGrow: 1,
-                            paddingX: 5,
-                        }}
-                    >
-                        <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des modèles
-                        </Typography>
-                        <Grid container spacing={3} justifyContent="center">
-                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-                                <Box sx={{ display: 'flex' }}>
-                                    <CircularProgress />
-                                </Box>
-                            </div>
-                        </Grid>
-                    </Box>
-                </Box>
-            </Box>
-        </ThemeProvider>
-        );
-    }
-
-    if (!models.length) {
-        return (
-
-            <ThemeProvider theme={defaultTheme}>
-            <Box sx={{ display: 'flex' }}>
-                <CssBaseline />
-                <AppBar position="absolute" open={open}>
-                    <Toolbar sx={{ pr: '24px' }}>
-                        <IconButton
-                            edge="start"
-                            color="inherit"
-                            aria-label="open drawer"
-                            onClick={toggleDrawer}
-                            sx={{
-                                marginRight: '36px',
-                                ...(open && { display: 'none' }),
-                            }}
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <Typography
-                            component="h1"
-                            variant="h6"
-                            color="inherit"
-                            noWrap
-                            sx={{ flexGrow: 1 }}
-                        >
-                            Dashboard
-                        </Typography>
-                        <IconButton color="inherit">
-                            <Badge badgeContent={4} color="secondary">
-                                <NotificationsIcon />
-                            </Badge>
-                        </IconButton>
-                    </Toolbar>
-                </AppBar>
-
                 <Box
                     component="main"
                     sx={{
@@ -462,7 +339,50 @@ export default function Models() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des modèles
+                            Liste des marques
+                        </Typography>
+                        <Grid container spacing={3} justifyContent="center">
+                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+                                <Box sx={{ display: 'flex' }}>
+                                    <CircularProgress />
+                                </Box>
+                            </div>
+                        </Grid>
+                    </Box>
+                </Box>
+            </Box>
+        </ThemeProvider>
+        );
+    }
+
+    if (!brands.length) {
+        return (
+
+            <ThemeProvider theme={defaultTheme}>
+            <Box sx={{ display: 'flex' }}>
+                <CssBaseline />
+                <NavbarPro />
+                <Box
+                    component="main"
+                    sx={{
+                        backgroundColor: (theme) =>
+                            theme.palette.mode === 'light'
+                                ? theme.palette.grey[100]
+                                : theme.palette.grey[900],
+                        flexGrow: 1
+                    }}
+                >
+                    <Toolbar />
+                    <Box
+                        sx={{
+                            mt: 4,
+                            mb: 4,
+                            flexGrow: 1,
+                            paddingX: 5,
+                        }}
+                    >
+                        <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
+                            Liste des marques
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                         <Grid item xs={12}>
@@ -483,12 +403,12 @@ export default function Models() {
                                 
                                 <Box sx={{ mb: 2 }}>
                                     <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
-                                        Créer un nouveau modèle
+                                        Créer une nouvelle marque
                                     </Button>
                                 </Box>
 
                                 <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
-                                    <DialogTitle>Créer un nouveau modèle</DialogTitle>
+                                    <DialogTitle>Créer une nouvelle marque</DialogTitle>
                                     <form onSubmit={handleCreate}>
                                         <DialogContent>
                                             <TextField
@@ -500,20 +420,6 @@ export default function Models() {
                                                 error={!!formErrors.name}
                                                 required
                                             />
-                                            <FormControl fullWidth margin="normal">
-                                                <InputLabel>Marques</InputLabel>
-                                                <Select
-                                                    value={selectedBrand}
-                                                    onChange={(e) => setSelectedBrand(e.target.value)}
-                                                    required
-                                                >
-                                                    {brands.map((brand) => (
-                                                        <MenuItem key={brand.id} value={brand.id}>
-                                                            {brand.name}
-                                                        </MenuItem>
-                                                    ))}
-                                                </Select>
-                                            </FormControl>
                                         </DialogContent>
                                         <DialogActions>
                                             <Button onClick={handleCloseCreateDialog}>Annuler</Button>
@@ -536,7 +442,6 @@ export default function Models() {
                                         <TableHead>
                                             <TableRow style={{background: '#556cd6'}}>
                                                 <TableCell style={{color: 'white'}}>Nom</TableCell>
-                                                <TableCell style={{color: 'white'}}>Marque</TableCell>
                                                 <TableCell style={{color: 'white'}}>Crée à</TableCell>
                                                 <TableCell style={{color: 'white'}}>Modifié à</TableCell>
                                                 <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
@@ -547,7 +452,7 @@ export default function Models() {
                                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                             >
                                                 <TableCell component="th" scope="row" colSpan={8} align="center">
-                                                    Aucun modèle trouvé
+                                                    Aucune marque trouvée
                                                 </TableCell>
                                             </TableRow>
                                         </TableBody>
@@ -587,7 +492,7 @@ export default function Models() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des modèles
+                            Liste des marques
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                             <Grid item xs={12}>
@@ -608,12 +513,12 @@ export default function Models() {
                                 
                                 <Box sx={{ mb: 2 }}>
                                     <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
-                                        Créer un nouveau modèle
+                                        Créer une nouvelle marque
                                     </Button>
                                 </Box>
 
                                 <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
-                                    <DialogTitle>Créer un nouveau modèle</DialogTitle>
+                                    <DialogTitle>Créer une nouvelle marque</DialogTitle>
                                     <form onSubmit={handleCreate}>
                                         <DialogContent>
                                             <TextField
@@ -625,20 +530,6 @@ export default function Models() {
                                                 error={!!formErrors.name}
                                                 required
                                             />
-                                            <FormControl fullWidth margin="normal">
-                                                <InputLabel>Marques</InputLabel>
-                                                <Select
-                                                    value={selectedBrand}
-                                                    onChange={(e) => setSelectedBrand(e.target.value)}
-                                                    required
-                                                >
-                                                    {brands.map((brand) => (
-                                                        <MenuItem key={brand.id} value={brand.id}>
-                                                            {brand.name}
-                                                        </MenuItem>
-                                                    ))}
-                                                </Select>
-                                            </FormControl>
                                         </DialogContent>
                                         <DialogActions>
                                             <Button onClick={handleCloseCreateDialog}>Annuler</Button>
@@ -661,29 +552,27 @@ export default function Models() {
                                         <TableHead>
                                             <TableRow style={{background: '#556cd6'}}>
                                                 <TableCell style={{color: 'white'}}>Nom</TableCell>
-                                                <TableCell style={{color: 'white'}}>Marque</TableCell>
                                                 <TableCell style={{color: 'white'}}>Crée à</TableCell>
                                                 <TableCell style={{color: 'white'}}>Modifié à</TableCell>
                                                 <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {models.map((model) => (
+                                            {brands.map((brand) => (
                                                 <TableRow
-                                                    key={model.id}
+                                                    key={brand.id}
                                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                 >
                                                     <TableCell component="th" scope="row">
-                                                        {model.name}
+                                                        {brand.name}
                                                     </TableCell>
-                                                    <TableCell>{model.brand ? model.brand.name : ''}</TableCell>
-                                                    <TableCell>{model.createdAt ? format(new Date(model.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
-                                                    <TableCell>{model.updatedAt ? format(new Date(model.updatedAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
+                                                    <TableCell>{brand.createdAt ? format(new Date(brand.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
+                                                    <TableCell>{brand.updatedAt ? format(new Date(brand.updatedAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
                                                     <TableCell align="right">
-                                                        <IconButton onClick={() => handleEdit(model)}>
+                                                        <IconButton onClick={() => handleEdit(brand)}>
                                                             <EditIcon />
                                                         </IconButton>
-                                                        <IconButton onClick={() => handleDelete(model)}>
+                                                        <IconButton onClick={() => handleDelete(brand)}>
                                                             <DeleteIcon />
                                                         </IconButton>
                                                     </TableCell>
@@ -697,7 +586,7 @@ export default function Models() {
                                         >
                                             <DialogTitle>Confirmation</DialogTitle>
                                             <DialogContent>
-                                                Êtes-vous sûr de vouloir supprimer ce modèle ?
+                                                Êtes-vous sûr de vouloir supprimer cette marque ?
                                             </DialogContent>
                                             <DialogActions>
                                                 <Button onClick={() => setOpenDeleteDialog(false)}>Annuler</Button>
@@ -709,7 +598,7 @@ export default function Models() {
                                             open={openEditDialog}
                                             onClose={() => setOpenEditDialog(false)}
                                         >
-                                            <DialogTitle>Modifier le modèle</DialogTitle>
+                                            <DialogTitle>Modifier la marque</DialogTitle>
                                             <DialogContent>
                                                 <TextField
                                                     label="Name"
@@ -719,19 +608,6 @@ export default function Models() {
                                                     fullWidth
                                                     margin="normal"
                                                 />
-                                                <FormControl fullWidth margin="normal">
-                                                    <InputLabel>Marques</InputLabel>
-                                                    <Select
-                                                        value={selectedBrand}
-                                                        onChange={(e) => setSelectedBrand(e.target.value)}
-                                                    >
-                                                        {brands.map((brand) => (
-                                                            <MenuItem key={brand.id} value={brand.id}>
-                                                                {brand.name}
-                                                            </MenuItem>
-                                                        ))}
-                                                    </Select>
-                                                </FormControl>
                                             </DialogContent>
                                             <DialogActions>
                                                 <Button onClick={() => setOpenEditDialog(false)}>Annuler</Button>

@@ -73,7 +73,7 @@ class MediaObject
 
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['user:read', 'car:read'])]
+    #[Groups(['user:read', 'car:read', 'rents_user:read'])]
     public ?string $filePath = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]

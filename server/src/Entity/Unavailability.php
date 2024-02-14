@@ -22,11 +22,11 @@ class Unavailability
     private ?string $reason = null;
 
     #[ORM\Column]
-    #[Groups(['car:read'])]
+    #[Groups(['car:read', 'rents_user:read'])]
     private ?\DateTimeImmutable $date_start = null;
 
     #[ORM\Column]
-    #[Groups(['car:read'])]
+    #[Groups(['car:read', 'rents_user:read'])]
     private ?\DateTimeImmutable $date_end = null;
 
     #[ORM\Column(nullable: true)]
@@ -34,7 +34,7 @@ class Unavailability
     private ?int $price = null;
 
     #[ORM\ManyToOne(inversedBy: 'unavailability')]
-    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read', 'rents_companie:read'])]
+    #[Groups(['rents:read', 'rents_car:read', 'rents_companie:read'])]
     private ?Car $car = null;
 
     public function getCar(): ?Car

@@ -22,7 +22,7 @@ class Brand
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: 'Le nom ne peut pas être vide')]
-    #[Groups(['car:read', 'car_search:read', 'user:read', 'model:read', 'rents:read', 'comments:read', 'rents_companie:read'])]
+    #[Groups(['car:read', 'car_search:read', 'user:read', 'model:read', 'rents:read', 'comments:read', 'rents_companie:read', 'rents_user:read'])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'brand', targetEntity: Model::class, orphanRemoval: true)]
