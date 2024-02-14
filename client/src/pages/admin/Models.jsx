@@ -366,7 +366,49 @@ export default function Models() {
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
                 <NavbarPro />
+                <Box
+                    component="main"
+                    sx={{
+                        backgroundColor: (theme) =>
+                            theme.palette.mode === 'light'
+                                ? theme.palette.grey[100]
+                                : theme.palette.grey[900],
+                        flexGrow: 1
+                    }}
+                >
+                    <Toolbar />
+                    <Box
+                        sx={{
+                            mt: 4,
+                            mb: 4,
+                            flexGrow: 1,
+                            paddingX: 5,
+                        }}
+                    >
+                        <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
+                            Liste des compagnies
+                        </Typography>
+                        <Grid container spacing={3} justifyContent="center">
+                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+                                <Box sx={{ display: 'flex' }}>
+                                    <CircularProgress />
+                                </Box>
+                            </div>
+                        </Grid>
+                    </Box>
+                </Box>
+            </Box>
+        </ThemeProvider>
+        );
+    }
 
+    if (!companies.length) {
+        return (
+
+            <ThemeProvider theme={defaultTheme}>
+            <Box sx={{ display: 'flex' }}>
+                <CssBaseline />
+                <NavbarPro />
                 <Box
                     component="main"
                     sx={{
@@ -409,37 +451,7 @@ export default function Models() {
             <ThemeProvider theme={defaultTheme}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
-                <AppBar position="absolute" open={open}>
-                    <Toolbar sx={{ pr: '24px' }}>
-                        <IconButton
-                            edge="start"
-                            color="inherit"
-                            aria-label="open drawer"
-                            onClick={toggleDrawer}
-                            sx={{
-                                marginRight: '36px',
-                                ...(open && { display: 'none' }),
-                            }}
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <Typography
-                            component="h1"
-                            variant="h6"
-                            color="inherit"
-                            noWrap
-                            sx={{ flexGrow: 1 }}
-                        >
-                            Dashboard
-                        </Typography>
-                        <IconButton color="inherit">
-                            <Badge badgeContent={4} color="secondary">
-                                <NotificationsIcon />
-                            </Badge>
-                        </IconButton>
-                    </Toolbar>
-                </AppBar>
-
+                <NavbarPro />
                 <Box
                     component="main"
                     sx={{

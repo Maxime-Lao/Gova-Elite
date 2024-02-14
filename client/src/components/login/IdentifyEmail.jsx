@@ -1,28 +1,32 @@
 import React, { useState } from 'react';
-import { Container, Typography, TextField, Button, Box } from '@mui/material';
+import { Container, Typography, TextField, Button, Box, Alert } from '@mui/material';
 import sendRequest from "../../services/axiosRequestFunction.js";
 
 const IdentifyEmail = () => {
     const [email, setEmail] = useState('');
     const [success, setSuccess] = useState('');
+    const [error, setError] = useState('');
 
     const handleEmailChange = (event) => {
         setEmail(event.target.value);
+        setError('');
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        sendRequest(
-            '/forgot_password_send_email',
-            'post',
-            {
-                email: email,
-            },
-            false
-        ).then((response) => {
-            setSuccess('Un e-mail vous a été envoyé !')
-        })
-
+        try {
+            const response = await sendRequest(
+                '/forgot_password_send_email',
+                'post',
+                {
+                    email: email,
+                },
+                false
+            );
+            setSuccess(response);
+        } catch (error) {
+            setError(error.response.data);
+        }
     };
 
     return (
@@ -35,7 +39,12 @@ const IdentifyEmail = () => {
             </Typography>
             {success && (
                 <Box mt={2}>
-                    <Typography color="success">{success}</Typography>
+                    <Alert severity="success">{success}</Alert>
+                </Box>
+            )}
+            {error && (
+                <Box mt={2}>
+                    <Alert severity="error">{error}</Alert>
                 </Box>
             )}
             <form onSubmit={handleSubmit}>

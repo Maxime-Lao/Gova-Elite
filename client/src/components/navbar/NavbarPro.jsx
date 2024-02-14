@@ -10,6 +10,7 @@ import Divider from '@mui/material/Divider';
 import List from '@mui/material/List';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import {MainListItems, secondaryListItems} from '../dashboard/ListItems.jsx';
+import NotificationButton from '../button/NotificationButton.jsx';
 
 
 const drawerWidth = 240;
@@ -90,11 +91,7 @@ const NavbarPro = () => {
             >
                 Dashboard
             </Typography>
-            <IconButton color="inherit">
-                <Badge badgeContent={4} color="secondary">
-                    <NotificationsIcon />
-                </Badge>
-            </IconButton>
+            <NotificationButton />
         </Toolbar>
     </AppBar>
 
