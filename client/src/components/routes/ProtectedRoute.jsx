@@ -1,8 +1,8 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import useGetConnectedUser from "../hooks/useGetConnectedUser.jsx";
-import Navbar from "./navbar/Navbar.jsx";
-import Loading from "../assets/img/loading.jpg";
+import Navbar from "../navbar/Navbar.jsx";
+import Loading from "../../assets/img/loading.jpg";
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const user = useGetConnectedUser();
@@ -25,7 +25,7 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   }
 
 
-  if (connectedUser.roles.includes('ROLE_PRO') && connectedUser.companie) {
+  if (user.connectedUser.roles.includes('ROLE_PRO') && user.connectedUser.companie) {
     return <Navigate to="/" replace />;
   }
 

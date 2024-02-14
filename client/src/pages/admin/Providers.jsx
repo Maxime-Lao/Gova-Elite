@@ -41,7 +41,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import {MainListItems, secondaryListItems} from '../../components/dashboard/ListItems.jsx';
 import { useMediaQuery } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
-import NavbarPro from '../components/navbar/NavbarPro.jsx';
+import NavbarPro from '../../components/navbar/NavbarPro.jsx';
 
 export function Copyright() {
     return (
