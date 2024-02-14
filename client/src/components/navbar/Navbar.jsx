@@ -42,6 +42,10 @@ const Navbar = () => {
         navigate('/register');
     };
 
+    const redirectToBookings = () => {
+        navigate('/bookings');
+    };
+
     return (
         <AppBar position="static" sx={{ backgroundColor: 'white', color: 'black' }}>
         <Toolbar>
@@ -52,7 +56,6 @@ const Navbar = () => {
             </Link>
             <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: '1em' }}>
                 <ul style={{ listStyleType: 'none', display: 'flex', gap: '1em' }}>
-                    <li><a href="#"><Button startIcon={<CarRentalIcon />}>Louer mon véhicule</Button></a></li>
                     {
                         !myToken || !user.connectedUser.id ? (
                             <>
@@ -60,9 +63,12 @@ const Navbar = () => {
                                 <li><Button onClick={redirectToRegister}>S'inscrire</Button></li>
                             </>
                         ) : (
-                            <li>
-                                <AvatarDialog firstName={user.connectedUser?.firstname} lastName={user.connectedUser?.lastname} handleLogout={ handleLogout }/>
-                            </li>
+                            <>
+                                <li><Button onClick={redirectToBookings}>Réservations</Button></li>
+                                <li>
+                                    <AvatarDialog firstName={user.connectedUser?.firstname} lastName={user.connectedUser?.lastname} handleLogout={ handleLogout }/>
+                                </li>
+                            </>
                         )
                     }
                     <li><a href="#"><Button>FR | EN</Button></a></li>

@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Delete;
 use App\Repository\CompanieRepository;
@@ -19,10 +20,17 @@ use ApiPlatform\Metadata\GetCollection;
 
 #[ORM\Entity(repositoryClass: CompanieRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['companies:read']],
     operations: [
+        new GetCollection(
+            //security: "is_granted('ROLE_ADMIN')",
+            normalizationContext: ['groups' => ['companies:read']],
+        ),
         new Get(),
         new Put(),
+        new Patch(
+            uriTemplate: '/companies/{id}',
+            normalizationContext: ['groups' => ['companies:update']],
+        ),
         new Delete(),
         new Post(
             controller: CompanieController::class,

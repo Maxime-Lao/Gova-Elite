@@ -108,8 +108,6 @@ export default function Users() {
     const [phone, setPhone] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const [kbis, setKbis] = useState('');
-    const [showKbis, setShowKbis] = useState(false);
 
     useEffect(() => {
         setOpen(!isMobile);
@@ -226,12 +224,6 @@ export default function Users() {
 
     const handleRoleChange = (e) => {
         setRole(e.target.value);
-        if (e.target.value === 'professionnel') {
-            setShowKbis(true);
-        } else {
-            setShowKbis(false);
-            setKbis('');
-        }
     };
 
     const handleConfirmDelete = async () => {
@@ -471,17 +463,6 @@ export default function Users() {
                                                     <MenuItem value="administrateur">Administrateur</MenuItem>
                                                 </Select>
                                             </FormControl>
-                                            {showKbis && (
-                                                <FormControl fullWidth margin="normal">
-                                                    <InputLabel htmlFor="kbis-file">KBIS</InputLabel>
-                                                    <Input
-                                                        id="kbis-file"
-                                                        type="file"
-                                                        onChange={(e) => setKbisFile(e.target.files[0])}
-                                                        fullWidth
-                                                    />
-                                                </FormControl>
-                                            )}
                                         </DialogContent>
                                         <DialogActions>
                                             <Button onClick={handleCloseCreateDialog}>Annuler</Button>
@@ -649,17 +630,6 @@ export default function Users() {
                                                     <MenuItem value="administrateur">Administrateur</MenuItem>
                                                 </Select>
                                             </FormControl>
-                                            {showKbis && (
-                                                <FormControl fullWidth margin="normal">
-                                                    <InputLabel htmlFor="kbis-file">KBIS</InputLabel>
-                                                    <Input
-                                                        id="kbis-file"
-                                                        type="file"
-                                                        onChange={(e) => setKbisFile(e.target.files[0])}
-                                                        fullWidth
-                                                    />
-                                                </FormControl>
-                                            )}
                                         </DialogContent>
                                         <DialogActions>
                                             <Button onClick={handleCloseCreateDialog}>Annuler</Button>

@@ -136,7 +136,6 @@ export default function Companies() {
     const [open, setOpen] = useState(!isMobile);
     const [isLoading, setIsLoading] = useState(true);
     const [companies, setCompanies] = useState([]);
-    const [openCreateDialog, setOpenCreateDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [selectedCompany, setSelectedCompany] = useState(null);
@@ -201,65 +200,7 @@ export default function Companies() {
         }
     }, [selectedCompany]);    
 
-    const handleCreate = async () => {
-        event.preventDefault();
-        
-        try {
-            const response = await fetch('http://localhost:8000/api/companies', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    name: name,
-                    address: address,
-                    zipCode: parseInt(zipCode),
-                    city: city,
-                    createdAt: new Date().toISOString(),
-                }),
-            });
-
-            if (!response.ok) {
-                setFormErrors({});
-
-                const data = await response.json();
-
-                if (data.violations) {
-                    const errors = {};
-                    data.violations.forEach(violation => {
-                        errors[violation.propertyPath] = violation.message;
-                    });
-                    setFormErrors(errors);
-                } else {
-                    setError('Une erreur s\'est produite lors de la création de la compagnie.');
-                }
-                return;
-            } else {
-                const data = await response.json();
-                setError('');
-                setCompanies([...companies, data]);
-                setOpenCreateDialog(false);
-                setSuccess('Compagnie créée avec succès !');
-            }
-        } catch (error) {
-            setError('Une erreur s\'est produite lors de la création de la compagnie.');
-        }
-    };
-
-    const handleOpenCreateDialog = () => {
-        setFormErrors({});
-        setName('');
-        setAddress('');
-        setZipCode('');
-        setCity('');
-        setOpenCreateDialog(true);
-    };
     
-    const handleCloseCreateDialog = () => {
-        setOpenCreateDialog(false);
-    };
-
     const handleConfirmDelete = async () => {
         try {
             const response = await fetch(`http://localhost:8000/api/companies/${selectedCompany.id}`, {
@@ -437,70 +378,6 @@ export default function Companies() {
                                         </Box>
                                     ) : null
                                 }
-                                
-                                <Box sx={{ mb: 2 }}>
-                                    <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
-                                        Créer une nouvelle compagnie
-                                    </Button>
-                                </Box>
-
-                                <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
-                                    <DialogTitle>Créer une nouvelle compagnie</DialogTitle>
-                                    <form onSubmit={handleCreate}>
-                                        <DialogContent>
-                                            <TextField
-                                                label="Name"
-                                                value={name}
-                                                onChange={(e) => setName(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.name}
-                                                required
-                                            />
-                                            <TextField
-                                                label="Address"
-                                                value={address}
-                                                onChange={(e) => setAddress(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.address}
-                                                required
-                                            />
-                                            <TextField
-                                                label="Zip code"
-                                                value={zipCode}
-                                                onChange={(e) => setZipCode(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.zipCode}
-                                                type="number"
-                                                required
-                                            />
-                                            <TextField
-                                                label="City"
-                                                value={city}
-                                                onChange={(e) => setCity(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.city}
-                                                required
-                                            />
-                                        </DialogContent>
-                                        <DialogActions>
-                                            <Button onClick={handleCloseCreateDialog}>Annuler</Button>
-                                            <Button type="submit">Créer</Button>
-                                        </DialogActions>
-                                    </form>
-                                    {Object.keys(formErrors).length > 0 && (
-                                        <Box sx={{ margin: 2 }}>
-                                            {Object.values(formErrors).map((error, index) => (
-                                                <Typography key={index} color="error">
-                                                    - {error}
-                                                </Typography>
-                                            ))}
-                                        </Box>
-                                    )}
-                                </Dialog>
 
                                 <TableContainer component={Paper}>
                                     <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -579,70 +456,6 @@ export default function Companies() {
                                         </Box>
                                     ) : null
                                 }
-                                
-                                <Box sx={{ mb: 2 }}>
-                                    <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
-                                        Créer une nouvelle compagnie
-                                    </Button>
-                                </Box>
-
-                                <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
-                                    <DialogTitle>Créer une nouvelle compagnie</DialogTitle>
-                                    <form onSubmit={handleCreate}>
-                                        <DialogContent>
-                                            <TextField
-                                                label="Name"
-                                                value={name}
-                                                onChange={(e) => setName(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.name}
-                                                required
-                                            />
-                                            <TextField
-                                                label="Address"
-                                                value={address}
-                                                onChange={(e) => setAddress(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.address}
-                                                required
-                                            />
-                                            <TextField
-                                                label="Zip code"
-                                                value={zipCode}
-                                                onChange={(e) => setZipCode(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.zipCode}
-                                                type="number"
-                                                required
-                                            />
-                                            <TextField
-                                                label="City"
-                                                value={city}
-                                                onChange={(e) => setCity(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.city}
-                                                required
-                                            />
-                                        </DialogContent>
-                                        <DialogActions>
-                                            <Button onClick={handleCloseCreateDialog}>Annuler</Button>
-                                            <Button type="submit">Créer</Button>
-                                        </DialogActions>
-                                    </form>
-                                    {Object.keys(formErrors).length > 0 && (
-                                        <Box sx={{ margin: 2 }}>
-                                            {Object.values(formErrors).map((error, index) => (
-                                                <Typography key={index} color="error">
-                                                    - {error}
-                                                </Typography>
-                                            ))}
-                                        </Box>
-                                    )}
-                                </Dialog>
 
                                 <TableContainer component={Paper}>
                                     <Table sx={{ minWidth: 650 }} aria-label="simple table">

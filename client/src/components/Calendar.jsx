@@ -4,12 +4,14 @@ import 'react-datepicker/dist/react-datepicker.css';
 import useGetConnectedUser from "./hooks/useGetConnectedUser.jsx";
 import { Grid, Typography, Button, TextField, Modal, Box } from '@mui/material';
 import StripePaymentForm from './StripePaymentForm';
+import { useNavigate } from "react-router-dom";
 
 function Calendar({ carId, companieId }) {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [carData, setCarData] = useState(0);
   const user = useGetConnectedUser();
+  const navigate = useNavigate();
   const [totalPrice, setTotalPrice] = useState(0);
   const [rentedTimes, setRentedTimes] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -116,7 +118,7 @@ function Calendar({ carId, companieId }) {
   const handleOpenModal = () => {
 
     if (!user || !user.connectedUser || user.connectedUser.length === 0) {
-      setError('Vous devez être connecté pour pourvoir payer !');
+      navigate('/login');
       setSuccessMessage('');
       return;
     }
