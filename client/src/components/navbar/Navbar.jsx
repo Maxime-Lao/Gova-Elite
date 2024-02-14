@@ -54,7 +54,7 @@ const Navbar = () => {
                 <ul style={{ listStyleType: 'none', display: 'flex', gap: '1em' }}>
                     <li><a href="#"><Button startIcon={<CarRentalIcon />}>Louer mon véhicule</Button></a></li>
                     {
-                        !myToken || !user.connectedUser.id ? (
+                        !myToken || !user.connectedUser ? (
                             <>
                                 <li><Button onClick={redirectToLogin}>Se connecter</Button></li>
                                 <li><Button onClick={redirectToRegister}>S'inscrire</Button></li>

@@ -5,24 +5,24 @@ import useGetConnectedUser from "../components/hooks/useGetConnectedUser.jsx";
 import HomePro from "./HomePro.jsx";
 import Dashboard from "./Dashboard.jsx";
 import Loading from "../assets/img/loading.jpg"
+
 function Home() {
     const user = useGetConnectedUser();
 
-    if (user.loading) {
+    if (user.connectedUser === undefined) {
         return (
             <>
-                <Navbar />
+                <Navbar/>
                 <div className="flex items-center justify-center h-screen">
                     <div className="text-center">
-                        <img className='animate-spin w-20' src={Loading} alt="Loading" />
+                        <img className='animate-spin w-20' src={Loading} alt="Loading"/>
                     </div>
                 </div>
             </>
         );
     }
 
-
-    if (user.connectedUser.id && !user.connectedUser.isVerified) {
+    if (user.connectedUser && !user.connectedUser.isVerified) {
         return (
             <>
                 <Navbar/>
@@ -35,33 +35,31 @@ function Home() {
         )
     }
 
+    if (user.connectedUser === null) {
+        return (
+            <>
+                <Navbar/>
+                <Banner/>
+                <HomeSectionOne/>
+            </>
+        )
+    }
+
     return (
         <>
             <Navbar/>
             {
-                user.connectedUser.roles && user.connectedUser.roles[0] === 'ROLE_PRO' ?
+                user.connectedUser ? user.connectedUser.roles[0] === 'ROLE_PRO' ?
                     <HomePro user={user}/> : user.connectedUser.roles && user.connectedUser.roles[0] === 'ROLE_ADMIN' ?
                         <Dashboard/> : (
                             <>
                                 <Banner/>
                                 <HomeSectionOne/>
                             </>
-                        )
+                        ) : null
             }
         </>
     )
-
-    // return (
-    //     !isPro ? (
-    //         <>
-    //             <Navbar/>
-    //             <Banner/>
-    //             <HomeSectionOne />
-    //       </>
-    // ) : (
-    //     <HomePro user = { user }/>
-    // )
-    // );
 }
 
 export default Home
