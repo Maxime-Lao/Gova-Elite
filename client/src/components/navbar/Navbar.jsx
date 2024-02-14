@@ -1,23 +1,22 @@
-import { AppBar, Button, Link } from "@mui/material";
-import { Toolbar } from "@mui/material";
-import { Typography } from "@mui/material";
+import { AppBar, Button, Link, Toolbar, Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import CarRentalIcon from '@mui/icons-material/CarRental';
-import logo from '../../assets/img/la-gova.png';
-import {useCallback, useState} from "react";
+import { useCallback, useState } from "react";
 import AvatarDialog from "./AvatarDialog.jsx";
 import useGetConnectedUser from "../hooks/useGetConnectedUser.jsx";
 import { useNavigate } from "react-router-dom";
+import NotificationButton from "../button/NotificationButton.jsx";
+import CarRentalIcon from '@mui/icons-material/CarRental';
+import logo from '../../assets/img/la-gova.png';
 
 const Navbar = () => {
-
     const localStorageToken = localStorage.getItem('token');
     const [myToken, setMyToken] = useState(localStorageToken);
     const user = useGetConnectedUser();
     const navigate = useNavigate();
-    const handleLogout = useCallback(() => {
+
+    const handleLogout = useCallback(async () => {
         try {
-            const response = fetch('http://localhost:8000/logout', {
+            const response = await fetch('http://localhost:8000/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -25,14 +24,14 @@ const Navbar = () => {
                 },
             });
         } catch (error) {
-            console.error('Erreur lors de la déconnexion: ' + error.message);
+            console.error('Error logging out: ' + error.message);
         }
         localStorage.removeItem('token');
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('email');
         setMyToken(null);
         location.reload();
-    }, [localStorageToken, user]);
+    }, [myToken]);
 
     const redirectToLogin = () => {
         navigate('/login');
@@ -44,33 +43,36 @@ const Navbar = () => {
 
     return (
         <AppBar position="static" sx={{ backgroundColor: 'white', color: 'black' }}>
-        <Toolbar>
-            <Link href="/" underline="none" color="inherit"  sx={{ flexGrow: 1 }}>
-                <Typography variant="h6" component="div">
-                    <img src={logo} alt="La Gova" style={{ height: '50px' }} />
-                </Typography>
-            </Link>
-            <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: '1em' }}>
-                <ul style={{ listStyleType: 'none', display: 'flex', gap: '1em' }}>
-                    <li><a href="#"><Button startIcon={<CarRentalIcon />}>Louer mon véhicule</Button></a></li>
-                    {
-                        !myToken || !user.connectedUser.id ? (
+            <Toolbar>
+                <Link href="/" underline="none" color="inherit" sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6" component="div">
+                        <img src={logo} alt="La Gova" style={{ height: '50px' }} />
+                    </Typography>
+                </Link>
+                <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: '1em' }}>
+                    <ul style={{ listStyleType: 'none', display: 'flex', gap: '1em', alignItems: 'center' }}>
+                        <li><Button startIcon={<CarRentalIcon />}>Rent my vehicle</Button></li>
+                        {!myToken || !user.connectedUser.id ? (
                             <>
-                                <li><Button onClick={redirectToLogin}>Se connecter</Button></li>
-                                <li><Button onClick={redirectToRegister}>S'inscrire</Button></li>
+                                <li><Button onClick={redirectToLogin}>Log In</Button></li>
+                                <li><Button onClick={redirectToRegister}>Register</Button></li>
                             </>
                         ) : (
-                            <li>
-                                <AvatarDialog firstName={user.connectedUser?.firstname} lastName={user.connectedUser?.lastname} handleLogout={ handleLogout }/>
-                            </li>
-                        )
-                    }
-                    <li><a href="#"><Button>FR | EN</Button></a></li>
-                </ul>
-            </Box>
-        </Toolbar>
+                            <>
+                                {(user.connectedUser?.roles[0] === 'ROLE_ADMIN' || user.connectedUser?.roles[0] === 'ROLE_PRO') && (
+                                    <li><NotificationButton /></li>
+                                )}
+                                <li>
+                                    <AvatarDialog firstName={user.connectedUser?.firstname} lastName={user.connectedUser?.lastname} handleLogout={handleLogout} />
+                                </li>
+                            </>
+                        )}
+                        <li><a href="#"><Button>FR | EN</Button></a></li>
+                    </ul>
+                </Box>
+            </Toolbar>
         </AppBar>
     );
-    };
+};
 
 export default Navbar;
