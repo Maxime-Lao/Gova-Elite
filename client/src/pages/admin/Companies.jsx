@@ -294,7 +294,7 @@ export default function Companies() {
             <ThemeProvider theme={defaultTheme}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
-                
+                <NavbarPro />
 
                 <Box
                     component="main"

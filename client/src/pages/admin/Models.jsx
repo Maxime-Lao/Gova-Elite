@@ -402,7 +402,7 @@ export default function Models() {
         );
     }
 
-    if (!companies.length) {
+    if (!models.length) {
         return (
 
             <ThemeProvider theme={defaultTheme}>
