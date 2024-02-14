@@ -3,3 +3,25 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+auth:
+    path: /auth
+    methods: ['POST']
+
+api_refresh_token:
+    path: /api/token/refresh
+
+forgot_password_send_email:
+    path: /forgot_password_send_email
+    controller: 'App\Controller\ForgotPasswordSendEmailController'
+    methods: [POST]
+
+reset_password:
+    path: /reset_password
+    controller: 'App\Controller\ResetPasswordController'
+    methods: [POST]
+
+logout:
+    path: /logout
+    controller: 'App\Controller\Logout_Controller'
+    methods: [POST]

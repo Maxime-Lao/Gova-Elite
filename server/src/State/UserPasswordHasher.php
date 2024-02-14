@@ -1,0 +1,80 @@
+<?php
+
+namespace App\State;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProcessorInterface;
+use App\Entity\User;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Doctrine\ORM\EntityManagerInterface;
+
+final class UserPasswordHasher implements ProcessorInterface
+{
+    private MailerInterface $mailer;
+
+    public function __construct(
+        private readonly ProcessorInterface $processor,
+        private readonly UserPasswordHasherInterface $passwordHasher,
+        MailerInterface $mailer,
+        UrlGeneratorInterface $router,
+        EntityManagerInterface $entityManager
+    )
+    {
+        $this->mailer = $mailer;
+        $this->router = $router;
+        $this->entityManager = $entityManager;
+    }
+
+    private function sendWelcomeEmail(User $user)
+    {
+        $verificationUrl = $this->router->generate(
+            'user_verify',
+            ['token' =>  $user->getToken()],
+            UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $currentEmail = (new Email())
+            ->from('mmo@kanieba.com')
+            ->to($user->getEmail())
+            ->subject('Bienvenue sur La Gova !')
+            ->text('')
+            ->html("<p>Please verify your account by clicking <a href=\"{$verificationUrl}\">here</a>.</p>");
+
+        $this->mailer->send($currentEmail);
+    }
+    public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
+    {
+
+        if ($data instanceof User && $data->getPlainPassword()) {
+            $hashedPassword = $this->passwordHasher->hashPassword($data, $data->getPlainPassword());
+            $data->setPassword($hashedPassword);
+            $data->eraseCredentials();
+
+            if ($operation->getMethod()) {
+                $verificationToken = bin2hex(random_bytes(32));
+                $data->setToken($verificationToken);
+                $this->sendWelcomeEmail($data);
+            }
+        }
+        return $this->processor->process($data, $operation, $uriVariables, $context);
+    }
+
+    public function sendVerificationEmail(User $user)
+    {
+        $verificationUrl = $this->router->generate(
+            'user_verify',
+            ['token' =>  $user->getPasswordResetToken()],
+            UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $currentEmail = (new Email())
+            ->from('mmo@kanieba.com')
+            ->to($user->getEmail())
+            ->subject('Modification de mot de passe')
+            ->text('')
+            ->html("<p>Cliquez ici pour changer votre mot de passe <a href=\"http://localhost:3000/resetpswd/" . $user->getPasswordResetToken() . "\">ici</a>.</p>");
+
+        $this->mailer->send($currentEmail);
+    }
+
+}
