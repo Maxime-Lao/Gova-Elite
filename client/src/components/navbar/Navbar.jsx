@@ -52,7 +52,7 @@ const Navbar = () => {
                 <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: '1em' }}>
                     <ul style={{ listStyleType: 'none', display: 'flex', gap: '1em', alignItems: 'center' }}>
                         <li><Button startIcon={<CarRentalIcon />}>Rent my vehicle</Button></li>
-                        {!myToken || !user.connectedUser.id ? (
+                        {!myToken || !user.connectedUser ? (
                             <>
                                 <li><Button onClick={redirectToLogin}>Log In</Button></li>
                                 <li><Button onClick={redirectToRegister}>Register</Button></li>

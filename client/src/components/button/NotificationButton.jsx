@@ -27,7 +27,7 @@ export default function NotificationButton() {
     }
 
     fetchNotifications();
-  }, [user.connectedUser.id])
+  }, [user.connectedUser])
 
 
 
