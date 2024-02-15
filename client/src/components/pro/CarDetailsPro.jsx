@@ -105,7 +105,12 @@ const CarDetailsPro = () => {
     useEffect(() => {
         const fetchCar = async () => {
             try {
-                const response = await fetch(`http://195.35.29.110:8000/api/cars/${carId}`);
+                const response = await fetch(`http://195.35.29.110:8000/api/cars/${carId}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    }
+                });
                 if (!response.ok) {
                     throw new Error('An error occurred');
                 }

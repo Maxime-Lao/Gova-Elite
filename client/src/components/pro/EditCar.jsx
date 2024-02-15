@@ -87,11 +87,11 @@ const EditCar = ({ carId }) => {
             }
         };
 
-        fetchWithAuthorization('http://localhost:8000/api/gears', setMyGears);
-        fetchWithAuthorization('http://localhost:8000/api/models', setAllModels);
-        fetchWithAuthorization('http://localhost:8000/api/brands', setMyBrands);
-        fetchWithAuthorization('http://localhost:8000/api/energies', setMyEnergies);
-        fetchWithAuthorization('http://localhost:8000/api/categories', setMyCategories);
+        fetchWithAuthorization('http://195.35.29.110:8000/api/gears', setMyGears);
+        fetchWithAuthorization('http://195.35.29.110:8000/api/models', setAllModels);
+        fetchWithAuthorization('http://195.35.29.110:8000/api/brands', setMyBrands);
+        fetchWithAuthorization('http://195.35.29.110:8000/api/energies', setMyEnergies);
+        fetchWithAuthorization('http://195.35.29.110:8000/api/categories', setMyCategories);
     }, []);
 
 

@@ -40,6 +40,10 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriVariables: ['userId' => new Link(fromClass: User::class, toProperty: 'author')],
             normalizationContext: ['groups' => ['comments_user:read']]
         ),
+        new GetCollection(
+            security: "is_granted('ROLE_ADMIN')",
+            normalizationContext: ['groups' => ['comments:read']]
+        ),
         new Delete(
             security: "is_granted('ROLE_ADMIN')"
         ),

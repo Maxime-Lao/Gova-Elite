@@ -22,11 +22,10 @@ class CompanieController extends AbstractController
         $userId = $request->request->get('userId');
         if ($userId) {
             $user = $em->getRepository(User::class)->find($userId);
-        }
-
-        if ($user->getRoles() == ["ROLE_PRO"]) {
-            if ($user->getCompanie() != []) {
-                throw new HttpException(400, "Cet utilisateur possède déjà une compagnie.");
+            if ($user->getRoles() == ["ROLE_PRO"]) {
+                if ($user->getCompanie() != []) {
+                    throw new HttpException(400, "Cet utilisateur possède déjà une compagnie.");
+                }
             }
         }
 

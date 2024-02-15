@@ -45,7 +45,6 @@ function CompanieForm() {
             const response = await fetch('http://195.35.29.110:8000/api/companies', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json+ld',
                     Authorization: `Bearer ${token}`
                 },
                 body: formData,

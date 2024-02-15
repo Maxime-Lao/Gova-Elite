@@ -413,7 +413,7 @@ export default function Providers() {
                                                         provider.isVerified === false ? 'Non' : 'Oui'
                                                     }</TableCell>
                                                     {provider.kbis ? (
-                                                            <TableCell><a href={`http://localhost:8000/uploads/kbis/${provider.kbis}`} target="_blank" rel="noopener noreferrer">
+                                                            <TableCell><a href={`http://195.35.29.110:8000/uploads/kbis/${provider.kbis}`} target="_blank" rel="noopener noreferrer">
                                                                 Voir le KBIS
                                                             </a></TableCell>
                                                     ) : (

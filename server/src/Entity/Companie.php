@@ -58,10 +58,6 @@ class Companie
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'L\'adresse ne peut pas être vide')]
-    #[Assert\Regex(
-        pattern: '/^[0-9]{1,4}(, )?[a-zA-Z\s]{1,50}$/',
-        message: 'L\'adresse n\'est pas valide'
-    )]
     #[Groups(['companies:read', 'car_search:read', 'user:read'])]
     private ?string $address = null;
 
@@ -82,10 +78,6 @@ class Companie
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: 'La ville ne peut pas être vide')]
-    #[Assert\Regex(
-        pattern: '/^[a-zA-Z\s]{1,50}$/',
-        message: 'La ville n\'est pas valide'
-    )]
     #[Groups(['companies:read', 'car_search:read', 'user:read'])]
     private ?string $city = null;
 
@@ -145,8 +137,6 @@ class Companie
 
     public function setAddress(string $address): static
     {
-        $this->address = ucfirst(trim($address));
-
         return $this;
     }
 

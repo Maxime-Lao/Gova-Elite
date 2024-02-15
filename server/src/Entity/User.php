@@ -49,7 +49,7 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
         new Patch(
             uriTemplate: '/users/{id}',
             processor: UserPasswordHasher::class,
-            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_USER') and object == user",
+            security: "is_granted('ROLE_ADMIN') or ((is_granted('ROLE_PRO') or is_granted('ROLE_USER')) and object == user)",
             securityMessage: "Only ADMIN users can modify users."
         ),
         new Delete(
@@ -121,10 +121,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Le numéro de téléphone ne peut pas être vide')]
-    #[Assert\Regex(
-        pattern: '/^\d+$/',
-        message: 'Le numéro de téléphone doit contenir uniquement des chiffres'
-    )]
     #[Groups(['user:read', 'user:create', 'user:update', 'companies:read'])]
     private ?string $phone = null;
 

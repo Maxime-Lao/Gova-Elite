@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations: [
         new GetCollection(
-            //security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_PRO') and object.getUser() == user",
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_PRO')",
             uriTemplate: '/users/{userId}/notifications',
             uriVariables: [
                 'userId' => new Link(fromClass: User::class, toProperty: 'user'),
@@ -39,8 +39,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Delete(
             security: "is_granted('ROLE_ADMIN')",
         ),
-    ],
-    security: "is_granted('ROLE_ADMIN')"
+    ]
 )]
 class Notification
 {

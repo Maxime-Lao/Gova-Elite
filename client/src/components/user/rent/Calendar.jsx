@@ -29,7 +29,11 @@ function Calendar({ carId, companieId }) {
     const fetchRentedTimes = async () => {
       if (!carId) return;
       try {
-        const response = await fetch(`http://195.35.29.110:8000/api/cars/${carId}`);
+        const response = await fetch(`http://195.35.29.110:8000/api/cars/${carId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
         if (!response.ok) throw new Error('Erreur lors de la récupération des données');
         const carData = await response.json();
         const rents = carData.rents || [];

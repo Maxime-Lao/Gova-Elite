@@ -32,9 +32,10 @@ const CarItem = ({ car }) => {
         try {
             await fetch(`http://195.35.29.110:8000/api/cars/${car.id}`, {
                 method: 'DELETE',
-            }, {headers: {
+                headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
-                }});
+                }
+            });
             window.location.reload()
         } catch (error) {
             console.log(error);

@@ -129,7 +129,7 @@ const CreateCar = ({companieId}) => {
     
             if (carId) {
                 try {
-                    await axios.delete(`http://localhost:8000/api/cars/${carId}`, {
+                    await axios.delete(`http://195.35.29.110:8000/api/cars/${carId}`, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                             'Content-Type': 'application/json'

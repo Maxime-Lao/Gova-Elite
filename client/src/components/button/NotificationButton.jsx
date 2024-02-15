@@ -18,7 +18,7 @@ export default function NotificationButton() {
     const fetchNotifications = async () => {
       if (user.connectedUser) {
         try {
-          const response = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}/notifications`, {
+          const response = await fetch(`http://195.35.29.110:8000/api/users/${user.connectedUser.id}/notifications`, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${token}`

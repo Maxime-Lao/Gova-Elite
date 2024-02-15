@@ -20,10 +20,10 @@ use ApiPlatform\Metadata\Link;
     operations: [
         new GetCollection(),
         new Get(),
-        new Post(security: "is_granted('ROLE_PRO')", securityMessage: "Only Muthu users can create categories."),
-        new Put(security: "is_granted('ROLE_PRO')", securityMessage: "Only Muthu users can update categories."),
-        new Patch(security: "is_granted('ROLE_PRO')", securityMessage: "Only Muthu users can modify categories."),
-        new Delete(security: "is_granted('ROLE_PRO')", securityMessage: "Only Muthu users can delete categories.")
+        new Post(security: "is_granted('ROLE_PRO')", securityMessage: "Only Muthu can create categories."),
+        new Put(security: "is_granted('ROLE_PRO')", securityMessage: "Only Muthu can update categories."),
+        new Patch(security: "is_granted('ROLE_PRO')", securityMessage: "Only Muthu can modify categories."),
+        new Delete(security: "is_granted('ROLE_PRO')", securityMessage: "Only Muthu can delete categories.")
     ]
 )]
 class Unavailability
