@@ -263,37 +263,41 @@ const EditCar = ({ carId }) => {
                             margin="normal"
                             required
                         />
-                        <FormControl fullWidth margin="normal">
-                            <InputLabel id="gear-label">Boîte de vitesse *</InputLabel>
-                            <Select
-                                labelId="gear-label"
-                                value={gear}
-                                onChange={(e) => setGear(e.target.value)}
-                                required
-                            >
-                                {myGears && myGears.map((gear) => (
-                                    <MenuItem key={'gear-' + gear.id} value={gear.id}>
-                                        {gear.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <FormControl fullWidth margin="normal">
-                            <InputLabel id="brand-label">Marque *</InputLabel>
-                            <Select
-                                labelId="brand-label"
-                                value={selectedBrandId}
-                                onChange={handleBrandChange}
-                                required
-                            >
-                                {myBrands && myBrands.map((brand) => (
-                                    <MenuItem key={'brand-' + brand.id} value={brand.id}>
-                                        {brand.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <FormControl fullWidth margin="normal">
+                        {
+                            myGears ? <FormControl fullWidth margin="normal">
+                                <InputLabel id="gear-label">Boîte de vitesse *</InputLabel>
+                                <Select
+                                    labelId="gear-label"
+                                    value={gear}
+                                    onChange={(e) => setGear(e.target.value)}
+                                    required
+                                >
+                                    {myGears.map((gear) => (
+                                        <MenuItem key={'gear-' + gear.id} value={gear.id}>
+                                            {gear.name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl> : null
+                        }
+                        {
+                            myBrands ? <FormControl fullWidth margin="normal">
+                                <InputLabel id="brand-label">Marque *</InputLabel>
+                                <Select
+                                    labelId="brand-label"
+                                    value={selectedBrandId}
+                                    onChange={handleBrandChange}
+                                    required
+                                >
+                                    {myBrands.map((brand) => (
+                                        <MenuItem key={'brand-' + brand.id} value={brand.id}>
+                                            {brand.name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl> : null
+                        }
+                        { selectedBrandId && myModels ? <FormControl fullWidth margin="normal">
                             <InputLabel id="model-label">Modèle *</InputLabel>
                             <Select
                                 labelId="model-label"
@@ -307,37 +311,41 @@ const EditCar = ({ carId }) => {
                                     </MenuItem>
                                 ))}
                             </Select>
-                        </FormControl>
-                        <FormControl fullWidth margin="normal">
-                            <InputLabel id="energy-label">Carburant *</InputLabel>
-                            <Select
-                                labelId="energy-label"
-                                value={energy}
-                                onChange={(e) => setEnergy(e.target.value)}
-                                required
-                            >
-                                {myEnergies && myEnergies.map((energy) => (
-                                    <MenuItem key={'energy-' + energy.id} value={energy.id}>
-                                        {energy.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <FormControl fullWidth margin="normal">
-                            <InputLabel id="category-label">Catégorie du véhicule *</InputLabel>
-                            <Select
-                                labelId="category-label"
-                                value={category}
-                                onChange={(e) => setCategory(e.target.value)}
-                                required
-                            >
-                                {myCategories && myCategories.map((category) => (
-                                    <MenuItem key={'category-' + category.id} value={category.id}>
-                                        {category.libelle}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                        </FormControl> : null}
+                        {
+                            myEnergies ? <FormControl fullWidth margin="normal">
+                                <InputLabel id="energy-label">Carburant *</InputLabel>
+                                <Select
+                                    labelId="energy-label"
+                                    value={energy}
+                                    onChange={(e) => setEnergy(e.target.value)}
+                                    required
+                                >
+                                    {myEnergies.map((energy) => (
+                                        <MenuItem key={'energy-' + energy.id} value={energy.id}>
+                                            {energy.name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl> : null
+                        }
+                        {
+                            myCategories ? <FormControl fullWidth margin="normal">
+                                <InputLabel id="category-label">Catégorie du véhicule *</InputLabel>
+                                <Select
+                                    labelId="category-label"
+                                    value={category}
+                                    onChange={(e) => setCategory(e.target.value)}
+                                    required
+                                >
+                                    {myCategories.map((category) => (
+                                        <MenuItem key={'category-' + category.id} value={category.id}>
+                                            {category.libelle}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl> : null
+                        }
                         <TextField
                             label="Description"
                             type="text"

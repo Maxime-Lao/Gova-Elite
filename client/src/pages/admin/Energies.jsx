@@ -25,24 +25,25 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import format from 'date-fns/format';
-import { fr } from 'date-fns/locale';
 import {createTheme, styled, ThemeProvider, useTheme} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
+import format from 'date-fns/format';
+import { fr } from 'date-fns/locale';
 import Divider from '@mui/material/Divider';
 import Badge from '@mui/material/Badge';
 import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import {MainListItems, secondaryListItems} from '../components/dashboard/ListItems.jsx';
+import {MainListItems, secondaryListItems} from '../../components/dashboard/ListItems.jsx';
 import { useMediaQuery } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
-import NavbarPro from "../components/navbar/NavbarPro.jsx";
+import Navbar from "../../components/navbar/Navbar.jsx";
+import NavbarPro from "../../components/navbar/NavbarPro.jsx";
 
 export function Copyright() {
     return (
@@ -130,16 +131,16 @@ const defaultTheme = createTheme({
     },
 });
 
-export default function Companies() {
+export default function Energies() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [open, setOpen] = useState(!isMobile);
     const [isLoading, setIsLoading] = useState(true);
-    const [companies, setCompanies] = useState([]);
+    const [energies, setEnergies] = useState([]);
     const [openCreateDialog, setOpenCreateDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [selectedCompany, setSelectedCompany] = useState(null);
+    const [selectedEnergy, setSelectedEnergy] = useState(null);
     const token = localStorage.getItem('token');
     const [formErrors, setFormErrors] = useState({});
 
@@ -148,9 +149,6 @@ export default function Companies() {
     };
 
     const [name, setName] = useState('');
-    const [address, setAddress] = useState('');
-    const [zipCode, setZipCode] = useState('');
-    const [city, setCity] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
@@ -159,10 +157,10 @@ export default function Companies() {
     }, [isMobile]);
 
     useEffect(() => {
-        const getCompanies = async () => {
+        const getEnergies = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://195.35.29.110:8000/api/companies', {
+                const response = await fetch('http://195.35.29.110:8000/api/energies', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -175,7 +173,7 @@ export default function Companies() {
                 }
 
                 const data = await response.json();
-                setCompanies(data);
+                setEnergies(data);
                 setIsLoading(false);
             } catch (error) {
                 console.error(error);
@@ -183,29 +181,26 @@ export default function Companies() {
             }
         };
 
-        getCompanies();
+        getEnergies();
     }, [token]);
 
 
-    const handleDelete = (company) => {
-        setSelectedCompany(company);
+    const handleDelete = (energy) => {
+        setSelectedEnergy(energy);
         setOpenDeleteDialog(true);
     };
 
     useEffect(() => {
-        if (selectedCompany) {
-            setName(selectedCompany.name);
-            setAddress(selectedCompany.address);
-            setZipCode(selectedCompany.zipCode);
-            setCity(selectedCompany.city);
+        if (selectedEnergy) {
+            setName(selectedEnergy.name);
         }
-    }, [selectedCompany]);    
+    }, [selectedEnergy]);    
 
     const handleCreate = async () => {
         event.preventDefault();
         
         try {
-            const response = await fetch('http://195.35.29.110:8000/api/companies', {
+            const response = await fetch('http://195.35.29.110:8000/api/energies', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -213,9 +208,6 @@ export default function Companies() {
                 },
                 body: JSON.stringify({
                     name: name,
-                    address: address,
-                    zipCode: parseInt(zipCode),
-                    city: city,
                     createdAt: new Date().toISOString(),
                 }),
             });
@@ -232,27 +224,24 @@ export default function Companies() {
                     });
                     setFormErrors(errors);
                 } else {
-                    setError('Une erreur s\'est produite lors de la création de la compagnie.');
+                    setError('Une erreur s\'est produite lors de la création de l\'énergie.');
                 }
                 return;
             } else {
                 const data = await response.json();
                 setError('');
-                setCompanies([...companies, data]);
+                setEnergies([...energies, data]);
                 setOpenCreateDialog(false);
-                setSuccess('Compagnie créée avec succès !');
+                setSuccess('Energie créée avec succès !');
             }
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la création de la compagnie.');
+            setError('Une erreur s\'est produite lors de la création de l\'énergie.');
         }
     };
 
     const handleOpenCreateDialog = () => {
         setFormErrors({});
         setName('');
-        setAddress('');
-        setZipCode('');
-        setCity('');
         setOpenCreateDialog(true);
     };
     
@@ -262,7 +251,7 @@ export default function Companies() {
 
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(`http://195.35.29.110:8000/api/companies/${selectedCompany.id}`, {
+            const response = await fetch(`http://195.35.29.110:8000/api/energies/${selectedEnergy.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -274,25 +263,25 @@ export default function Companies() {
                 throw new Error(`Erreur HTTP! Statut: ${response.status}`);
             }
 
-            const updatedCompanies = companies.filter(company => company.id !== selectedCompany.id);
+            const updatedEnergies = energies.filter(energy => energy.id !== selectedEnergy.id);
             setError('');
-            setCompanies(updatedCompanies);
+            setEnergies(updatedEnergies);
             setOpenDeleteDialog(false);
-            setSuccess('Compagnie supprimée avec succès !');
+            setSuccess('Energie supprimée avec succès !');
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la suppression de la compagnie.');
+            setError('Une erreur s\'est produite lors de la suppression de l\'énergie.');
         }
     };
 
-    const handleEdit = (company) => {
+    const handleEdit = (energy) => {
         setFormErrors({});
-        setSelectedCompany(company);
+        setSelectedEnergy(energy);
         setOpenEditDialog(true);
     };
 
     const handleUpdate = async () => {
         try {
-            const response = await fetch(`http://195.35.29.110:8000/api/companies/${selectedCompany.id}`, {
+            const response = await fetch(`http://195.35.29.110:8000/api/energies/${selectedEnergy.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/merge-patch+json',
@@ -300,9 +289,6 @@ export default function Companies() {
                 },
                 body: JSON.stringify({
                     name: name,
-                    address: address,
-                    zipCode: parseInt(zipCode),
-                    city: city,
                     updatedAt: new Date().toISOString(),
                 }),
             });
@@ -319,31 +305,28 @@ export default function Companies() {
                     });
                     setFormErrors(errors);
                 } else {
-                    setError('Une erreur s\'est produite lors de la création de la compagnie.');
+                    setError('Une erreur s\'est produite lors de la création de l\'énergie.');
                 }
                 return;
             } else {
-                const updatedCompanies = companies.map(company => {
-                    if (company.id === selectedCompany.id) {
+                const updatedEnergies = energies.map(energy => {
+                    if (energy.id === selectedEnergy.id) {
                         return {
-                            ...company,
+                            ...energy,
                             name: name,
-                            address: address,
-                            zipCode: zipCode,
-                            city: city,
                             updatedAt: new Date().toISOString(),
                         };
                     }
-                    return company;
+                    return energy;
                 });
     
                 setError('');
-                setCompanies(updatedCompanies);
+                setEnergies(updatedEnergies);
                 setOpenEditDialog(false);
-                setSuccess('Compagnie modifiée avec succès !');
+                setSuccess('Energie modifiée avec succès !');
             }
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la mise à jour de la compagnie.');
+            setError('Une erreur s\'est produite lors de la mise à jour de l\'énergie.');
         }
     };
 
@@ -353,8 +336,7 @@ export default function Companies() {
             <ThemeProvider theme={defaultTheme}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
-                
-
+                <NavbarPro />
                 <Box
                     component="main"
                     sx={{
@@ -362,7 +344,9 @@ export default function Companies() {
                             theme.palette.mode === 'light'
                                 ? theme.palette.grey[100]
                                 : theme.palette.grey[900],
-                        flexGrow: 1
+                        flexGrow: 1,
+                        height: '100vh',
+                        overflow: 'auto',
                     }}
                 >
                     <Toolbar />
@@ -375,7 +359,7 @@ export default function Companies() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des compagnies
+                            Liste des énergies
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
@@ -391,14 +375,13 @@ export default function Companies() {
         );
     }
 
-    if (!companies.length) {
+    if (!energies.length) {
         return (
 
             <ThemeProvider theme={defaultTheme}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
                 <NavbarPro />
-
                 <Box
                     component="main"
                     sx={{
@@ -406,7 +389,9 @@ export default function Companies() {
                             theme.palette.mode === 'light'
                                 ? theme.palette.grey[100]
                                 : theme.palette.grey[900],
-                        flexGrow: 1
+                        flexGrow: 1,
+                        height: '100vh',
+                        overflow: 'auto',
                     }}
                 >
                     <Toolbar />
@@ -419,7 +404,7 @@ export default function Companies() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des compagnies
+                            Liste des énergies
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                         <Grid item xs={12}>
@@ -440,12 +425,12 @@ export default function Companies() {
                                 
                                 <Box sx={{ mb: 2 }}>
                                     <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
-                                        Créer une nouvelle compagnie
+                                        Créer une nouvelle énergie
                                     </Button>
                                 </Box>
 
                                 <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
-                                    <DialogTitle>Créer une nouvelle compagnie</DialogTitle>
+                                    <DialogTitle>Créer une nouvelle énergie</DialogTitle>
                                     <form onSubmit={handleCreate}>
                                         <DialogContent>
                                             <TextField
@@ -455,34 +440,6 @@ export default function Companies() {
                                                 fullWidth
                                                 margin="normal"
                                                 error={!!formErrors.name}
-                                                required
-                                            />
-                                            <TextField
-                                                label="Address"
-                                                value={address}
-                                                onChange={(e) => setAddress(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.address}
-                                                required
-                                            />
-                                            <TextField
-                                                label="Zip code"
-                                                value={zipCode}
-                                                onChange={(e) => setZipCode(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.zipCode}
-                                                type="number"
-                                                required
-                                            />
-                                            <TextField
-                                                label="City"
-                                                value={city}
-                                                onChange={(e) => setCity(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.city}
                                                 required
                                             />
                                         </DialogContent>
@@ -507,12 +464,9 @@ export default function Companies() {
                                         <TableHead>
                                             <TableRow style={{background: '#556cd6'}}>
                                                 <TableCell style={{color: 'white'}}>Nom</TableCell>
-                                                <TableCell style={{color: 'white'}}>Adresse</TableCell>
-                                                <TableCell style={{color: 'white'}}>Code postal</TableCell>
-                                                <TableCell style={{color: 'white'}}>Ville</TableCell>
                                                 <TableCell style={{color: 'white'}}>Crée à</TableCell>
                                                 <TableCell style={{color: 'white'}}>Modifié à</TableCell>
-                                                <TableCell  style={{color: 'white'}} align="right">Actions</TableCell>
+                                                <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -520,7 +474,7 @@ export default function Companies() {
                                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                             >
                                                 <TableCell component="th" scope="row" colSpan={8} align="center">
-                                                    Aucune compagnie trouvée
+                                                    Aucune énergie trouvée
                                                 </TableCell>
                                             </TableRow>
                                         </TableBody>
@@ -540,7 +494,6 @@ export default function Companies() {
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
                 <NavbarPro />
-
                 <Box
                     component="main"
                     sx={{
@@ -561,7 +514,7 @@ export default function Companies() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des compagnies
+                            Liste des énergies
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                             <Grid item xs={12}>
@@ -582,12 +535,12 @@ export default function Companies() {
                                 
                                 <Box sx={{ mb: 2 }}>
                                     <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
-                                        Créer une nouvelle compagnie
+                                        Créer une nouvelle énergie
                                     </Button>
                                 </Box>
 
                                 <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
-                                    <DialogTitle>Créer une nouvelle compagnie</DialogTitle>
+                                    <DialogTitle>Créer une nouvelle énergie</DialogTitle>
                                     <form onSubmit={handleCreate}>
                                         <DialogContent>
                                             <TextField
@@ -597,34 +550,6 @@ export default function Companies() {
                                                 fullWidth
                                                 margin="normal"
                                                 error={!!formErrors.name}
-                                                required
-                                            />
-                                            <TextField
-                                                label="Address"
-                                                value={address}
-                                                onChange={(e) => setAddress(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.address}
-                                                required
-                                            />
-                                            <TextField
-                                                label="Zip code"
-                                                value={zipCode}
-                                                onChange={(e) => setZipCode(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.zipCode}
-                                                type="number"
-                                                required
-                                            />
-                                            <TextField
-                                                label="City"
-                                                value={city}
-                                                onChange={(e) => setCity(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.city}
                                                 required
                                             />
                                         </DialogContent>
@@ -649,33 +574,27 @@ export default function Companies() {
                                         <TableHead>
                                             <TableRow style={{background: '#556cd6'}}>
                                                 <TableCell style={{color: 'white'}}>Nom</TableCell>
-                                                <TableCell style={{color: 'white'}}>Adresse</TableCell>
-                                                <TableCell style={{color: 'white'}}>Code postal</TableCell>
-                                                <TableCell style={{color: 'white'}}>Ville</TableCell>
                                                 <TableCell style={{color: 'white'}}>Crée à</TableCell>
                                                 <TableCell style={{color: 'white'}}>Modifié à</TableCell>
-                                                <TableCell  style={{color: 'white'}} align="right">Actions</TableCell>
+                                                <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {companies.map((company) => (
+                                            {energies.map((energy) => (
                                                 <TableRow
-                                                    key={company.id}
+                                                    key={energy.id}
                                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                 >
                                                     <TableCell component="th" scope="row">
-                                                        {company.name}
+                                                        {energy.name}
                                                     </TableCell>
-                                                    <TableCell>{company.address}</TableCell>
-                                                    <TableCell>{company.zipCode}</TableCell>
-                                                    <TableCell>{company.city}</TableCell>
-                                                    <TableCell>{company.createdAt ? format(new Date(company.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
-                                                    <TableCell>{company.updatedAt ? format(new Date(company.updatedAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
+                                                    <TableCell>{energy.createdAt ? format(new Date(energy.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
+                                                    <TableCell>{energy.updatedAt ? format(new Date(energy.updatedAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
                                                     <TableCell align="right">
-                                                        <IconButton onClick={() => handleEdit(company)}>
+                                                        <IconButton onClick={() => handleEdit(energy)}>
                                                             <EditIcon />
                                                         </IconButton>
-                                                        <IconButton onClick={() => handleDelete(company)}>
+                                                        <IconButton onClick={() => handleDelete(energy)}>
                                                             <DeleteIcon />
                                                         </IconButton>
                                                     </TableCell>
@@ -689,7 +608,7 @@ export default function Companies() {
                                         >
                                             <DialogTitle>Confirmation</DialogTitle>
                                             <DialogContent>
-                                                Êtes-vous sûr de vouloir supprimer cette compagnie ?
+                                                Êtes-vous sûr de vouloir supprimer cette énergie ?
                                             </DialogContent>
                                             <DialogActions>
                                                 <Button onClick={() => setOpenDeleteDialog(false)}>Annuler</Button>
@@ -701,7 +620,7 @@ export default function Companies() {
                                             open={openEditDialog}
                                             onClose={() => setOpenEditDialog(false)}
                                         >
-                                            <DialogTitle>Modifier la compagnie</DialogTitle>
+                                            <DialogTitle>Modifier l'énergie</DialogTitle>
                                             <DialogContent>
                                                 <TextField
                                                     label="Name"
@@ -710,35 +629,6 @@ export default function Companies() {
                                                     onChange={(e) => setName(e.target.value)}
                                                     fullWidth
                                                     margin="normal"
-                                                    required
-                                                />
-                                                <TextField
-                                                    label="Address"
-                                                    type="text"
-                                                    value={address}
-                                                    onChange={(e) => setAddress(e.target.value)}
-                                                    fullWidth
-                                                    margin="normal"
-                                                    error={!!formErrors.address}
-                                                    required
-                                                />
-                                                <TextField
-                                                    label="Zip code"
-                                                    value={zipCode}
-                                                    onChange={(e) => setZipCode(e.target.value)}
-                                                    fullWidth
-                                                    margin="normal"
-                                                    type="number"
-                                                    required
-                                                />
-                                                <TextField
-                                                    label="City"
-                                                    type="text"
-                                                    value={city}
-                                                    onChange={(e) => setCity(e.target.value)}
-                                                    fullWidth
-                                                    margin="normal"
-                                                    required
                                                 />
                                             </DialogContent>
                                             <DialogActions>

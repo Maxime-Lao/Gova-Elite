@@ -24,9 +24,9 @@ import {
     Input
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
 import format from 'date-fns/format';
 import { fr } from 'date-fns/locale';
+import EditIcon from "@mui/icons-material/Edit";
 import {createTheme, styled, ThemeProvider, useTheme} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -39,10 +39,10 @@ import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import {MainListItems, secondaryListItems} from '../components/dashboard/ListItems.jsx';
+import {MainListItems, secondaryListItems} from '../../components/dashboard/ListItems.jsx';
 import { useMediaQuery } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
-import NavbarPro from "../components/navbar/NavbarPro.jsx";
+import NavbarPro from "../../components/navbar/NavbarPro.jsx";
 
 export function Copyright() {
     return (
@@ -130,16 +130,16 @@ const defaultTheme = createTheme({
     },
 });
 
-export default function Gears() {
+export default function Models() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [open, setOpen] = useState(!isMobile);
     const [isLoading, setIsLoading] = useState(true);
-    const [gears, setGears] = useState([]);
+    const [models, setModels] = useState([]);
     const [openCreateDialog, setOpenCreateDialog] = useState(false);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [selectedGear, setSelectedGear] = useState(null);
+    const [selectedModel, setSelectedModel] = useState(null);
     const token = localStorage.getItem('token');
     const [formErrors, setFormErrors] = useState({});
 
@@ -148,6 +148,8 @@ export default function Gears() {
     };
 
     const [name, setName] = useState('');
+    const [brands, setBrands] = useState([]);
+    const [selectedBrand, setSelectedBrand] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
@@ -156,10 +158,10 @@ export default function Gears() {
     }, [isMobile]);
 
     useEffect(() => {
-        const getGears = async () => {
+        const getBrands = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://195.35.29.110:8000/api/gears', {
+                const response = await fetch('http://195.35.29.110:8000/api/brands', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -172,7 +174,7 @@ export default function Gears() {
                 }
 
                 const data = await response.json();
-                setGears(data);
+                setBrands(data);
                 setIsLoading(false);
             } catch (error) {
                 console.error(error);
@@ -180,26 +182,54 @@ export default function Gears() {
             }
         };
 
-        getGears();
+        getBrands();
     }, [token]);
 
+    useEffect(() => {
+        const getModels = async () => {
+            setIsLoading(true);
+            try {
+                const response = await fetch('http://195.35.29.110:8000/api/models', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    }
+                });
 
-    const handleDelete = (gear) => {
-        setSelectedGear(gear);
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP! Statut: ${response.status}`);
+                }
+
+                const data = await response.json();
+                setModels(data);
+                setIsLoading(false);
+            } catch (error) {
+                console.error(error);
+                setIsLoading(false);
+            }
+        };
+
+        getModels();
+    }, [token]);
+    
+    const handleDelete = (model) => {
+        setSelectedModel(model);
         setOpenDeleteDialog(true);
     };
 
     useEffect(() => {
-        if (selectedGear) {
-            setName(selectedGear.name);
+        if (selectedModel) {
+            setName(selectedModel.name);
+            setSelectedBrand(selectedModel.brand.id);
         }
-    }, [selectedGear]);    
+    }, [selectedModel]);    
 
     const handleCreate = async () => {
         event.preventDefault();
         
         try {
-            const response = await fetch('http://195.35.29.110:8000/api/gears', {
+            const response = await fetch('http://195.35.29.110:8000/api/models', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -207,6 +237,7 @@ export default function Gears() {
                 },
                 body: JSON.stringify({
                     name: name,
+                    brand: `/api/brands/${selectedBrand}`,
                     createdAt: new Date().toISOString(),
                 }),
             });
@@ -223,24 +254,25 @@ export default function Gears() {
                     });
                     setFormErrors(errors);
                 } else {
-                    setError('Une erreur s\'est produite lors de la création de la boîte de vitesse.');
+                    setError('Une erreur s\'est produite lors de la création du modèle.');
                 }
                 return;
             } else {
                 const data = await response.json();
                 setError('');
-                setGears([...gears, data]);
+                setModels([...models, data]);
                 setOpenCreateDialog(false);
-                setSuccess('Boîte de vitesse créée avec succès !');
+                setSuccess('Modèle créé avec succès !');
             }
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la création de la boîte de vitesse.');
+            setError('Une erreur s\'est produite lors de la création du modèle.');
         }
     };
 
     const handleOpenCreateDialog = () => {
         setFormErrors({});
         setName('');
+        setSelectedBrand('');
         setOpenCreateDialog(true);
     };
     
@@ -250,7 +282,7 @@ export default function Gears() {
 
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(`http://195.35.29.110:8000/api/gears/${selectedGear.id}`, {
+            const response = await fetch(`http://195.35.29.110:8000/api/models/${selectedModel.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -262,25 +294,25 @@ export default function Gears() {
                 throw new Error(`Erreur HTTP! Statut: ${response.status}`);
             }
 
-            const updatedGears = gears.filter(gear => gear.id !== selectedGear.id);
+            const updatedModels = models.filter(model => model.id !== selectedModel.id);
             setError('');
-            setGears(updatedGears);
+            setModels(updatedModels);
             setOpenDeleteDialog(false);
-            setSuccess('Boîte de vitesse supprimée avec succès !');
+            setSuccess('Modèle supprimé avec succès !');
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la suppression de la boîte de vitesse.');
+            setError('Une erreur s\'est produite lors de la suppression du modèle.');
         }
     };
 
-    const handleEdit = (gear) => {
+    const handleEdit = (model) => {
         setFormErrors({});
-        setSelectedGear(gear);
+        setSelectedModel(model);
         setOpenEditDialog(true);
     };
 
     const handleUpdate = async () => {
         try {
-            const response = await fetch(`http://195.35.29.110:8000/api/gears/${selectedGear.id}`, {
+            const response = await fetch(`http://195.35.29.110:8000/api/models/${selectedModel.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/merge-patch+json',
@@ -288,6 +320,7 @@ export default function Gears() {
                 },
                 body: JSON.stringify({
                     name: name,
+                    brand: `/api/brands/${selectedBrand}`,
                     updatedAt: new Date().toISOString(),
                 }),
             });
@@ -304,28 +337,25 @@ export default function Gears() {
                     });
                     setFormErrors(errors);
                 } else {
-                    setError('Une erreur s\'est produite lors de la création de la boîte de vitesse.');
+                    setError('Une erreur s\'est produite lors de la création du modèle.');
                 }
                 return;
             } else {
-                const updatedGears = gears.map(gear => {
-                    if (gear.id === selectedGear.id) {
-                        return {
-                            ...gear,
-                            name: name,
-                            updatedAt: new Date().toISOString(),
-                        };
-                    }
-                    return gear;
-                });
+                const updatedModel = await response.json();
+                const updatedModels = models.map(model => {
+                if (model.id === selectedModel.id) {
+                    return updatedModel;
+                }
+                return model;
+            });
     
                 setError('');
-                setGears(updatedGears);
+                setModels(updatedModels);
                 setOpenEditDialog(false);
-                setSuccess('Boîte de vitesse modifiée avec succès !');
+                setSuccess('Modèle modifié avec succès !');
             }
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la mise à jour de la boîte de vitesse.');
+            setError('Une erreur s\'est produite lors de la mise à jour du modèle.');
         }
     };
 
@@ -335,225 +365,7 @@ export default function Gears() {
             <ThemeProvider theme={defaultTheme}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
-                <AppBar position="absolute" open={open}>
-                    <Toolbar sx={{ pr: '24px' }}>
-                        <IconButton
-                            edge="start"
-                            color="inherit"
-                            aria-label="open drawer"
-                            onClick={toggleDrawer}
-                            sx={{
-                                marginRight: '36px',
-                                ...(open && { display: 'none' }),
-                            }}
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <Typography
-                            component="h1"
-                            variant="h6"
-                            color="inherit"
-                            noWrap
-                            sx={{ flexGrow: 1 }}
-                        >
-                            Dashboard
-                        </Typography>
-                        <IconButton color="inherit">
-                            <Badge badgeContent={4} color="secondary">
-                                <NotificationsIcon />
-                            </Badge>
-                        </IconButton>
-                    </Toolbar>
-                </AppBar>
-
-                <Box
-                    component="main"
-                    sx={{
-                        backgroundColor: (theme) =>
-                            theme.palette.mode === 'light'
-                                ? theme.palette.grey[100]
-                                : theme.palette.grey[900],
-                        flexGrow: 1,
-                        height: '100vh',
-                        overflow: 'auto',
-                    }}
-                >
-                    <Toolbar />
-                    <Box
-                        sx={{
-                            mt: 4,
-                            mb: 4,
-                            flexGrow: 1,
-                            paddingX: 5,
-                        }}
-                    >
-                        <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des boîtes de vitesse
-                        </Typography>
-                        <Grid container spacing={3} justifyContent="center">
-                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-                                <Box sx={{ display: 'flex' }}>
-                                    <CircularProgress />
-                                </Box>
-                            </div>
-                        </Grid>
-                    </Box>
-                </Box>
-            </Box>
-        </ThemeProvider>
-        );
-    }
-
-    if (!gears.length) {
-        return (
-
-            <ThemeProvider theme={defaultTheme}>
-            <Box sx={{ display: 'flex' }}>
-                <CssBaseline />
-                <AppBar position="absolute" open={open}>
-                    <Toolbar sx={{ pr: '24px' }}>
-                        <IconButton
-                            edge="start"
-                            color="inherit"
-                            aria-label="open drawer"
-                            onClick={toggleDrawer}
-                            sx={{
-                                marginRight: '36px',
-                                ...(open && { display: 'none' }),
-                            }}
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        <Typography
-                            component="h1"
-                            variant="h6"
-                            color="inherit"
-                            noWrap
-                            sx={{ flexGrow: 1 }}
-                        >
-                            Dashboard
-                        </Typography>
-                        <IconButton color="inherit">
-                            <Badge badgeContent={4} color="secondary">
-                                <NotificationsIcon />
-                            </Badge>
-                        </IconButton>
-                    </Toolbar>
-                </AppBar>
-
-                <Box
-                    component="main"
-                    sx={{
-                        backgroundColor: (theme) =>
-                            theme.palette.mode === 'light'
-                                ? theme.palette.grey[100]
-                                : theme.palette.grey[900],
-                        flexGrow: 1,
-                        height: '100vh',
-                        overflow: 'auto',
-                    }}
-                >
-                    <Toolbar />
-                    <Box
-                        sx={{
-                            mt: 4,
-                            mb: 4,
-                            flexGrow: 1,
-                            paddingX: 5,
-                        }}
-                    >
-                        <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des boîtes de vitesse
-                        </Typography>
-                        <Grid container spacing={3} justifyContent="center">
-                        <Grid item xs={12}>
-                                {
-                                    success.length ? (
-                                        <Box mt={2} textAlign="center">
-                                            <p style={{color: 'green'}}>{success}</p>
-                                        </Box>
-                                    ) : null
-                                }
-                                {
-                                    error.length ? (
-                                        <Box mt={2} textAlign="center">
-                                            <p style={{color: 'red'}}>{error}</p>
-                                        </Box>
-                                    ) : null
-                                }
-                                
-                                <Box sx={{ mb: 2 }}>
-                                    <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
-                                        Créer une nouvelle boîte de vitesse
-                                    </Button>
-                                </Box>
-
-                                <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
-                                    <DialogTitle>Créer une nouvelle boîte de vitesse</DialogTitle>
-                                    <form onSubmit={handleCreate}>
-                                        <DialogContent>
-                                            <TextField
-                                                label="Name"
-                                                value={name}
-                                                onChange={(e) => setName(e.target.value)}
-                                                fullWidth
-                                                margin="normal"
-                                                error={!!formErrors.name}
-                                                required
-                                            />
-                                        </DialogContent>
-                                        <DialogActions>
-                                            <Button onClick={handleCloseCreateDialog}>Annuler</Button>
-                                            <Button type="submit">Créer</Button>
-                                        </DialogActions>
-                                    </form>
-                                    {Object.keys(formErrors).length > 0 && (
-                                        <Box sx={{ margin: 2 }}>
-                                            {Object.values(formErrors).map((error, index) => (
-                                                <Typography key={index} color="error">
-                                                    - {error}
-                                                </Typography>
-                                            ))}
-                                        </Box>
-                                    )}
-                                </Dialog>
-
-                                <TableContainer component={Paper}>
-                                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                                        <TableHead>
-                                            <TableRow style={{background: '#556cd6'}}>
-                                                <TableCell style={{color: 'white'}}>Nom</TableCell>
-                                                <TableCell style={{color: 'white'}}>Crée à</TableCell>
-                                                <TableCell style={{color: 'white'}}>Modifié à</TableCell>
-                                                <TableCell  style={{color: 'white'}}align="right">Actions</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            <TableRow
-                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                            >
-                                                <TableCell component="th" scope="row" colSpan={8} align="center">
-                                                    Aucune boîte de vitesse trouvée
-                                                </TableCell>
-                                            </TableRow>
-                                        </TableBody>
-                                    </Table>
-                                </TableContainer>
-                            </Grid>
-                        </Grid>
-                    </Box>
-                </Box>
-            </Box>
-        </ThemeProvider>
-        );
-    }
-
-    return (
-        <ThemeProvider theme={defaultTheme}>
-            <Box sx={{ display: 'flex' }}>
-                <CssBaseline />
                 <NavbarPro />
-
                 <Box
                     component="main"
                     sx={{
@@ -574,10 +386,98 @@ export default function Gears() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des boîtes de vitesse
+                            Liste des compagnies
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
-                            <Grid item xs={12}>
+                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+                                <Box sx={{ display: 'flex' }}>
+                                    <CircularProgress />
+                                </Box>
+                            </div>
+                        </Grid>
+                    </Box>
+                </Box>
+            </Box>
+        </ThemeProvider>
+        );
+    }
+
+    if (!models.length) {
+        return (
+
+            <ThemeProvider theme={defaultTheme}>
+            <Box sx={{ display: 'flex' }}>
+                <CssBaseline />
+                <NavbarPro />
+                <Box
+                    component="main"
+                    sx={{
+                        backgroundColor: (theme) =>
+                            theme.palette.mode === 'light'
+                                ? theme.palette.grey[100]
+                                : theme.palette.grey[900],
+                        flexGrow: 1
+                    }}
+                >
+                    <Toolbar />
+                    <Box
+                        sx={{
+                            mt: 4,
+                            mb: 4,
+                            flexGrow: 1,
+                            paddingX: 5,
+                        }}
+                    >
+                        <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
+                            Liste des modèles
+                        </Typography>
+                        <Grid container spacing={3} justifyContent="center">
+                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+                                <Box sx={{ display: 'flex' }}>
+                                    <CircularProgress />
+                                </Box>
+                            </div>
+                        </Grid>
+                    </Box>
+                </Box>
+            </Box>
+        </ThemeProvider>
+        );
+    }
+
+    if (!models.length) {
+        return (
+
+            <ThemeProvider theme={defaultTheme}>
+            <Box sx={{ display: 'flex' }}>
+                <CssBaseline />
+                <NavbarPro />
+                <Box
+                    component="main"
+                    sx={{
+                        backgroundColor: (theme) =>
+                            theme.palette.mode === 'light'
+                                ? theme.palette.grey[100]
+                                : theme.palette.grey[900],
+                        flexGrow: 1,
+                        height: '100vh',
+                        overflow: 'auto',
+                    }}
+                >
+                    <Toolbar />
+                    <Box
+                        sx={{
+                            mt: 4,
+                            mb: 4,
+                            flexGrow: 1,
+                            paddingX: 5,
+                        }}
+                    >
+                        <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
+                            Liste des modèles
+                        </Typography>
+                        <Grid container spacing={3} justifyContent="center">
+                        <Grid item xs={12}>
                                 {
                                     success.length ? (
                                         <Box mt={2} textAlign="center">
@@ -595,12 +495,12 @@ export default function Gears() {
                                 
                                 <Box sx={{ mb: 2 }}>
                                     <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
-                                        Créer une nouvelle boîte de vitesse
+                                        Créer un nouveau modèle
                                     </Button>
                                 </Box>
 
                                 <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
-                                    <DialogTitle>Créer une nouvelle boîte de vitesse</DialogTitle>
+                                    <DialogTitle>Créer un nouveau modèle</DialogTitle>
                                     <form onSubmit={handleCreate}>
                                         <DialogContent>
                                             <TextField
@@ -612,6 +512,20 @@ export default function Gears() {
                                                 error={!!formErrors.name}
                                                 required
                                             />
+                                            <FormControl fullWidth margin="normal">
+                                                <InputLabel>Marques</InputLabel>
+                                                <Select
+                                                    value={selectedBrand}
+                                                    onChange={(e) => setSelectedBrand(e.target.value)}
+                                                    required
+                                                >
+                                                    {brands.map((brand) => (
+                                                        <MenuItem key={brand.id} value={brand.id}>
+                                                            {brand.name}
+                                                        </MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
                                         </DialogContent>
                                         <DialogActions>
                                             <Button onClick={handleCloseCreateDialog}>Annuler</Button>
@@ -634,27 +548,154 @@ export default function Gears() {
                                         <TableHead>
                                             <TableRow style={{background: '#556cd6'}}>
                                                 <TableCell style={{color: 'white'}}>Nom</TableCell>
+                                                <TableCell style={{color: 'white'}}>Marque</TableCell>
                                                 <TableCell style={{color: 'white'}}>Crée à</TableCell>
                                                 <TableCell style={{color: 'white'}}>Modifié à</TableCell>
-                                                <TableCell  style={{color: 'white'}}align="right">Actions</TableCell>
+                                                <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {gears.map((gear) => (
+                                            <TableRow
+                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                            >
+                                                <TableCell component="th" scope="row" colSpan={8} align="center">
+                                                    Aucun modèle trouvé
+                                                </TableCell>
+                                            </TableRow>
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Grid>
+                        </Grid>
+                    </Box>
+                </Box>
+            </Box>
+        </ThemeProvider>
+        );
+    }
+
+    return (
+        <ThemeProvider theme={defaultTheme}>
+            <Box sx={{ display: 'flex' }}>
+                <CssBaseline />
+                <NavbarPro />
+                <Box
+                    component="main"
+                    sx={{
+                        backgroundColor: (theme) =>
+                            theme.palette.mode === 'light'
+                                ? theme.palette.grey[100]
+                                : theme.palette.grey[900],
+                        flexGrow: 1
+                    }}
+                >
+                    <Toolbar />
+                    <Box
+                        sx={{
+                            mt: 4,
+                            mb: 4,
+                            flexGrow: 1,
+                            paddingX: 5,
+                        }}
+                    >
+                        <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
+                            Liste des modèles
+                        </Typography>
+                        <Grid container spacing={3} justifyContent="center">
+                            <Grid item xs={12}>
+                                {
+                                    success.length ? (
+                                        <Box mt={2} textAlign="center">
+                                            <p style={{color: 'green'}}>{success}</p>
+                                        </Box>
+                                    ) : null
+                                }
+                                {
+                                    error.length ? (
+                                        <Box mt={2} textAlign="center">
+                                            <p style={{color: 'red'}}>{error}</p>
+                                        </Box>
+                                    ) : null
+                                }
+                                
+                                <Box sx={{ mb: 2 }}>
+                                    <Button variant="contained" color="primary" onClick={handleOpenCreateDialog}>
+                                        Créer un nouveau modèle
+                                    </Button>
+                                </Box>
+
+                                <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog}>
+                                    <DialogTitle>Créer un nouveau modèle</DialogTitle>
+                                    <form onSubmit={handleCreate}>
+                                        <DialogContent>
+                                            <TextField
+                                                label="Name"
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
+                                                fullWidth
+                                                margin="normal"
+                                                error={!!formErrors.name}
+                                                required
+                                            />
+                                            <FormControl fullWidth margin="normal">
+                                                <InputLabel>Marques</InputLabel>
+                                                <Select
+                                                    value={selectedBrand}
+                                                    onChange={(e) => setSelectedBrand(e.target.value)}
+                                                    required
+                                                >
+                                                    {brands.map((brand) => (
+                                                        <MenuItem key={brand.id} value={brand.id}>
+                                                            {brand.name}
+                                                        </MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        </DialogContent>
+                                        <DialogActions>
+                                            <Button onClick={handleCloseCreateDialog}>Annuler</Button>
+                                            <Button type="submit">Créer</Button>
+                                        </DialogActions>
+                                    </form>
+                                    {Object.keys(formErrors).length > 0 && (
+                                        <Box sx={{ margin: 2 }}>
+                                            {Object.values(formErrors).map((error, index) => (
+                                                <Typography key={index} color="error">
+                                                    - {error}
+                                                </Typography>
+                                            ))}
+                                        </Box>
+                                    )}
+                                </Dialog>
+
+                                <TableContainer component={Paper}>
+                                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                                        <TableHead>
+                                            <TableRow style={{background: '#556cd6'}}>
+                                                <TableCell style={{color: 'white'}}>Nom</TableCell>
+                                                <TableCell style={{color: 'white'}}>Marque</TableCell>
+                                                <TableCell style={{color: 'white'}}>Crée à</TableCell>
+                                                <TableCell style={{color: 'white'}}>Modifié à</TableCell>
+                                                <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {models.map((model) => (
                                                 <TableRow
-                                                    key={gear.id}
+                                                    key={model.id}
                                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                 >
                                                     <TableCell component="th" scope="row">
-                                                        {gear.name}
+                                                        {model.name}
                                                     </TableCell>
-                                                    <TableCell>{gear.createdAt ? format(new Date(gear.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
-                                                    <TableCell>{gear.updatedAt ? format(new Date(gear.updatedAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
+                                                    <TableCell>{model.brand ? model.brand.name : ''}</TableCell>
+                                                    <TableCell>{model.createdAt ? format(new Date(model.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
+                                                    <TableCell>{model.updatedAt ? format(new Date(model.updatedAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
                                                     <TableCell align="right">
-                                                        <IconButton onClick={() => handleEdit(gear)}>
+                                                        <IconButton onClick={() => handleEdit(model)}>
                                                             <EditIcon />
                                                         </IconButton>
-                                                        <IconButton onClick={() => handleDelete(gear)}>
+                                                        <IconButton onClick={() => handleDelete(model)}>
                                                             <DeleteIcon />
                                                         </IconButton>
                                                     </TableCell>
@@ -668,7 +709,7 @@ export default function Gears() {
                                         >
                                             <DialogTitle>Confirmation</DialogTitle>
                                             <DialogContent>
-                                                Êtes-vous sûr de vouloir supprimer cette boîte de vitesse ?
+                                                Êtes-vous sûr de vouloir supprimer ce modèle ?
                                             </DialogContent>
                                             <DialogActions>
                                                 <Button onClick={() => setOpenDeleteDialog(false)}>Annuler</Button>
@@ -680,7 +721,7 @@ export default function Gears() {
                                             open={openEditDialog}
                                             onClose={() => setOpenEditDialog(false)}
                                         >
-                                            <DialogTitle>Modifier la boîte de vitesse</DialogTitle>
+                                            <DialogTitle>Modifier le modèle</DialogTitle>
                                             <DialogContent>
                                                 <TextField
                                                     label="Name"
@@ -690,6 +731,19 @@ export default function Gears() {
                                                     fullWidth
                                                     margin="normal"
                                                 />
+                                                <FormControl fullWidth margin="normal">
+                                                    <InputLabel>Marques</InputLabel>
+                                                    <Select
+                                                        value={selectedBrand}
+                                                        onChange={(e) => setSelectedBrand(e.target.value)}
+                                                    >
+                                                        {brands.map((brand) => (
+                                                            <MenuItem key={brand.id} value={brand.id}>
+                                                                {brand.name}
+                                                            </MenuItem>
+                                                        ))}
+                                                    </Select>
+                                                </FormControl>
                                             </DialogContent>
                                             <DialogActions>
                                                 <Button onClick={() => setOpenEditDialog(false)}>Annuler</Button>

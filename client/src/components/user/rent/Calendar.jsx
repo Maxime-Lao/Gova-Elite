@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import useGetConnectedUser from "./hooks/useGetConnectedUser.jsx";
+import useGetConnectedUser from "../../hooks/useGetConnectedUser.jsx";
 import { Grid, Typography, Button, TextField, Modal, Box } from '@mui/material';
-import StripePaymentForm from './StripePaymentForm';
+import StripePaymentForm from '../../stripe/StripePaymentForm.jsx';
+import { useNavigate } from "react-router-dom";
+import { is } from 'date-fns/locale';
 
 function Calendar({ carId, companieId }) {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [carData, setCarData] = useState(0);
   const user = useGetConnectedUser();
+  const navigate = useNavigate();
+  const [unavailabilityDates, setUnavailabilityDates] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
   const [rentedTimes, setRentedTimes] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,17 +30,23 @@ function Calendar({ carId, companieId }) {
         if (!response.ok) throw new Error('Erreur lors de la récupération des données');
         const carData = await response.json();
         const rents = carData.rents || [];
-        
+        const unavailability = carData.unavailability || [];
+
         setCarData(carData);
         setRentedTimes(rents.map(({ dateStart, dateEnd }) => ({
           startDate: new Date(dateStart),
           endDate: new Date(dateEnd),
         })));
+
+        setUnavailabilityDates(unavailability.map(({ date_start, date_end }) => ({
+          startDate: new Date(date_start),
+          endDate: new Date(date_end),
+        })));
       } catch (error) {
         console.error('Erreur:', error);
       }
     };
-
+  
     fetchRentedTimes();
   }, [carId]);
 
@@ -49,15 +59,23 @@ function Calendar({ carId, companieId }) {
     }
   }, [startDate, endDate, carData]);
 
-  const excludeDates = useMemo(() => rentedTimes.flatMap(rent => {
-    const dates = [];
-    let currentDate = new Date(rent.startDate);
-    while (currentDate <= rent.endDate) {
-      dates.push(new Date(currentDate));
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-    return dates;
-  }), [rentedTimes]);
+  const calculateExcludedDates = (ranges) => {
+    return ranges.flatMap(range => {
+      const dates = [];
+      let currentDate = new Date(range.startDate);
+      while (currentDate <= range.endDate) {
+        dates.push(new Date(currentDate));
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      return dates;
+    });
+  };
+
+  const excludeDates = useMemo(() => {
+    const rentedDates = calculateExcludedDates(rentedTimes);
+    const unavailableDates = calculateExcludedDates(unavailabilityDates);
+    return [...rentedDates, ...unavailableDates];
+  }, [rentedTimes, unavailabilityDates]);
  
   const handleRentalSubmit = useCallback(async (paymentIntent) => {
     if (startDate && endDate) {
@@ -114,27 +132,36 @@ function Calendar({ carId, companieId }) {
   }, [startDate, endDate, rentedTimes, carId]);
 
   const handleOpenModal = () => {
-
     if (!user || !user.connectedUser || user.connectedUser.length === 0) {
-      setError('Vous devez être connecté pour pourvoir payer !');
+      navigate('/login');
       setSuccessMessage('');
       return;
     }
-
-    const isDatesValid = rentedTimes.every(rent => {
-      const selectedStart = startDate.getTime();
-      const selectedEnd = endDate.getTime();
+  
+    const selectedStart = startDate.getTime();
+    const selectedEnd = endDate.getTime();
+  
+    const isDateOverlap = (dateStart, dateEnd) => {
+      return (
+        (selectedStart >= dateStart && selectedStart <= dateEnd) ||
+        (selectedEnd >= dateStart && selectedEnd <= dateEnd) ||
+        (selectedStart <= dateStart && selectedEnd >= dateEnd)
+      );
+    };
+  
+    const isDatesOverlapRented = rentedTimes.some(rent => {
       const rentStart = new Date(rent.startDate).getTime();
       const rentEnd = new Date(rent.endDate).getTime();
-  
-      return !(
-        (selectedStart >= rentStart && selectedStart <= rentEnd) ||
-        (selectedEnd >= rentStart && selectedEnd <= rentEnd) ||
-        (selectedStart <= rentStart && selectedEnd >= rentEnd)
-      );
+      return isDateOverlap(rentStart, rentEnd);
     });
   
-    if (!isDatesValid) {
+    const isDatesOverlapUnavailable = unavailabilityDates.some(unavailable => {
+      const unavailableStart = new Date(unavailable.startDate).getTime();
+      const unavailableEnd = new Date(unavailable.endDate).getTime();
+      return isDateOverlap(unavailableStart, unavailableEnd);
+    });
+  
+    if (isDatesOverlapRented || isDatesOverlapUnavailable) {
       setError('La voiture n\'est pas disponible pour les dates sélectionnées.');
       setSuccessMessage('');
       return;
@@ -162,6 +189,14 @@ function Calendar({ carId, companieId }) {
     }
   };
 
+  const isUnavailable = date => {
+    return unavailabilityDates.some(unavailable => {
+      const start = new Date(unavailable.startDate).setHours(0, 0, 0, 0);
+      const end = new Date(unavailable.endDate).setHours(23, 59, 59, 999);
+      return date >= start && date <= end;
+    });
+  };
+
   return (
     <>
     <Grid container spacing={2} justifyContent="center">
@@ -184,6 +219,7 @@ function Calendar({ carId, companieId }) {
               dateFormat="MMMM d, yyyy h:mm aa"
               placeholderText="Date et heure de début"
               excludeDates={excludeDates}
+              dayClassName={date => isUnavailable(date) ? 'bg-red-500' : undefined}
             />
           </Grid>
           <Grid item xs={12}>
@@ -198,6 +234,7 @@ function Calendar({ carId, companieId }) {
               dateFormat="MMMM d, yyyy h:mm aa"
               placeholderText="Date et heure de fin"
               excludeDates={excludeDates}
+              dayClassName={date => isUnavailable(date) ? 'bg-red-500' : undefined}
             />
           </Grid>
           <Grid item xs={12}>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from "../../components/navbar/Navbar.jsx";
-import Calendar from "../../components/Calendar";
+import Calendar from "../../components/user/rent/Calendar.jsx";
 import { Grid, Typography, List, ListItem, ListItemText, ListItemIcon, Card, CardContent, IconButton } from '@mui/material';
 import { CarRental, ArrowForwardIos, ArrowBackIos } from '@mui/icons-material';
 import CircularProgress from '@mui/material/CircularProgress';

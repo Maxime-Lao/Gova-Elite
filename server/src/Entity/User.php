@@ -146,6 +146,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups('user:read')]
     private Collection $notices;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Notification::class, orphanRemoval: true)]
+    private Collection $notifications;
+
     #[ORM\Column(nullable: true)]
     #[Groups(['user:create', 'user:update','user:read'])]
     private ?\DateTimeImmutable $createdAt = null;
@@ -396,6 +399,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if ($this->notices->removeElement($notice)) {
             if ($notice->getUser() === $this) {
                 $notice->setUser(null);
+            }
+        }
+        return $this;
+    }
+
+    public function addNotification(Notification $notification): static
+    {
+        if (!$this->notifications->contains($notification)) {
+            $this->notifications->add($notification);
+            $notification->setUser($this);
+        }
+        return $this;
+    }
+
+    public function removeNotification(Notification $notification): static
+    {
+        if ($this->notifications->removeElement($notification)) {
+            if ($notification->getUser() === $this) {
+                $notification->setUser(null);
             }
         }
         return $this;

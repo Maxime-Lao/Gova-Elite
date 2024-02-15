@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { styled } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
@@ -25,7 +25,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import { useNavigate } from "react-router-dom";
-import StripePaymentFormUpdate from './StripePaymentFormUpdate';
+import StripePaymentFormUpdate from '../../stripe/StripePaymentFormUpdate';
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -51,6 +51,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
   const [error, setError] = useState('');
   const [open, setOpen] = useState(false);
   const [rentalSuccessMessage, setRentalSuccessMessage] = useState('');
+  const [unavailabilityDates, setUnavailabilityDates] = useState([]);
   const navigate = useNavigate();
 
   const isRentButtonDisabled = !startDate || !endDate;
@@ -110,6 +111,26 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
     }
   }, [startDate, endDate, rent]);
 
+  useEffect(() => {
+    const unavailability = rent.car.unavailability || [];
+    setUnavailabilityDates(unavailability.map(({ date_start, date_end }) => ({
+      startDate: new Date(date_start),
+      endDate: new Date(date_end),
+    })));
+  }, [rent]);
+
+  const calculateExcludedDates = (ranges) => {
+    return ranges.flatMap(range => {
+      const dates = [];
+      let currentDate = new Date(range.startDate);
+      while (currentDate <= range.endDate) {
+        dates.push(new Date(currentDate));
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      return dates;
+    });
+  };
+  
   const fetchUpdatedRentedTimes = async (carId) => {
     try {
       const response = await fetch(`http://195.35.29.110:8000/api/cars/${carId}/rents`);
@@ -205,6 +226,27 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
       }
       return true;
     });
+
+    const isUnavailable = unavailabilityDates.some(unavailable => {
+      const selectedStart = startDate.getTime();
+      const selectedEnd = endDate.getTime();
+      const unavailableStart = new Date(unavailable.startDate).getTime();
+      const unavailableEnd = new Date(unavailable.endDate).getTime();
+
+      if (
+        (selectedStart >= unavailableStart && selectedStart <= unavailableEnd) ||
+        (selectedEnd >= unavailableStart && selectedEnd <= unavailableEnd) ||
+        (selectedStart <= unavailableStart && selectedEnd >= unavailableEnd)
+      ) {
+        return false;
+      }
+      return true;
+    });
+
+    if (!isUnavailable) {
+      setError('La voiture n\'est pas disponible pour les dates sélectionnées.');
+      return;
+    }
   
     if (!isDatesValid) {
       setError('La voiture n\'est pas disponible pour les dates sélectionnées.');
@@ -233,17 +275,35 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
     }
   };
 
+  const excludeDates = useMemo(() => {
+    const unavailabilityDatesExcluded = calculateExcludedDates(unavailabilityDates);
+    return [...unavailabilityDatesExcluded];
+  }, [unavailabilityDates]);
+  
+  const isUnavailable = date => {
+    return unavailabilityDates.some(({ startDate, endDate }) => {
+      const start = new Date(startDate).setHours(0, 0, 0, 0);
+      const end = new Date(endDate).setHours(23, 59, 59, 999);
+      return date >= start && date <= end;
+    });
+  };  
+
   return (
     <Card sx={{ maxWidth: 345 }}>
       <CardHeader
-        title={rent.car.model.name}
+        title={rent.car.model.brand.name + ' - ' + rent.car.model.name + ' - ' + rent.car.year}
         subheader={rent.car.companie.name}
       />
       <CardMedia
         component="img"
         height="194"
-        image="https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-        alt="Paella dish"
+        image={rent.car.media[0].filePath ? `http://localhost:8000/media/${rent.car.media[0].filePath}` : "https://source.unsplash.com/random"}
+        alt={`${rent.car.model.name} image`}
+        sx={{
+          width: '100%',
+          height: 194,
+          objectFit: 'cover',
+        }}
       />
       <CardContent>
         <Grid container alignItems="center" spacing={1}>
@@ -351,6 +411,8 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
                     return (isCurrentUserReservation && currentDate >= rentStart && currentDate <= rentEnd) || (!isCurrentUserReservation && (currentDate < rentStart || currentDate > rentEnd));
                   });
                 }}
+                excludeDates={excludeDates}
+                dayClassName={date => isUnavailable(date) ? 'bg-red-500' : undefined}
               />
             </Grid>
             <Grid item xs={12}>
@@ -377,6 +439,8 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
                     return (isCurrentUserReservation && currentDate >= rentStart && currentDate <= rentEnd) || (!isCurrentUserReservation && (currentDate < rentStart || currentDate > rentEnd));
                   });
                 }}
+                excludeDates={excludeDates}
+                dayClassName={date => isUnavailable(date) ? 'bg-red-500' : undefined}
               />
             </Grid>
             <Grid item xs={12}>

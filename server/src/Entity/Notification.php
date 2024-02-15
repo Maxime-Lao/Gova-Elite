@@ -5,9 +5,18 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\NotificationRepository;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]
 #[ApiResource]
+#[ApiResource(
+    uriTemplate: '/users/{userId}/notifications',
+    uriVariables: [
+        'userId' => new Link(fromClass: User::class, toProperty: 'user'),
+    ],
+    operations: [new GetCollection()],
+)]
 class Notification
 {
     #[ORM\Id]
@@ -21,6 +30,10 @@ class Notification
     #[ORM\ManyToOne(inversedBy: 'notification')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
+
+    #[ORM\Column(type: 'boolean')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?bool $isRead = false;
 
     public function getId(): ?int
     {
@@ -47,6 +60,18 @@ class Notification
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getIsRead(): ?bool
+    {
+        return $this->isRead;
+    }
+
+    public function setIsRead(bool $isRead): static
+    {
+        $this->isRead = $isRead;
 
         return $this;
     }

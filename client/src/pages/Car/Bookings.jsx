@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Grid, Typography } from '@mui/material';
 import Navbar from "../../components/navbar/Navbar.jsx";
-import CurrentBookingsCard from "../../components/CurrentBookingsCard.jsx";
+import CurrentBookingsCard from "../../components/user/booking/CurrentBookingsCard.jsx";
 import PastBookingsCard from "../../components/PastBookingsCard.jsx";
 import CircularProgress from '@mui/material/CircularProgress';
 import useGetConnectedUser from "../../components/hooks/useGetConnectedUser.jsx";

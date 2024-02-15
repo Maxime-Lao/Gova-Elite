@@ -1,7 +1,8 @@
 import './App.css'
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './components/routes/ProtectedRoute.jsx';
+import PublicRoute from './components/routes/PublicRoute.jsx';
 import Home from './pages/Home';
 import CarDetails from './pages/Car/CarDetails';
 import Bookings from './pages/Car/Bookings';
@@ -11,25 +12,25 @@ import myTheme from './theme';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import RegisterPage from "./pages/Register.jsx";
 import Login from "./pages/Login.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
-import Users from "./pages/Users.jsx";
-import Providers from './pages/Providers.jsx';
-import Brands from './pages/Brands.jsx';
-import Categories from './pages/Categories.jsx';
-import Gears from './pages/Gears.jsx';
-import Energies from './pages/Energies.jsx';
-import Companies from './pages/Companies.jsx';
+import Dashboard from "./pages/admin/Dashboard.jsx";
+import Users from "./pages/admin/Users.jsx";
+import Providers from './pages/admin/Providers.jsx';
+import Brands from './pages/admin/Brands.jsx';
+import Categories from './pages/admin/Categories.jsx';
+import Gears from './pages/admin/Gears.jsx';
+import Energies from './pages/admin/Energies.jsx';
+import Companies from './pages/admin/Companies.jsx';
 import IdentifyEmail from "./components/login/IdentifyEmail.jsx";
 import ResetPassword from "./components/login/ResetPassword.jsx";
 import Account from "./components/account/Account.jsx";
-import PaymentSuccess from './pages/PaymentSuccess.jsx';
-import UpdatePaymentSuccess from './pages/UpdatePaymentSucces.jsx';
+import PaymentSuccess from './pages/stripe/PaymentSuccess.jsx';
+import UpdatePaymentSuccess from './pages/stripe/UpdatePaymentSucces.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import CreateCompanie from "./pages/CreateCompanie.jsx";
-import Rents from './pages/Rents.jsx';
-import Comments from './pages/Comments.jsx';
-import Cars from './pages/Cars.jsx';
-import Models from './pages/Models.jsx';
+import Rents from './pages/admin/Rents.jsx';
+import Comments from './pages/admin/Comments.jsx';
+import Cars from './pages/admin/Cars.jsx';
+import Models from './pages/admin/Models.jsx';
 import CarDetailsPro from "./components/pro/CarDetailsPro.jsx";
 import { useJsApiLoader } from '@react-google-maps/api';
 import { useState } from 'react';
@@ -49,8 +50,8 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/search" element={<SearchResult isMapLoaded={isLoaded} />} />
               <Route path="/cars/:id" element={<CarDetails />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+              <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
               <Route path="/admin/dashboard" element={
                 <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
                   <Dashboard />
@@ -117,7 +118,7 @@ function App() {
                   <Comments />
                 </ProtectedRoute>
               } />
-              <Route path="/login/identify" element={<IdentifyEmail />} />
+               <Route path="/login/identify" element={<PublicRoute><IdentifyEmail /></PublicRoute>} />
               <Route path="/resetpswd/:token" element={<ResetPassword />} />
               <Route path="/account" element={
                 <ProtectedRoute allowedRoles={['ROLE_USER', 'ROLE_ADMIN', 'ROLE_PRO']}>

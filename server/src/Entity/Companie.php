@@ -4,11 +4,12 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Delete;
-use ApiPlatform\Metadata\Patch;
 use App\Repository\CompanieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -16,13 +17,13 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 use App\Controller\CompanieController;
 use Symfony\Component\Validator\Constraints as Assert;
-use ApiPlatform\Metadata\GetCollection;
 
 #[ORM\Entity(repositoryClass: CompanieRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['companies:read']],
     operations: [
-        new GetCollection(),
+        new GetCollection(
+            normalizationContext: ['groups' => ['companies:read']]
+        ),
         new Get(),
         new Put(
             security: "is_granted('ROLE_ADMIN')"
@@ -31,6 +32,8 @@ use ApiPlatform\Metadata\GetCollection;
             security: "is_granted('ROLE_ADMIN')"
         ),
         new Patch(
+            uriTemplate: '/companies/{id}',
+            normalizationContext: ['groups' => ['companies:update']],
             security: "is_granted('ROLE_ADMIN')"
         ),
         new Post(
