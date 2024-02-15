@@ -86,7 +86,7 @@ class Rent
     private ?Companie $companie = null;
 
     #[ORM\Column]
-    #[Groups('rents:read')]
+    #[Groups(['rents:read', 'rents_companie:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
