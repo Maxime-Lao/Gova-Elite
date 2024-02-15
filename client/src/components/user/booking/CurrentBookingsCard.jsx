@@ -204,51 +204,32 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
     }
   };
 
+  const isDateOverlap = (dateStart, dateEnd) => {
+    const selectedStart = startDate.getTime();
+    const selectedEnd = endDate.getTime();
+  
+    return (
+      (selectedStart >= dateStart && selectedStart <= dateEnd) ||
+      (selectedEnd >= dateStart && selectedEnd <= dateEnd) ||
+      (selectedStart <= dateStart && selectedEnd >= dateEnd)
+    );
+  };
+
   const handleOpenStripeModal = () => {
-    const currentRentId = rent.id;
-  
-    const isDatesValid = rentedTimes.every(rent => {
-      if (rent.id === currentRentId) {
-        return true;
-      }
-  
-      const selectedStart = startDate.getTime();
-      const selectedEnd = endDate.getTime();
+    const isDatesOverlapRented = rentedTimes.some(rent => {
+      if (rent.id === rentId) return false;
       const rentStart = new Date(rent.dateStart).getTime();
       const rentEnd = new Date(rent.dateEnd).getTime();
-  
-      if (
-        (selectedStart >= rentStart && selectedStart <= rentEnd) ||
-        (selectedEnd >= rentStart && selectedEnd <= rentEnd) ||
-        (selectedStart <= rentStart && selectedEnd >= rentEnd)
-      ) {
-        return false;
-      }
-      return true;
+      return isDateOverlap(rentStart, rentEnd);
     });
-
-    const isUnavailable = unavailabilityDates.some(unavailable => {
-      const selectedStart = startDate.getTime();
-      const selectedEnd = endDate.getTime();
-      const unavailableStart = new Date(unavailable.startDate).getTime();
-      const unavailableEnd = new Date(unavailable.endDate).getTime();
-
-      if (
-        (selectedStart >= unavailableStart && selectedStart <= unavailableEnd) ||
-        (selectedEnd >= unavailableStart && selectedEnd <= unavailableEnd) ||
-        (selectedStart <= unavailableStart && selectedEnd >= unavailableEnd)
-      ) {
-        return false;
-      }
-      return true;
-    });
-
-    if (!isUnavailable) {
-      setError('La voiture n\'est pas disponible pour les dates sélectionnées.');
-      return;
-    }
   
-    if (!isDatesValid) {
+    const isDatesOverlapUnavailable = unavailabilityDates.some(({ startDate, endDate }) => {
+      const unavailableStart = new Date(startDate).getTime();
+      const unavailableEnd = new Date(endDate).getTime();
+      return isDateOverlap(unavailableStart, unavailableEnd);
+    });
+  
+    if (isDatesOverlapRented || isDatesOverlapUnavailable) {
       setError('La voiture n\'est pas disponible pour les dates sélectionnées.');
       return;
     }
