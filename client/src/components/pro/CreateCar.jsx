@@ -159,9 +159,6 @@ const CreateCar = ({companieId}) => {
     return (
         <Grid container spacing={2} justifyContent="center">
             <Grid item xs={12} sm={6}>
-                <Box mt={2} textAlign="center">
-                    <h1>Ajouter une voiture</h1>
-                </Box>
                 {
                     (myGears && myEnergies && myCategories && myBrands) ? (
                         <form onSubmit={handleSubmit}>
