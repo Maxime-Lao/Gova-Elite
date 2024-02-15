@@ -24,7 +24,7 @@ class PaymentController extends AbstractController
                 'payment_method' => $data['paymentMethodId'],
                 'confirmation_method' => 'manual',
                 'confirm' => true,
-                'return_url' => 'http://localhost:3000/',
+                'return_url' => 'http://195.35.29.110:3000/',
             ]);
             
             return $this->json(['success' => true, 'paymentIntent' => $paymentIntent]);
@@ -55,7 +55,7 @@ public function updatePaymentIntent(Request $request): Response
             'payment_method' => $data['paymentMethodId'],
             'confirmation_method' => 'manual',
             'confirm' => true,
-            'return_url' => 'http://localhost:3000/',
+            'return_url' => 'http://195.35.29.110:3000/',
         ]);
         
         return $this->json(['success' => true, 'newPaymentIntent' => $newPaymentIntent]);
