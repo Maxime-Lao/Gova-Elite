@@ -161,7 +161,7 @@ export default function Companies() {
         const getCompanies = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://localhost:8000/api/companies', {
+                const response = await fetch('http://195.35.29.110:8000/api/companies', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -200,10 +200,64 @@ export default function Companies() {
         }
     }, [selectedCompany]);    
 
+    const handleCreate = async () => {
+        event.preventDefault();
+        
+        try {
+            const response = await fetch('http://195.35.29.110:8000/api/companies', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    name: name,
+                    address: address,
+                    zipCode: parseInt(zipCode),
+                    city: city,
+                    createdAt: new Date().toISOString(),
+                }),
+            });
+
+            if (!response.ok) {
+                setFormErrors({});
+
+                const data = await response.json();
+
+                if (data.violations) {
+                    const errors = {};
+                    data.violations.forEach(violation => {
+                        errors[violation.propertyPath] = violation.message;
+                    });
+                    setFormErrors(errors);
+                } else {
+                    setError('Une erreur s\'est produite lors de la création de la compagnie.');
+                }
+                return;
+            } else {
+                const data = await response.json();
+                setError('');
+                setCompanies([...companies, data]);
+                setOpenCreateDialog(false);
+                setSuccess('Compagnie créée avec succès !');
+            }
+        } catch (error) {
+            setError('Une erreur s\'est produite lors de la création de la compagnie.');
+        }
+    };
+
+    const handleOpenCreateDialog = () => {
+        setFormErrors({});
+        setName('');
+        setAddress('');
+        setZipCode('');
+        setCity('');
+        setOpenCreateDialog(true);
+    };
     
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/companies/${selectedCompany.id}`, {
+            const response = await fetch(`http://195.35.29.110:8000/api/companies/${selectedCompany.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -233,7 +287,7 @@ export default function Companies() {
 
     const handleUpdate = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/companies/${selectedCompany.id}`, {
+            const response = await fetch(`http://195.35.29.110:8000/api/companies/${selectedCompany.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/merge-patch+json',

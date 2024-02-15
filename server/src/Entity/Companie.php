@@ -21,20 +21,25 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations: [
         new GetCollection(
-            //security: "is_granted('ROLE_ADMIN')",
-            normalizationContext: ['groups' => ['companies:read']],
+            normalizationContext: ['groups' => ['companies:read']]
         ),
         new Get(),
-        new Put(),
+        new Put(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
         new Patch(
             uriTemplate: '/companies/{id}',
             normalizationContext: ['groups' => ['companies:update']],
+            security: "is_granted('ROLE_ADMIN')"
         ),
-        new Delete(),
         new Post(
+            security: "is_granted('ROLE_PRO')",
             controller: CompanieController::class,
             deserialize: false
-        ),
+        )
     ]
 )]
 
@@ -53,10 +58,6 @@ class Companie
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'L\'adresse ne peut pas être vide')]
-    #[Assert\Regex(
-        pattern: '/^[0-9]{1,4}(, )?[a-zA-Z\s]{1,50}$/',
-        message: 'L\'adresse n\'est pas valide'
-    )]
     #[Groups(['companies:read', 'car_search:read', 'user:read'])]
     private ?string $address = null;
 
@@ -77,10 +78,6 @@ class Companie
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: 'La ville ne peut pas être vide')]
-    #[Assert\Regex(
-        pattern: '/^[a-zA-Z\s]{1,50}$/',
-        message: 'La ville n\'est pas valide'
-    )]
     #[Groups(['companies:read', 'car_search:read', 'user:read'])]
     private ?string $city = null;
 
@@ -95,10 +92,6 @@ class Companie
     #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Car::class, orphanRemoval: true)]
     #[Groups(['companies:read', 'user:read'])]
     private Collection $cars;
-
-    #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Notice::class, orphanRemoval: true)]
-    #[Groups(['companies:read', 'user:read'])]
-    private Collection $notices;
 
     #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Rent::class, orphanRemoval: true)]
     #[Groups(['companies:read', 'user:read'])]
@@ -116,7 +109,6 @@ class Companie
     public function __construct()
     {
         $this->cars = new ArrayCollection();
-        $this->notices = new ArrayCollection();
         $this->users = new ArrayCollection();
         $this->rents = new ArrayCollection();
     }
@@ -145,8 +137,6 @@ class Companie
 
     public function setAddress(string $address): static
     {
-        $this->address = ucfirst(trim($address));
-
         return $this;
     }
 
@@ -224,35 +214,6 @@ class Companie
             // set the owning side to null (unless already changed)
             if ($car->getCompanie() === $this) {
                 $car->setCompanie(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Notice>
-     */
-    public function getNotices(): Collection
-    {
-        return $this->notices;
-    }
-
-    public function addNotice(Notice $notice): static
-    {
-        if (!$this->notices->contains($notice)) {
-            $this->notices->add($notice);
-            $notice->setCompanie($this);
-        }
-
-        return $this;
-    }
-
-    public function removeNotice(Notice $notice): static
-    {
-        if ($this->notices->removeElement($notice)) {
-            if ($notice->getCompanie() === $this) {
-                $notice->setCompanie(null);
             }
         }
 

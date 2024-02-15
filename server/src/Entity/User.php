@@ -37,25 +37,25 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
             validationContext: ['groups' => ['Default', 'user:create']]
         ),
         new Get(
-            //security: "is_granted('ROLE_ADMIN')",
+            security: "is_granted('ROLE_USER') and object == user",
             normalizationContext: ['groups' => ['user:read']],
         ),
         new Put(
             uriTemplate: '/users/{id}',
             processor: UserPasswordHasher::class,
             security: "is_granted('ROLE_ADMIN')",
-            securityMessage: "Only authenticated users can modify users."
+            securityMessage: "Only ADMIN users can modify users."
         ),
         new Patch(
             uriTemplate: '/users/{id}',
             processor: UserPasswordHasher::class,
-            //security: "is_granted('ROLE_ADMIN')",
-            securityMessage: "Only authenticated users can modify users."
+            security: "is_granted('ROLE_ADMIN') or ((is_granted('ROLE_PRO') or is_granted('ROLE_USER')) and object == user)",
+            securityMessage: "Only ADMIN users can modify users."
         ),
         new Delete(
             uriTemplate: '/users/{id}',
             security: "is_granted('ROLE_ADMIN')",
-            securityMessage: "Only authenticated users can delete users."
+            securityMessage: "Only admin users can delete users."
         ),
     ],
     normalizationContext: [
@@ -121,10 +121,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Le numéro de téléphone ne peut pas être vide')]
-    #[Assert\Regex(
-        pattern: '/^\d+$/',
-        message: 'Le numéro de téléphone doit contenir uniquement des chiffres'
-    )]
     #[Groups(['user:read', 'user:create', 'user:update', 'companies:read'])]
     private ?string $phone = null;
 
@@ -145,10 +141,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: MediaObject::class, orphanRemoval: true)]
     #[Groups('user:read', 'companies:read')]
     private Collection $media;
-
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Notice::class, orphanRemoval: true)]
-    #[Groups('user:read')]
-    private Collection $notices;
 
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Notification::class, orphanRemoval: true)]
     private Collection $notifications;
@@ -328,14 +320,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->media;
     }
 
-    /**
-     * @return Collection<int, Notice[]>
-     */
-    public function getNotices(): Collection
-    {
-        return $this->notices;
-    }
-
     public function getCompanie(): ?Companie
     {
         return $this->companie;
@@ -386,25 +370,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             }
         }
 
-        return $this;
-    }
-
-    public function addNotice(Notice $notice): static
-    {
-        if (!$this->notices->contains($notice)) {
-            $this->notices->add($notice);
-            $notice->setUser($this);
-        }
-        return $this;
-    }
-
-    public function removeNotice(Notice $notice): static
-    {
-        if ($this->notices->removeElement($notice)) {
-            if ($notice->getUser() === $this) {
-                $notice->setUser(null);
-            }
-        }
         return $this;
     }
 

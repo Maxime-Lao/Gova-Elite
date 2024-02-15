@@ -30,11 +30,12 @@ const CarItem = ({ car }) => {
 
     const handleDelete = async () => {
         try {
-            await fetch(`http://localhost:8000/api/cars/${car.id}`, {
+            await fetch(`http://195.35.29.110:8000/api/cars/${car.id}`, {
                 method: 'DELETE',
-            }, {headers: {
+                headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
-                }});
+                }
+            });
             window.location.reload()
         } catch (error) {
             console.log(error);
@@ -63,7 +64,7 @@ const CarItem = ({ car }) => {
         <Card style={{ display: 'flex' }}>
             <CardMedia
                 component="img"
-                src={ car.media.length > 0 ? `http://localhost:8000/media/${car.media[0].filePath}` : 'https://source.unsplash.com/random' }
+                src={ car.media.length > 0 ? `http://195.35.29.110:8000/media/${car.media[0].filePath}` : 'https://source.unsplash.com/random' }
                 style={{ width: '200px' }}
             />
             <div style={{ flex: 1 }}>

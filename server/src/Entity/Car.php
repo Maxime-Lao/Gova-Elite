@@ -4,6 +4,10 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Link;
 use Symfony\Component\Serializer\Annotation\Groups;
 use App\Repository\CarRepository;
@@ -15,17 +19,42 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CarRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['car:read']],
-    //denormalizationContext: ['groups' => ['car:write']],
+    normalizationContext: ['groups' => ['car:read', 'car_search:read']],
+    denormalizationContext: ['groups' => ['car:write']],
+    operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['car_search:read']],
+            security: "is_granted('ROLE_USER')",
+            securityMessage: "Vous devez être connecté pour voir les voitures."
+        ),
+        new Get(
+            security: "is_granted('ROLE_USER') or is_granted('ROLE_PRO')",
+            securityMessage: "Vous devez être connecté et avoir les droits appropriés pour accéder à cette voiture."
+        ),
+        new GetCollection(
+            uriTemplate: '/companies/{companyId}/cars',
+            uriVariables: [
+                'companyId' => new Link(fromClass: Companie::class, toProperty: 'companie'),
+            ],
+            normalizationContext: ['groups' => ['car_search:read']],
+            security: "is_granted('ROLE_USER')",
+            securityMessage: "Vous devez être connecté pour voir les voitures d'une compagnie."
+        ),
+        new Post(
+            security: "is_granted('ROLE_PRO')",
+            securityMessage: "Seuls les utilisateurs avec le rôle PRO peuvent créer des voitures."
+        ),
+        new Patch(
+            security: "is_granted('ROLE_PRO') and object.getCompanie() == user.getCompanie()",
+            securityMessage: "Seul le propriétaire de la voiture peut la modifier."
+        ),
+        new Delete(
+            security: "is_granted('ROLE_PRO') and object.getCompanie() == user.getCompanie()",
+            securityMessage: "Seul le propriétaire de la voiture peut la supprimer."
+        )
+    ]
 )]
-#[ApiResource(
-    uriTemplate: '/companies/{companyId}/cars',
-    uriVariables: [
-        'companyId' => new Link(fromClass: Companie::class, toProperty: 'companie'),
-    ],
-    operations: [new GetCollection()],
-    normalizationContext: ['groups' => ['car_search:read']],
-)]
+
 class Car
 {
     #[ORM\Id]
@@ -36,7 +65,7 @@ class Car
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La description ne peut pas être vide')]
-    #[Groups(['car:read', 'comments_car:read', 'user:read', 'rents_user:read', 'car_search:read'])]
+    #[Groups(['car:read', 'car:write', 'comments_car:read', 'user:read', 'rents_user:read', 'car_search:read'])]
     private ?string $description = null;
 
     #[ORM\Column]
@@ -48,85 +77,85 @@ class Car
         minMessage: 'L\'année doit contenir 4 chiffres',
         maxMessage: 'L\'année doit contenir 4 chiffres'
     )]
-    #[Groups(['car:read', 'comments_car:read', 'user:read', 'rents_user:read', 'car_search:read'])]
+    #[Groups(['car:read', 'car:write', 'comments_car:read', 'user:read', 'rents_user:read', 'car_search:read'])]
     private ?int $year = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le nombre de sièges ne peut pas être vide')]
     #[Assert\Positive(message: 'Le nombre de sièges doit être un nombre positif ou égal à zéro')]
-    #[Groups(['car:read', 'user:read', 'rents_user:read', 'car_search:read'])]
+    #[Groups(['car:read', 'car:write', 'user:read', 'rents_user:read', 'car_search:read'])]
     private ?int $horses = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le prix ne peut pas être vide')]
     #[Assert\Positive(message: 'Le prix doit être un nombre positif ou égal à zéro')]
-    #[Groups(['car:read', 'user:read', 'rents_user:read', 'car_search:read'])]
+    #[Groups(['car:read', 'car:write', 'user:read', 'rents_user:read', 'car_search:read'])]
     private ?int $nbSeats = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le nombre de portes ne peut pas être vide')]
     #[Assert\Positive(message: 'Le nombre de portes doit être un nombre positif ou égal à zéro')]
-    #[Groups(['car:read', 'user:read', 'rents_user:read', 'car_search:read'])]
+    #[Groups(['car:read', 'car:write', 'user:read', 'rents_user:read', 'car_search:read'])]
     private ?int $nbDoors = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le prix ne peut pas être vide')]
     #[Assert\Positive(message: 'Le prix doit être un nombre positif ou égal à zéro')]
-    #[Groups(['car:read', 'car_search:read', 'user:read', 'rents_user:read'])]
+    #[Groups(['car:read', 'car:write', 'car_search:read', 'user:read', 'rents_user:read'])]
     private ?float $price = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le kilométrage ne peut pas être vide')]
     #[Assert\Positive(message: 'Le kilométrage doit être un nombre positif ou égal à zéro')]
-    #[Groups(['car:read', 'user:read', 'rents_user:read', 'car_search:read'])]
+    #[Groups(['car:read', 'car:write', 'user:read', 'rents_user:read', 'car_search:read'])]
     private ?int $mileage = null;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['car:read', 'user:read', 'rents_user:read', 'car_search:read'])]
+    #[Groups(['car:read', 'car:write', 'user:read', 'rents_user:read', 'car_search:read'])]
     private ?Gear $gear = null;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
-    #[Groups(['car:read', 'comments_car:read', 'car_search:read', 'user:read', 'rents_user:read', 'rents:read', 'comments:read', 'rents_companie:read'])]
+    #[Groups(['car:read', 'car:write', 'comments_car:read', 'car_search:read', 'user:read', 'rents_user:read', 'rents:read', 'comments:read', 'rents_companie:read'])]
     private ?Model $model = null;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['car:read', 'user:read', 'rents_user:read', 'car_search:read'])]
+    #[Groups(['car:read', 'car:write', 'user:read', 'rents_user:read', 'car_search:read'])]
     private ?Energy $energy = null;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['car:read', 'user:read', 'rents_user:read', 'car_search:read'])]
+    #[Groups(['car:read', 'car:write', 'user:read', 'rents_user:read', 'car_search:read'])]
     private ?Category $category = null;
 
     #[ORM\OneToMany(mappedBy: 'car', targetEntity: MediaObject::class, orphanRemoval: true)]
-    #[Groups(['car:read', 'car_search:read', 'user:read', 'rents_user:read'])]
+    #[Groups(['car:read', 'car:write', 'car_search:read', 'user:read', 'rents_user:read'])]
     private Collection $media;
 
     #[ORM\ManyToOne(inversedBy: 'cars')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['car:read', 'comments_car:read', 'car_search:read', 'rents_user:read', 'rents:read', 'comments:read'])]
+    #[Groups(['car:read', 'car:write', 'comments_car:read', 'car_search:read', 'rents_user:read', 'rents:read', 'comments:read'])]
     private ?Companie $companie = null;
 
     #[ORM\OneToMany(mappedBy: 'car', targetEntity: Rent::class, orphanRemoval: true)]
-    #[Groups(['car:read', 'user:read', 'comments_user:read'])]
+    #[Groups(['car:read', 'car:write', 'user:read', 'comments_user:read'])]
     private Collection $rents;
 
     #[ORM\OneToMany(mappedBy: 'car', targetEntity: Unavailability::class, orphanRemoval: true)]
-    #[Groups(['car:read', 'rents_user:read'])]
-    private Collection $unavailabilities;
+    #[Groups(['car:read', 'car:write', 'rents_user:read'])]
+    private Collection $unavailability;
 
     #[ORM\OneToMany(mappedBy: 'car', targetEntity: Comment::class, orphanRemoval: true)]
-    #[Groups(['user:read'])]
+    #[Groups(['user:read', 'car:write',])]
     private Collection $comments;
 
     #[ORM\Column]
-    #[Groups(['car:read', 'user:read', 'comments_user:read'])]
+    #[Groups(['car:read', 'car:write', 'user:read', 'comments_user:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['car:read'])]
+    #[Groups(['car:read', 'car:write'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     public function __construct()

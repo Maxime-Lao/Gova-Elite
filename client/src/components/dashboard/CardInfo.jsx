@@ -1,29 +1,15 @@
 import React from 'react';
-import { Card, CardContent, Typography } from '@mui/material';
-import { makeStyles } from '@mui/styles';
-
-const useStyles = makeStyles({
-    card: {
-        minWidth: 275,
-        textAlign: 'center',
-        height: '100%',
-    },
-});
 
 const CardInfo = ({ title, nbInfo }) => {
-    const classes = useStyles();
-
     return (
-        <Card className={classes.card}>
-            <CardContent>
-                <Typography variant="h6" component="div">
-                    {title}
-                </Typography>
-                <Typography variant="h4" component="div" style={{ marginTop: 10 }}>
-                    {nbInfo}
-                </Typography>
-            </CardContent>
-        </Card>
+        <div className="min-w-275 text-center h-full bg-white rounded-md shadow-md p-4">
+            <div className="mb-4">
+                <h6 className="text-xl font-semibold">{title}</h6>
+            </div>
+            <div>
+                <h4 className="text-4xl font-bold">{nbInfo}</h4>
+            </div>
+        </div>
     );
 };
 

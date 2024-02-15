@@ -3,6 +3,12 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
 use App\Repository\EnergyRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -11,7 +17,17 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EnergyRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Get(),
+        new Post(security: "is_granted('ROLE_ADMIN')", securityMessage: "Only ADMIN users can create energies."),
+        new Put(security: "is_granted('ROLE_ADMIN')", securityMessage: "Only ADMIN users can update energies."),
+        new Patch(security: "is_granted('ROLE_ADMIN')", securityMessage: "Only ADMIN users can modify energies."),
+        new Delete(security: "is_granted('ROLE_ADMIN')", securityMessage: "Only ADMIN users can delete energies.")
+    ]
+)]
+
 class Energy
 {
     #[ORM\Id]

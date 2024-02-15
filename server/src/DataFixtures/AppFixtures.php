@@ -6,7 +6,6 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use App\Entity\User;
-use App\Entity\Role;
 use App\Entity\MediaObject;
 use App\Entity\Companie;
 use App\Entity\Car;
@@ -15,8 +14,6 @@ use App\Entity\Model;
 use App\Entity\Energy;
 use App\Entity\Gear;
 use App\Entity\Category;
-use App\Entity\Notice;
-use App\Entity\Reason;
 use App\Entity\Rent;
 
 class AppFixtures extends Fixture
@@ -25,21 +22,13 @@ class AppFixtures extends Fixture
     {
         $faker = Factory::create();
 
-        $roles = [];
-        $roleNames = ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_PRO'];
-        foreach ($roleNames as $name) {
-            $role = new Role();
-            $role->setName($name);
-            $manager->persist($role);
-            $roles[] = $role;
-        }
-
         $users = [];
+        $roleNames = ['ROLE_USER', 'ROLE_PRO'];
         for ($i = 0; $i < 20; $i++) {
             $user = new User();
             $user->setEmail($faker->email);
-            $randomRole = $roles[array_rand($roles)];
-            $user->setRoles([$randomRole->getName()]);
+            $randomRole = $roleNames[array_rand($roleNames)];
+            $user->setRoles([$randomRole]);
             $user->setPassword($faker->password);
             $user->setIsVerified($faker->boolean);
             $user->setFirstname($faker->firstName);
@@ -137,16 +126,6 @@ class AppFixtures extends Fixture
             $media->setUser($faker->randomElement($users));
             $media->setCar($faker->randomElement($cars));
             $manager->persist($media);
-        }
-
-        for ($i = 0; $i < 15; $i++) {
-            $notice = new Notice();
-            $notice->setMessage($faker->sentence);
-            $notice->setNbStars($faker->numberBetween(1, 5));
-            $notice->setCreatedAt(\DateTimeImmutable::createFromMutable($faker->dateTime()));
-            $notice->setCompanie($faker->randomElement($companies));
-            $notice->setUser($faker->randomElement($users));
-            $manager->persist($notice);
         }
 
         $manager->flush();
