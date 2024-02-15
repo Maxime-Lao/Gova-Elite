@@ -22,6 +22,10 @@ services:
         tags:
             - { name: 'api_platform.state_processor', priority: 0 }
 
+    App\Subscriber\PreventRoleChangeSubscriber:
+        tags:
+            - { name: 'kernel.event_subscriber' }
+
     App\State\MainProcessor:
         arguments:
             $userPasswordHasher: '@App\State\UserPasswordHasher'
@@ -36,6 +40,10 @@ services:
 
 
     App\Subscriber\UserCreateSubscriber:
+        tags:
+            - { name: 'kernel.event_subscriber' }
+
+    App\Subscriber\RentMailSubscriber:
         tags:
             - { name: 'kernel.event_subscriber' }
 

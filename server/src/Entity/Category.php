@@ -3,6 +3,12 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
 use App\Repository\CategoryRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -11,7 +17,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Get(),
+        new Post(security: "is_granted('ROLE_ADMIN')", securityMessage: "Only ADMIN users can create categories."),
+        new Put(security: "is_granted('ROLE_ADMIN')", securityMessage: "Only ADMIN users can update categories."),
+        new Patch(security: "is_granted('ROLE_ADMIN')", securityMessage: "Only ADMIN users can modify categories."),
+        new Delete(security: "is_granted('ROLE_ADMIN')", securityMessage: "Only ADMIN users can delete categories.")
+    ]
+)]
 class Category
 {
     #[ORM\Id]
@@ -51,7 +66,7 @@ class Category
 
     public function setLibelle(string $libelle): static
     {
-        $this->libelle = $libelle;
+        $this->libelle = ucfirst(trim($libelle));
 
         return $this;
     }

@@ -59,6 +59,7 @@ class Rent
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'Le prix total ne peut pas être vide')]
+    #[Assert\Positive(message: 'Le prix total doit être un nombre positif')]
     #[Groups(['rents:read', 'rents_car:read', 'rents_user:read', 'rents_companie:read', 'car:read'])]
     private ?float $totalPrice = null;
 

@@ -4,9 +4,10 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
 use App\Repository\CompanieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -15,20 +16,30 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 use App\Controller\CompanieController;
 use Symfony\Component\Validator\Constraints as Assert;
-use ApiPlatform\Metadata\GetCollection;
 
 #[ORM\Entity(repositoryClass: CompanieRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['companies:read']],
     operations: [
+        new GetCollection(
+            normalizationContext: ['groups' => ['companies:read']]
+        ),
         new Get(),
-        new Put(),
-        new Delete(),
+        new Put(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
+        new Patch(
+            uriTemplate: '/companies/{id}',
+            normalizationContext: ['groups' => ['companies:update']],
+            security: "is_granted('ROLE_ADMIN')"
+        ),
         new Post(
+            security: "is_granted('ROLE_PRO')",
             controller: CompanieController::class,
             deserialize: false
-        ),
-        new GetCollection()
+        )
     ]
 )]
 
@@ -50,7 +61,7 @@ class Companie
     #[Groups(['companies:read', 'car_search:read', 'user:read'])]
     private ?string $address = null;
 
-    #[Groups(['companies:read'])]
+    #[Groups(['companies:read', 'car:read'])]
     #[ORM\OneToMany(mappedBy: 'companie', targetEntity: User::class, orphanRemoval: true)]
     private Collection $users;
 
@@ -75,15 +86,12 @@ class Companie
     private bool $isVerified = false;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['companies:read'])]
     private ?string $kbis = null;
 
     #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Car::class, orphanRemoval: true)]
     #[Groups(['companies:read', 'user:read'])]
     private Collection $cars;
-
-    #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Notice::class, orphanRemoval: true)]
-    #[Groups(['companies:read', 'user:read'])]
-    private Collection $notices;
 
     #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Rent::class, orphanRemoval: true)]
     #[Groups(['companies:read', 'user:read'])]
@@ -101,7 +109,6 @@ class Companie
     public function __construct()
     {
         $this->cars = new ArrayCollection();
-        $this->notices = new ArrayCollection();
         $this->users = new ArrayCollection();
         $this->rents = new ArrayCollection();
     }
@@ -118,7 +125,7 @@ class Companie
 
     public function setName(string $name): static
     {
-        $this->name = $name;
+        $this->name = ucfirst(trim($name));
 
         return $this;
     }
@@ -130,8 +137,6 @@ class Companie
 
     public function setAddress(string $address): static
     {
-        $this->address = $address;
-
         return $this;
     }
 
@@ -156,7 +161,7 @@ class Companie
 
     public function setCity(string $city): static
     {
-        $this->city = $city;
+        $this->city = ucfirst(trim($city));
 
         return $this;
     }
@@ -209,35 +214,6 @@ class Companie
             // set the owning side to null (unless already changed)
             if ($car->getCompanie() === $this) {
                 $car->setCompanie(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Notice>
-     */
-    public function getNotices(): Collection
-    {
-        return $this->notices;
-    }
-
-    public function addNotice(Notice $notice): static
-    {
-        if (!$this->notices->contains($notice)) {
-            $this->notices->add($notice);
-            $notice->setCompanie($this);
-        }
-
-        return $this;
-    }
-
-    public function removeNotice(Notice $notice): static
-    {
-        if ($this->notices->removeElement($notice)) {
-            if ($notice->getCompanie() === $this) {
-                $notice->setCompanie(null);
             }
         }
 
@@ -324,5 +300,10 @@ class Companie
         $this->updatedAt = $updatedAt;
 
         return $this;
+    }
+
+    public function getKbisUrl(): ?string
+    {
+        return $this->kbis ? sprintf('/uploads/kbis/%s', $this->kbis) : null;
     }
 }

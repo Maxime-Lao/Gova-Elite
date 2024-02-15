@@ -54,10 +54,10 @@ const FilterPop = ( data ) => {
             }
         };
 
-        fetchData('http://localhost:8000/api/categories', (data) => setFilters(prevState => ({ ...prevState, categories: data })));
-        fetchData('http://localhost:8000/api/energies', (data) => setFilters(prevState => ({ ...prevState, energies: data })));
-        fetchData('http://localhost:8000/api/gears', (data) => setFilters(prevState => ({ ...prevState, gears: data })));
-        fetchData('http://localhost:8000/api/brands', (data) => setFilters(prevState => ({ ...prevState, brands: data })));
+        fetchData('http://195.35.29.110:8000/api/categories', (data) => setFilters(prevState => ({ ...prevState, categories: data })));
+        fetchData('http://195.35.29.110:8000/api/energies', (data) => setFilters(prevState => ({ ...prevState, energies: data })));
+        fetchData('http://195.35.29.110:8000/api/gears', (data) => setFilters(prevState => ({ ...prevState, gears: data })));
+        fetchData('http://195.35.29.110:8000/api/brands', (data) => setFilters(prevState => ({ ...prevState, brands: data })));
     }, []);
 
     const handleCategoryChange = useCallback((event) => {

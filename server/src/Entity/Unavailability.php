@@ -3,12 +3,29 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
 use App\Repository\UnavailabilityRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use ApiPlatform\Metadata\Link;
 
 #[ORM\Entity(repositoryClass: UnavailabilityRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Get(),
+        new Post(security: "is_granted('ROLE_PRO')", securityMessage: "Only Muthu can create categories."),
+        new Put(security: "is_granted('ROLE_PRO')", securityMessage: "Only Muthu can update categories."),
+        new Patch(security: "is_granted('ROLE_PRO')", securityMessage: "Only Muthu can modify categories."),
+        new Delete(security: "is_granted('ROLE_PRO')", securityMessage: "Only Muthu can delete categories.")
+    ]
+)]
 class Unavailability
 {
     #[ORM\Id]
@@ -18,23 +35,25 @@ class Unavailability
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'La raison ne peut pas être vide')]
     #[Groups(['car:read'])]
     private ?string $reason = null;
 
     #[ORM\Column]
-    #[Groups(['car:read'])]
+    #[Groups(['car:read', 'rents_user:read'])]
     private ?\DateTimeImmutable $date_start = null;
 
     #[ORM\Column]
-    #[Groups(['car:read'])]
+    #[Groups(['car:read', 'rents_user:read'])]
     private ?\DateTimeImmutable $date_end = null;
 
     #[ORM\Column(nullable: true)]
+    #[Assert\Positive(message: 'Le prix doit être un nombre positif')]
     #[Groups(['car:read'])]
     private ?int $price = null;
 
-    #[ORM\ManyToOne(inversedBy: 'unavailability')]
-    #[Groups(['rents:read', 'rents_car:read', 'rents_user:read', 'rents_companie:read'])]
+    #[ORM\ManyToOne(inversedBy: 'unavailabilities')]
+    #[Groups(['rents:read', 'rents_car:read', 'rents_companie:read'])]
     private ?Car $car = null;
 
     public function getCar(): ?Car
@@ -61,7 +80,7 @@ class Unavailability
 
     public function setReason(string $reason): static
     {
-        $this->reason = $reason;
+        $this->reason = ucfirst(trim($reason));
 
         return $this;
     }

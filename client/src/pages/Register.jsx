@@ -8,7 +8,7 @@ import {
     Select,
     MenuItem, Box, Link, Input, Typography
 } from '@mui/material';
-import sendRequest from "../services/axiosRequestFunction";
+import send from "../services/axiosRequest.js";
 import {useNavigate} from "react-router-dom";
 
 const Register = () => {
@@ -24,7 +24,7 @@ const Register = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        sendRequest(
+        send(
             '/api/users',
             'post',
             {

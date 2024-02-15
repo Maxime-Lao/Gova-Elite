@@ -1,5 +1,4 @@
 <?php
-// api/src/Entity/MediaObject.php
 
 namespace App\Entity;
 
@@ -9,6 +8,8 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\OpenApi\Model;
 use App\Controller\CreateMediaObjectAction;
 use Doctrine\ORM\Mapping as ORM;
@@ -29,27 +30,36 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
             controller: CreateMediaObjectAction::class,
             deserialize: false,
             validationContext: ['groups' => ['Default', 'media_object_create']],
-            openapi: new Model\Operation(
-                requestBody: new Model\RequestBody(
-                    content: new \ArrayObject([
+            openapiContext: [
+                'requestBody' => [
+                    'content' => [
                         'multipart/form-data' => [
                             'schema' => [
                                 'type' => 'object',
                                 'properties' => [
                                     'file' => [
-                                        'type' => 'file',
+                                        'type' => 'string',
+                                        'format' => 'binary',
                                     ]
                                 ]
                             ]
                         ]
-                    ])
-                )
-            )
+                    ]
+                ]
+            ]
+        ),
+        new Put(
+            security: "is_granted('ROLE_ADMIN')",
+            securityMessage: "Seules les personnes avec le rôle admin peuvent modifier les objets médias."
+        ),
+        new Patch(
+            security: "is_granted('ROLE_ADMIN')",
+            securityMessage: "Seules les personnes avec le rôle admin peuvent modifier les objets médias."
         ),
         new Delete(
-            uriTemplate: '/media_objects/{id}',
+            security: "object.getUser() == user",
+            securityMessage: "Vous ne pouvez supprimer que les objets médias qui vous appartiennent."
         )
-
     ]
 )]
 class MediaObject
@@ -65,15 +75,16 @@ class MediaObject
     #[Vich\UploadableField(mapping: 'media_object', fileNameProperty: 'filePath')]
     #[Assert\NotNull(groups: ['media_object_create'])]
     #[Assert\File(
-        mimeTypes: ["image/jpeg", "image/png", "image/jpg"],
-        mimeTypesMessage : "Veuillez télécharger un fichier JPEG, JPG ou PNG valide."
+        mimeTypes: ["image/jpeg", "image/png", "image/jpg", "application/pdf"],
+        mimeTypesMessage: "Veuillez télécharger un fichier JPEG, JPG, PNG ou PDF valide.",
+        maxSize: "1M",
+        maxSizeMessage: "Le fichier est trop volumineux ({{ size }} {{ suffix }}). La taille maximale autorisée est de {{ limit }} {{ suffix }}."
     )]
     #[ApiProperty(types: ['https://schema.org/image'])]
-    public ?File $file = null;
-
+    public ?File $file = null;    
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['user:read', 'car:read'])]
+    #[Groups(['user:read', 'car:read', 'rents_user:read', 'car_search:read'])]
     public ?string $filePath = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]

@@ -17,11 +17,18 @@ const RentCard = (data) => {
             borderColor: 'var(--joy-palette-neutral-outlinedDisabledBorder)',
           },
         }}>
+            {data.car.media.length > 0 && data.car.media[0].filePath !== null ? (
+                <CardMedia
+                image={data.car.media[0].filePath}
+                title="Car Image"
+                sx={{ width: '40%' }}
+                /> ) : (
             <CardMedia
                 image="https://source.unsplash.com/random/345x140?car"
                 title="Car Image"
                 sx={{ width: '40%' }}
             />
+            )}
             <CardContent sx={{ display:"flex", flexDirection: "column", justifyContent: "space-between" }}>
                 <Stack direction="row" spacing={2} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Box>

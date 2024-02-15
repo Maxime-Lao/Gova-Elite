@@ -3,11 +3,44 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use App\Repository\NotificationRepository;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_PRO')",
+            uriTemplate: '/users/{userId}/notifications',
+            uriVariables: [
+                'userId' => new Link(fromClass: User::class, toProperty: 'user'),
+            ],
+        ),
+        new Get(
+            security: "is_granted('ROLE_ADMIN')",
+        ),
+        new Post(
+            security: "is_granted('ROLE_ADMIN')",
+        ),
+        new Put(
+            security: "is_granted('ROLE_ADMIN')",
+        ),
+        new Patch(
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_PRO')",
+        ),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')",
+        ),
+    ]
+)]
 class Notification
 {
     #[ORM\Id]
@@ -16,11 +49,16 @@ class Notification
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Le message ne peut pas être vide')]
     private ?string $message = null;
 
     #[ORM\ManyToOne(inversedBy: 'notification')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
+
+    #[ORM\Column(type: 'boolean')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?bool $isRead = false;
 
     public function getId(): ?int
     {
@@ -34,7 +72,7 @@ class Notification
 
     public function setMessage(string $message): static
     {
-        $this->message = $message;
+        $this->message = ucfirst(trim($message));
 
         return $this;
     }
@@ -47,6 +85,18 @@ class Notification
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getIsRead(): ?bool
+    {
+        return $this->isRead;
+    }
+
+    public function setIsRead(bool $isRead): static
+    {
+        $this->isRead = $isRead;
 
         return $this;
     }

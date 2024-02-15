@@ -68,36 +68,41 @@ const EditCar = ({ carId }) => {
     }, [selectedBrandId]);
 
     useEffect(() => {
-        fetch(`http://localhost:8000/api/gears`)
-            .then(response => response.json())
-            .then(data => setMyGears(data))
-            .catch(error => console.error(error));
+        const fetchWithAuthorization = async (url, setStateFunction) => {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                });
 
-        fetch(`http://localhost:8000/api/models`)
-            .then(response => response.json())
-            .then(data => setAllModels(data))
-            .catch(error => console.error(error));
+                if (!response.ok) {
+                    throw new Error(`Erreur lors de la récupération des données de ${url}`);
+                }
 
-        fetch(`http://localhost:8000/api/brands`)
-            .then(response => response.json())
-            .then(data => setMyBrands(data))
-            .catch(error => console.error(error));
+                const data = await response.json();
+                setStateFunction(data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
 
-        fetch(`http://localhost:8000/api/energies`)
-            .then(response => response.json())
-            .then(data => setMyEnergies(data))
-            .catch(error => console.error(error));
-
-        fetch(`http://localhost:8000/api/categories`)
-            .then(response => response.json())
-            .then(data => setMyCategories(data))
-            .catch(error => console.error(error));
+        fetchWithAuthorization('http://195.35.29.110:8000/api/gears', setMyGears);
+        fetchWithAuthorization('http://195.35.29.110:8000/api/models', setAllModels);
+        fetchWithAuthorization('http://195.35.29.110:8000/api/brands', setMyBrands);
+        fetchWithAuthorization('http://195.35.29.110:8000/api/energies', setMyEnergies);
+        fetchWithAuthorization('http://195.35.29.110:8000/api/categories', setMyCategories);
     }, []);
+
 
     useEffect(() => {
         const fetchCarData = async () => {
             try {
-                const response = await axios.get(`http://localhost:8000/api/cars/${carId}`);
+                const response = await axios.get(`http://195.35.29.110:8000/api/cars/${carId}`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                });
                 setCarData(response.data);
             } catch (error) {
                 console.error("Error fetching car data", error);
@@ -125,7 +130,7 @@ const EditCar = ({ carId }) => {
         };
 
         try {
-            const response = await axios.patch(`http://localhost:8000/api/cars/${carId}`, carDataPayload, {
+            const response = await axios.patch(`http://195.35.29.110:8000/api/cars/${carId}`, carDataPayload, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                     'Content-Type': 'application/merge-patch+json',
@@ -139,9 +144,11 @@ const EditCar = ({ carId }) => {
                     formData.append('car_id', carId);
                     formData.append('user_id', user.connectedUser.id);
 
-                    const mediaResponse = await axios.post('http://localhost:8000/api/media_objects', formData, {
+                    const mediaResponse = await axios.post('http://195.35.29.110:8000/api/media_objects', formData, {
                         headers: {
+                            Authorization: `Bearer ${localStorage.getItem('token')}`,
                             'Content-Type': 'multipart/form-data',
+                            Authorization: `Bearer ${localStorage.getItem('token')}`,
                         },
                     });
 
@@ -151,7 +158,7 @@ const EditCar = ({ carId }) => {
             const carMediaIds = carData.media?.map(media => media.id) || [];
             for (const photo of carMediaIds) {
                 if (!files.some(file => file.id === photo)) {
-                    const response = await axios.delete(`http://localhost:8000/api/media_objects/${photo}`, {
+                    const response = await axios.delete(`http://195.35.29.110:8000/api/media_objects/${photo}`, {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem('token')}`,
                         },
@@ -263,37 +270,41 @@ const EditCar = ({ carId }) => {
                             margin="normal"
                             required
                         />
-                        <FormControl fullWidth margin="normal">
-                            <InputLabel id="gear-label">Boîte de vitesse *</InputLabel>
-                            <Select
-                                labelId="gear-label"
-                                value={gear}
-                                onChange={(e) => setGear(e.target.value)}
-                                required
-                            >
-                                {myGears && myGears.map((gear) => (
-                                    <MenuItem key={'gear-' + gear.id} value={gear.id}>
-                                        {gear.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <FormControl fullWidth margin="normal">
-                            <InputLabel id="brand-label">Marque *</InputLabel>
-                            <Select
-                                labelId="brand-label"
-                                value={selectedBrandId}
-                                onChange={handleBrandChange}
-                                required
-                            >
-                                {myBrands && myBrands.map((brand) => (
-                                    <MenuItem key={'brand-' + brand.id} value={brand.id}>
-                                        {brand.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <FormControl fullWidth margin="normal">
+                        {
+                            myGears ? <FormControl fullWidth margin="normal">
+                                <InputLabel id="gear-label">Boîte de vitesse *</InputLabel>
+                                <Select
+                                    labelId="gear-label"
+                                    value={gear}
+                                    onChange={(e) => setGear(e.target.value)}
+                                    required
+                                >
+                                    {myGears.map((gear) => (
+                                        <MenuItem key={'gear-' + gear.id} value={gear.id}>
+                                            {gear.name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl> : null
+                        }
+                        {
+                            myBrands ? <FormControl fullWidth margin="normal">
+                                <InputLabel id="brand-label">Marque *</InputLabel>
+                                <Select
+                                    labelId="brand-label"
+                                    value={selectedBrandId}
+                                    onChange={handleBrandChange}
+                                    required
+                                >
+                                    {myBrands.map((brand) => (
+                                        <MenuItem key={'brand-' + brand.id} value={brand.id}>
+                                            {brand.name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl> : null
+                        }
+                        { selectedBrandId && myModels ? <FormControl fullWidth margin="normal">
                             <InputLabel id="model-label">Modèle *</InputLabel>
                             <Select
                                 labelId="model-label"
@@ -307,37 +318,41 @@ const EditCar = ({ carId }) => {
                                     </MenuItem>
                                 ))}
                             </Select>
-                        </FormControl>
-                        <FormControl fullWidth margin="normal">
-                            <InputLabel id="energy-label">Carburant *</InputLabel>
-                            <Select
-                                labelId="energy-label"
-                                value={energy}
-                                onChange={(e) => setEnergy(e.target.value)}
-                                required
-                            >
-                                {myEnergies && myEnergies.map((energy) => (
-                                    <MenuItem key={'energy-' + energy.id} value={energy.id}>
-                                        {energy.name}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <FormControl fullWidth margin="normal">
-                            <InputLabel id="category-label">Catégorie du véhicule *</InputLabel>
-                            <Select
-                                labelId="category-label"
-                                value={category}
-                                onChange={(e) => setCategory(e.target.value)}
-                                required
-                            >
-                                {myCategories && myCategories.map((category) => (
-                                    <MenuItem key={'category-' + category.id} value={category.id}>
-                                        {category.libelle}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                        </FormControl> : null}
+                        {
+                            myEnergies ? <FormControl fullWidth margin="normal">
+                                <InputLabel id="energy-label">Carburant *</InputLabel>
+                                <Select
+                                    labelId="energy-label"
+                                    value={energy}
+                                    onChange={(e) => setEnergy(e.target.value)}
+                                    required
+                                >
+                                    {myEnergies.map((energy) => (
+                                        <MenuItem key={'energy-' + energy.id} value={energy.id}>
+                                            {energy.name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl> : null
+                        }
+                        {
+                            myCategories ? <FormControl fullWidth margin="normal">
+                                <InputLabel id="category-label">Catégorie du véhicule *</InputLabel>
+                                <Select
+                                    labelId="category-label"
+                                    value={category}
+                                    onChange={(e) => setCategory(e.target.value)}
+                                    required
+                                >
+                                    {myCategories.map((category) => (
+                                        <MenuItem key={'category-' + category.id} value={category.id}>
+                                            {category.libelle}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl> : null
+                        }
                         <TextField
                             label="Description"
                             type="text"
@@ -374,7 +389,7 @@ const EditCar = ({ carId }) => {
                                     <div key={`photo-container-${index}`} className="border-2">
                                         <CardMedia
                                             component="img"
-                                            src={`http://localhost:8000/media/${path.filePath}`}
+                                            src={`http://195.35.29.110:8000/media/${path.filePath}`}
                                             style={{width: '70px'}}
                                         />
                                         <div className="flex justify-end">

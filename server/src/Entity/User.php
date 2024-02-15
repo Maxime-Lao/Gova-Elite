@@ -37,25 +37,25 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
             validationContext: ['groups' => ['Default', 'user:create']]
         ),
         new Get(
-            //security: "is_granted('ROLE_ADMIN')",
+            security: "is_granted('ROLE_USER') and object == user",
             normalizationContext: ['groups' => ['user:read']],
         ),
         new Put(
             uriTemplate: '/users/{id}',
             processor: UserPasswordHasher::class,
             security: "is_granted('ROLE_ADMIN')",
-            securityMessage: "Only authenticated users can modify users."
+            securityMessage: "Only ADMIN users can modify users."
         ),
         new Patch(
             uriTemplate: '/users/{id}',
             processor: UserPasswordHasher::class,
-            //security: "is_granted('ROLE_ADMIN')",
-            securityMessage: "Only authenticated users can modify users."
+            security: "is_granted('ROLE_ADMIN') or ((is_granted('ROLE_PRO') or is_granted('ROLE_USER')) and object == user)",
+            securityMessage: "Only ADMIN users can modify users."
         ),
         new Delete(
             uriTemplate: '/users/{id}',
             security: "is_granted('ROLE_ADMIN')",
-            securityMessage: "Only authenticated users can delete users."
+            securityMessage: "Only admin users can delete users."
         ),
     ],
     normalizationContext: [
@@ -66,7 +66,7 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
-    #[Groups(['user:read', 'companies:read'])]
+    #[Groups(['user:read', 'companies:read', 'car:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'users')]
@@ -142,9 +142,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups('user:read', 'companies:read')]
     private Collection $media;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Notice::class, orphanRemoval: true)]
-    #[Groups('user:read')]
-    private Collection $notices;
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Notification::class, orphanRemoval: true)]
+    private Collection $notifications;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['user:create', 'user:update','user:read'])]
@@ -161,7 +160,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setPhone(?string $phone): static
     {
-        $this->phone = $phone;
+        $this->phone = trim($phone);
 
         return $this;
     }
@@ -212,7 +211,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setEmail(string $email): static
     {
-        $this->email = strtolower($email);
+        $this->email = strtolower(trim($email));
 
         return $this;
     }
@@ -287,7 +286,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setFirstname(?string $firstname): static
     {
-        $this->firstname = $firstname;
+        $this->firstname = ucfirst(trim($firstname));
 
         return $this;
     }
@@ -319,14 +318,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getMedia(): Collection
     {
         return $this->media;
-    }
-
-    /**
-     * @return Collection<int, Notice[]>
-     */
-    public function getNotices(): Collection
-    {
-        return $this->notices;
     }
 
     public function getCompanie(): ?Companie
@@ -382,20 +373,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function addNotice(Notice $notice): static
+    public function addNotification(Notification $notification): static
     {
-        if (!$this->notices->contains($notice)) {
-            $this->notices->add($notice);
-            $notice->setUser($this);
+        if (!$this->notifications->contains($notification)) {
+            $this->notifications->add($notification);
+            $notification->setUser($this);
         }
         return $this;
     }
 
-    public function removeNotice(Notice $notice): static
+    public function removeNotification(Notification $notification): static
     {
-        if ($this->notices->removeElement($notice)) {
-            if ($notice->getUser() === $this) {
-                $notice->setUser(null);
+        if ($this->notifications->removeElement($notification)) {
+            if ($notification->getUser() === $this) {
+                $notification->setUser(null);
             }
         }
         return $this;
@@ -403,7 +394,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setLastname(?string $lastname): static
     {
-        $this->lastname = $lastname;
+        $this->lastname = ucfirst(trim($lastname));
 
         return $this;
     }

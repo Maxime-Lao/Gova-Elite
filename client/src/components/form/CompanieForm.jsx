@@ -4,8 +4,9 @@ import useGetConnectedUser from '../hooks/useGetConnectedUser';
 import { useNavigate } from 'react-router-dom';
 
 function CompanieForm() {
+    const token = localStorage.getItem('token');
     const user = useGetConnectedUser();
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     const [companie, setCompanie] = useState({
         name: '',
@@ -36,14 +37,16 @@ function CompanieForm() {
             formData.append('kbis', kbisFile);
         }
 
-        console.log(user);
         if (user && user.connectedUser.id) {
             formData.append('userId', user.connectedUser.id);
         }        
 
         try {
-            const response = await fetch('http://localhost:8000/api/companies', {
+            const response = await fetch('http://195.35.29.110:8000/api/companies', {
                 method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
                 body: formData,
             });
 
@@ -59,7 +62,7 @@ function CompanieForm() {
     };
 
     return (
-        <Grid container spacing={2} justifyContent="center">
+        <Grid container spacing={2} justifyContent="center" sx={{ mt: 7, mb: 7 }}>
             <Grid item xs={12} sm={6}>
                 <Box mt={2} textAlign="center">
                     <h1>Créer une entreprise</h1>
@@ -72,6 +75,7 @@ function CompanieForm() {
                         label="Nom de l'entreprise"
                         fullWidth
                         margin="normal"
+                        required
                     />
                     <TextField
                         name="address"
@@ -80,14 +84,17 @@ function CompanieForm() {
                         label="Adresse"
                         fullWidth
                         margin="normal"
+                        required
                     />
                     <TextField
                         name="zipCode"
                         value={companie.zipCode}
                         onChange={handleChange}
+                        type="number"
                         label="Code Postal"
                         fullWidth
                         margin="normal"
+                        required
                     />
                     <TextField
                         name="city"
@@ -96,12 +103,14 @@ function CompanieForm() {
                         label="Ville"
                         fullWidth
                         margin="normal"
+                        required
                     />
                     <div style={{ marginBottom: '1rem', marginTop: '1rem' }}>
                         <input
                             type="file"
                             name="kbis"
                             onChange={handleFileChange}
+                            required
                         />
                     </div>
                     <Button

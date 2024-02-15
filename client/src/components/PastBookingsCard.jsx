@@ -12,6 +12,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import { useTranslation } from 'react-i18next';
 import format from 'date-fns/format';
 import { fr } from 'date-fns/locale';
 import Button from '@mui/material/Button';
@@ -34,6 +35,8 @@ const ExpandMore = styled((props) => {
 }));
 
 function PastBookings({ rent, user, onPastBookingChange }) {
+  const { t } = useTranslation();
+  const token = localStorage.getItem('token');
   const [expanded, setExpanded] = React.useState(false);
   const formattedStartDate = format(new Date(rent.dateStart), "dd/MM/yyyy HH'h'", { locale: fr });
   const formattedEndDate = format(new Date(rent.dateEnd), "dd/MM/yyyy HH'h'", { locale: fr });
@@ -107,7 +110,7 @@ function PastBookings({ rent, user, onPastBookingChange }) {
   
     for (const field of requiredFields) {
       if (!comment[field]) {
-        updateErrorMessages(field, 'Veuillez remplir tous les champs.');
+        updateErrorMessages(field, t('Veuillez remplir tous les champs.'));
         return false;
       }
     }
@@ -159,18 +162,20 @@ function PastBookings({ rent, user, onPastBookingChange }) {
         author,
         car,
       };
+      const token = localStorage.getItem('token');
 
-      const response = await fetch('http://localhost:8000/api/comments', {
+      const response = await fetch('http://195.35.29.110:8000/api/comments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json+ld',
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify(commentData),
       });
 
       if (response.ok) {
         onPastBookingChange();
-        setFeedbackMessage('Votre commentaire a été pris en compte.');
+        setFeedbackMessage(t('Votre commentaire a été pris en compte.'));
         setOpenDialog(false);
       } else {
         const errorData = await response.json();
@@ -249,23 +254,23 @@ function PastBookings({ rent, user, onPastBookingChange }) {
               backgroundColor: '#4bc3ff',
             },
           }}
-          disabled={isButtonDisabled}>Noter</Button>
+          disabled={isButtonDisabled}>{t('Noter')}</Button>
             <Button variant="contained" color="success" onClick={() => handleRedirectCarsPage (rent.car.id)}>
-              Reprendre RDV
+              {t('Reprendre RDV')}
             </Button>
       </CardActions>
 
       <Dialog open={openDialog} onClose={handleCloseDialog}>
           <DialogContent>
-            <Typography component="h2" variant="h6" fontWeight="bold">Note de la voiture :</Typography>
-            <Typography>Propreté :</Typography>
+            <Typography component="h2" variant="h6" fontWeight="bold">{t('Note de la voiture :')}</Typography>
+            <Typography>{t('Propreté')} :</Typography>
             <Rating
               name="cleanliness"
               value={comment.cleanliness}
               precision={0.5}
               onChange={(event, newValue) => handleRatingChange('cleanliness', newValue)}
             />
-            <Typography>Entretien :</Typography>
+            <Typography>{t('Entretien')} :</Typography>
             <Rating
               name="maintenance"
               value={comment.maintenance}
@@ -279,14 +284,14 @@ function PastBookings({ rent, user, onPastBookingChange }) {
               precision={0.5}
               onChange={(event, newValue) => handleRatingChange('communication', newValue)}
             />
-            <Typography>Confort :</Typography>
+            <Typography>{t('Confort')} :</Typography>
             <Rating
               name="convenience"
               value={comment.convenience}
               precision={0.5}
               onChange={(event, newValue) => handleRatingChange('convenience', newValue)}
             />
-            <Typography>Précision :</Typography>
+            <Typography>{t('Précision')} :</Typography>
             <Rating
               name="accuracy"
               value={comment.accuracy}
@@ -294,13 +299,13 @@ function PastBookings({ rent, user, onPastBookingChange }) {
               onChange={(event, newValue) => handleRatingChange('accuracy', newValue)}
             />
 
-            <Typography>Commentaire :</Typography>
+            <Typography>{t('Commentaire')} :</Typography>
             <textarea
               value={comment.comment}
               onChange={(event) => setComment({ ...comment, comment: event.target.value })}
               rows={4}
               cols={40}
-              placeholder="Ajouter un commentaire..."
+              placeholder={t('Ajouter un commentaire...')}
             />
 
           {Object.keys(errorMessages).map((fieldName) => (
@@ -315,8 +320,8 @@ function PastBookings({ rent, user, onPastBookingChange }) {
           )}
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCloseDialog} variant="contained" color="error">Annuler</Button>
-            <Button onClick={handleSubmitComment} variant="contained" color="success">Valider</Button>
+            <Button onClick={handleCloseDialog} variant="contained" color="error">{t('Annuler')}</Button>
+            <Button onClick={handleSubmitComment} variant="contained" color="success">{t('Valider')}</Button>
           </DialogActions>
         </Dialog>
     </Card>
