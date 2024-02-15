@@ -19,25 +19,23 @@ function Bookings() {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      try {
-        const response = await fetch(`http://195.35.29.110:8000/api/users/${user.connectedUser.id}/rents`);
-        const userData = await response.json();
-        const commentsResponse = await fetch(`http://195.35.29.110:8000/api/users/${user.connectedUser.id}/comments`);
-        const commentsData = await commentsResponse.json();
-        setUserData(userData);
-        setUserCommentsData(commentsData);
-      } catch (error) {
-        console.error('Error:', error);
-      } finally {
-        setIsLoading(false);
+      if (user.connectedUser) {
+        try {
+          const response = await fetch(`http://195.35.29.110:8000/api/users/${user.connectedUser.id}/rents`);
+          const userData = await response.json();
+          const commentsResponse = await fetch(`http://195.35.29.110:8000/api/users/${user.connectedUser.id}/comments`);
+          const commentsData = await commentsResponse.json();
+          setUserData(userData);
+          setUserCommentsData(commentsData);
+        } catch (error) {
+          console.error('Error:', error);
+        } finally {
+          setIsLoading(false);
+        }
       }
     };
-
-    if (user.connectedUser.id) {
-      fetchUserData();
-    }
     fetchUserData();
-  }, [user.connectedUser.id]);
+  }, [user.connectedUser]);
 
   const commentedRentIds = new Set();
     if (userCommentsData) {
@@ -108,14 +106,14 @@ function Bookings() {
               <Tab label="Historique" />
             </Tabs>
           </Grid>
-  
-          {tabValue === 0 && (
+
+          {(tabValue === 0 && currentBookings) ? (
             currentBookings.map((rent, index) => (
               <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
                 <CurrentBookingsCard rent={rent} user={user.connectedUser.id} onDelete={handleBookingDeletion} onBookingChange={refreshBookings}/>
               </Grid>
             ))
-          )}
+          ) : null}
 
           {tabValue === 1 && (
             pastBookings.map((rent, index) => (

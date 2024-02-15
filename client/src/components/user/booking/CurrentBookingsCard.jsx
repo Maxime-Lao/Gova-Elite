@@ -55,7 +55,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
   const navigate = useNavigate();
 
   const isRentButtonDisabled = !startDate || !endDate;
-  
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -297,7 +297,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
       <CardMedia
         component="img"
         height="194"
-        image={rent.car.media[0].filePath ? `http://localhost:8000/media/${rent.car.media[0].filePath}` : "https://source.unsplash.com/random"}
+        image={rent.car.media.length &&  rent.car.media[0].filePath ? `http://localhost:8000/media/${rent.car.media[0].filePath}` : "https://source.unsplash.com/random"}
         alt={`${rent.car.model.name} image`}
         sx={{
           width: '100%',
