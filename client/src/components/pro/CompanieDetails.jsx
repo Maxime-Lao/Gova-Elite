@@ -14,7 +14,7 @@ const CompanieDetails = ({ companie }) => {
 
     const fetchRentData = useCallback(async () => {
         try {
-            const response = await fetch(`http://195.35.29.110:8000/api/companies/${companie.id}/rents`, {
+            const response = await fetch(`https://kame-os.fr/api/companies/${companie.id}/rents`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

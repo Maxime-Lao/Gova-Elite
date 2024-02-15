@@ -142,7 +142,7 @@ export default function Providers() {
         const getProviders = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://195.35.29.110:8000/api/companies', {
+                const response = await fetch('https://kame-os.fr/api/companies', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -181,7 +181,7 @@ export default function Providers() {
 
     const handleConfirmAction = async () => {
         try {
-            const response = await fetch(`http://195.35.29.110:8000/api/companies/${selectedProvider.id}`, {
+            const response = await fetch(`https://kame-os.fr/api/companies/${selectedProvider.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/merge-patch+json',
@@ -413,7 +413,7 @@ export default function Providers() {
                                                         provider.isVerified === false ? 'Non' : 'Oui'
                                                     }</TableCell>
                                                     {provider.kbis ? (
-                                                            <TableCell><a href={`http://195.35.29.110:8000/uploads/kbis/${provider.kbis}`} target="_blank" rel="noopener noreferrer">
+                                                            <TableCell><a href={`https://kame-os.fr/uploads/kbis/${provider.kbis}`} target="_blank" rel="noopener noreferrer">
                                                                 Voir le KBIS
                                                             </a></TableCell>
                                                     ) : (

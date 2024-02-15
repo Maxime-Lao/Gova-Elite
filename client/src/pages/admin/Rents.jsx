@@ -151,7 +151,7 @@ export default function Rents() {
         const getRents = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://195.35.29.110:8000/api/rents', {
+                const response = await fetch('https://kame-os.fr/api/rents', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

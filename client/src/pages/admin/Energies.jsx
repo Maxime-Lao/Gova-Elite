@@ -160,7 +160,7 @@ export default function Energies() {
         const getEnergies = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://195.35.29.110:8000/api/energies', {
+                const response = await fetch('https://kame-os.fr/api/energies', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -200,7 +200,7 @@ export default function Energies() {
         event.preventDefault();
         
         try {
-            const response = await fetch('http://195.35.29.110:8000/api/energies', {
+            const response = await fetch('https://kame-os.fr/api/energies', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -251,7 +251,7 @@ export default function Energies() {
 
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(`http://195.35.29.110:8000/api/energies/${selectedEnergy.id}`, {
+            const response = await fetch(`https://kame-os.fr/api/energies/${selectedEnergy.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -281,7 +281,7 @@ export default function Energies() {
 
     const handleUpdate = async () => {
         try {
-            const response = await fetch(`http://195.35.29.110:8000/api/energies/${selectedEnergy.id}`, {
+            const response = await fetch(`https://kame-os.fr/api/energies/${selectedEnergy.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/merge-patch+json',
