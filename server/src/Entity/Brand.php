@@ -51,7 +51,7 @@ class Brand
 
     public function setName(string $name): static
     {
-        $this->name = $name;
+        $this->name = ucfirst(trim($name));
 
         return $this;
     }

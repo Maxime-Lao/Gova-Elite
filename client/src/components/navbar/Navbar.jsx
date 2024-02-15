@@ -55,7 +55,6 @@ const Navbar = () => {
                 </Link>
                 <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: '1em' }}>
                     <ul style={{ listStyleType: 'none', display: 'flex', gap: '1em', alignItems: 'center' }}>
-                        <li><Button startIcon={<CarRentalIcon />}>Rent my vehicle</Button></li>
                         {!myToken || !user.connectedUser ? (
                             <>
                                 <li><Button onClick={redirectToLogin}>Log In</Button></li>
@@ -66,7 +65,9 @@ const Navbar = () => {
                                 {(user.connectedUser?.roles[0] === 'ROLE_ADMIN' || user.connectedUser?.roles[0] === 'ROLE_PRO') && (
                                     <li><NotificationButton /></li>
                                 )}
-                                <li><Button onClick={redirectToBookings}>Réservations</Button></li>
+                                {(user.connectedUser?.roles[0] === 'ROLE_USER') && (
+                                    <li><Button onClick={redirectToBookings}>Réservations</Button></li>
+                                )}
                                 <li>
                                     <AvatarDialog firstName={user.connectedUser?.firstname} lastName={user.connectedUser?.lastname} handleLogout={handleLogout} />
                                 </li>

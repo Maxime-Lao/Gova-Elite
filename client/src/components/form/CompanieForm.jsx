@@ -59,7 +59,7 @@ function CompanieForm() {
     };
 
     return (
-        <Grid container spacing={2} justifyContent="center">
+        <Grid container spacing={2} justifyContent="center" sx={{ mt: 7, mb: 7 }}>
             <Grid item xs={12} sm={6}>
                 <Box mt={2} textAlign="center">
                     <h1>Créer une entreprise</h1>
@@ -85,6 +85,7 @@ function CompanieForm() {
                         name="zipCode"
                         value={companie.zipCode}
                         onChange={handleChange}
+                        type="number"
                         label="Code Postal"
                         fullWidth
                         margin="normal"

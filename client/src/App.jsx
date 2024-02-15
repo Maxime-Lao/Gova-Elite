@@ -137,7 +137,7 @@ function App() {
               } />
               <Route path="/not-found" element={<NotFoundPage />} />
               <Route path="/createCompanie" element={
-                <ProtectedRoute allowedRoles={['ROLE_PRO']}>
+                <ProtectedRoute allowedRoles={['ROLE_PRO']} redirectIfCompanyExists={true}>
                   <CreateCompanie />
                 </ProtectedRoute>
               } />

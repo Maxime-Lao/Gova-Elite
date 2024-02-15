@@ -51,7 +51,7 @@ class Category
 
     public function setLibelle(string $libelle): static
     {
-        $this->libelle = $libelle;
+        $this->libelle = ucfirst(trim($libelle));
 
         return $this;
     }
