@@ -3,19 +3,43 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use App\Repository\NotificationRepository;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]
-#[ApiResource]
 #[ApiResource(
-    uriTemplate: '/users/{userId}/notifications',
-    uriVariables: [
-        'userId' => new Link(fromClass: User::class, toProperty: 'user'),
+    operations: [
+        new GetCollection(
+            //security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_PRO') and object.getUser() == user",
+            uriTemplate: '/users/{userId}/notifications',
+            uriVariables: [
+                'userId' => new Link(fromClass: User::class, toProperty: 'user'),
+            ],
+        ),
+        new Get(
+            security: "is_granted('ROLE_ADMIN')",
+        ),
+        new Post(
+            security: "is_granted('ROLE_ADMIN')",
+        ),
+        new Put(
+            security: "is_granted('ROLE_ADMIN')",
+        ),
+        new Patch(
+            security: "is_granted('ROLE_ADMIN')",
+        ),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')",
+        ),
     ],
-    operations: [new GetCollection()],
+    security: "is_granted('ROLE_ADMIN')"
 )]
 class Notification
 {

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Delete;
 use App\Repository\CommentRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -38,6 +39,12 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/users/{userId}/comments',
             uriVariables: ['userId' => new Link(fromClass: User::class, toProperty: 'author')],
             normalizationContext: ['groups' => ['comments_user:read']]
+        ),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
+        new Post(
+            security: "is_granted('ROLE_USER')"
         )
     ]
 )]

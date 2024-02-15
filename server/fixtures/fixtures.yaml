@@ -26,10 +26,6 @@ App\Entity\Companie:
     zip_code: '<postcode()>'
     city: '<city()>'
 
-App\Entity\Role:
-  role_{1..10}:
-    name: '<randomElement(["ROLE_CLIENT", "ROLE_PRESTATAIRE", "ROLE_ADMIN"])>'
-
 App\Entity\User:
   user_{1..10}:
     email: '<email()>'

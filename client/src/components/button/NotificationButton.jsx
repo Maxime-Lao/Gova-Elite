@@ -10,13 +10,19 @@ import { Box, Divider, Typography } from '@mui/material';
 export default function NotificationButton() {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [notifications, setNotifications] = useState([]);
+  const token = localStorage.getItem('token');
 
   const user = useGetConnectedUser();
 
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}/notifications`)
+        const response = await fetch(`http://195.35.29.110:8000/api/users/${user.connectedUser.id}/notifications`, {
+          method: 'GET',
+          headers: {
+              Authorization: `Bearer ${token}`
+          }
+      })
         const data = await response.json()
         const filteredData = data.filter(notification => !notification.isRead)
         setNotifications(filteredData)
@@ -43,7 +49,7 @@ export default function NotificationButton() {
 
   const handleRead = async (id) => {
     try {
-      await fetch(`http://localhost:8000/api/notifications/${id}`, {
+      await fetch(`http://195.35.29.110:8000/api/notifications/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/merge-patch+json',

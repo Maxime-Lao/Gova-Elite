@@ -19,10 +19,13 @@ class CompanieController extends AbstractController
     #[Route('/api/companies', name: 'create_companie', methods: ['POST'])]
     public function __invoke(Request $request, FileUploader $fileUploader, EntityManagerInterface $em, LoggerInterface $logger, MailerInterface $mailer): Response
     {
-        $user = $security->getUser();
-        if ($user->hasRole('ROLE_PRO')) {
-            $existingCompanie = $em->getRepository(Companie::class)->findOneBy(['user' => $user]);
-            if ($existingCompanie) {
+        $userId = $request->request->get('userId');
+        if ($userId) {
+            $user = $em->getRepository(User::class)->find($userId);
+        }
+
+        if ($user->getRoles() == ["ROLE_PRO"]) {
+            if ($user->getCompanie() != []) {
                 throw new HttpException(400, "Cet utilisateur possède déjà une compagnie.");
             }
         }
@@ -34,8 +37,15 @@ class CompanieController extends AbstractController
             }
         }
 
-        if (!$request->files->get('kbis')) {
+        $kbisFile = $request->files->get('kbis');
+        if (!$kbisFile) {
             return $this->json(['status' => 'error', 'message' => 'Missing kbis file'], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $maxSize = 5 * 1024 * 1024;
+        $allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+        if ($kbisFile->getSize() > $maxSize || !in_array($kbisFile->getMimeType(), $allowedTypes)) {
+            return $this->json(['status' => 'error', 'message' => 'Invalid file. Only PDF, JPG, PNG files are allowed and size must be less than 5MB.'], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         $companie = new Companie();
@@ -48,13 +58,10 @@ class CompanieController extends AbstractController
         $kbisFilename = $fileUploader->upload($request->files->get('kbis'));
         $companie->setKbis($kbisFilename);
 
-        $userId = $request->request->get('userId');
-        if ($userId) {
-            $user = $em->getRepository(User::class)->find($userId);
-            if ($user) {
-                $companie->addUser($user);
-            }
+        if ($user) {
+            $companie->addUser($user);
         }
+        
 
         $em->persist($companie);
         $em->flush();

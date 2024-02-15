@@ -97,7 +97,11 @@ const EditCar = ({ carId }) => {
     useEffect(() => {
         const fetchCarData = async () => {
             try {
-                const response = await axios.get(`http://195.35.29.110:8000/api/cars/${carId}`);
+                const response = await axios.get(`http://195.35.29.110:8000/api/cars/${carId}`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    },
+                });
                 setCarData(response.data);
             } catch (error) {
                 console.error("Error fetching car data", error);
@@ -141,6 +145,7 @@ const EditCar = ({ carId }) => {
 
                     const mediaResponse = await axios.post('http://195.35.29.110:8000/api/media_objects', formData, {
                         headers: {
+                            Authorization: `Bearer ${localStorage.getItem('token')}`,
                             'Content-Type': 'multipart/form-data',
                         },
                     });

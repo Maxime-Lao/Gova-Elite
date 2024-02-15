@@ -14,7 +14,6 @@ use App\Entity\Model;
 use App\Entity\Energy;
 use App\Entity\Gear;
 use App\Entity\Category;
-use App\Entity\Reason;
 use App\Entity\Rent;
 
 class AppFixtures extends Fixture

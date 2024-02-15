@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 function CompanieForm() {
     const user = useGetConnectedUser();
     const navigate = useNavigate(); 
+    const token = localStorage.getItem('token');
 
     const [companie, setCompanie] = useState({
         name: '',
@@ -44,7 +45,10 @@ function CompanieForm() {
         try {
             const response = await fetch('http://195.35.29.110:8000/api/companies', {
                 method: 'POST',
-                body: formData,
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
             });
 
             if (!response.ok) {

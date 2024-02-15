@@ -49,7 +49,7 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
         new Patch(
             uriTemplate: '/users/{id}',
             processor: UserPasswordHasher::class,
-            security: "is_granted('ROLE_USER') and object == user",
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_USER') and object == user",
             securityMessage: "Only ADMIN users can modify users."
         ),
         new Delete(
