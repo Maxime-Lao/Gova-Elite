@@ -3,6 +3,12 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
 use App\Repository\ModelRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -12,6 +18,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ModelRepository::class)]
 #[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Get(),
+        new Post(security: "is_granted('ROLE_ADMIN')", securityMessage: "Only ADMIN users can create models."),
+        new Put(security: "is_granted('ROLE_ADMIN')", securityMessage: "Only ADMIN users can update models."),
+        new Patch(security: "is_granted('ROLE_ADMIN')", securityMessage: "Only ADMIN users can modify models."),
+        new Delete(security: "is_granted('ROLE_ADMIN')", securityMessage: "Only ADMIN users can delete models.")
+    ],
     normalizationContext: [
         'groups' => ['model:read']
     ]

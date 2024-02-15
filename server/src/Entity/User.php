@@ -37,25 +37,25 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
             validationContext: ['groups' => ['Default', 'user:create']]
         ),
         new Get(
-            //security: "is_granted('ROLE_ADMIN')",
+            security: "is_granted('ROLE_USER') and object == user",
             normalizationContext: ['groups' => ['user:read']],
         ),
         new Put(
             uriTemplate: '/users/{id}',
             processor: UserPasswordHasher::class,
             security: "is_granted('ROLE_ADMIN')",
-            securityMessage: "Only authenticated users can modify users."
+            securityMessage: "Only ADMIN users can modify users."
         ),
         new Patch(
             uriTemplate: '/users/{id}',
             processor: UserPasswordHasher::class,
-            //security: "is_granted('ROLE_ADMIN')",
-            securityMessage: "Only authenticated users can modify users."
+            security: "is_granted('ROLE_USER') and object == user",
+            securityMessage: "Only ADMIN users can modify users."
         ),
         new Delete(
             uriTemplate: '/users/{id}',
             security: "is_granted('ROLE_ADMIN')",
-            securityMessage: "Only authenticated users can delete users."
+            securityMessage: "Only admin users can delete users."
         ),
     ],
     normalizationContext: [

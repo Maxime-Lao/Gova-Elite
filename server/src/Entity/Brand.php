@@ -3,6 +3,12 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
 use App\Repository\BrandRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -11,7 +17,16 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BrandRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Get(),
+        new Post(security: "is_granted('ROLE_ADMIN')", securityMessage: "Only ADMIN users can create brands."),
+        new Put(security: "is_granted('ROLE_ADMIN')", securityMessage: "Only ADMIN users can update brands."),
+        new Patch(security: "is_granted('ROLE_ADMIN')", securityMessage: "Only ADMIN users can modify brands."),
+        new Delete(security: "is_granted('ROLE_ADMIN')", securityMessage: "Only ADMIN users can delete brands.")
+    ]
+)]
 class Brand
 {
     #[ORM\Id]

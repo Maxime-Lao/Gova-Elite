@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
 use App\Repository\CommentRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -11,22 +12,34 @@ use ApiPlatform\Metadata\GetCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
-#[ApiResource(normalizationContext: ['groups' => ['comments:read']])]
 #[ApiResource(
-    uriTemplate: '/cars/{carId}/comments',
-    uriVariables: [
-        'carId' => new Link(fromClass: Car::class, toProperty: 'car'),
-    ],
-    operations: [new GetCollection()],
-    normalizationContext: ['groups' => ['comments_car:read']],
-)]
-#[ApiResource(
-    uriTemplate: '/users/{userId}/comments',
-    uriVariables: [
-        'userId' => new Link(fromClass: User::class, toProperty: 'author'),
-    ],
-    operations: [new GetCollection()],
-    normalizationContext: ['groups' => ['comments_user:read']],
+    normalizationContext: ['groups' => ['comments:read']],
+    operations: [
+        new Post(
+            uriTemplate: '/cars/{carId}/comments',
+            uriVariables: ['carId' => new Link(fromClass: Car::class, toProperty: 'car')],
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
+            normalizationContext: ['groups' => ['comments_car:read']],
+            denormalizationContext: ['groups' => ['comments_car:write']]
+        ),
+        new Post(
+            uriTemplate: '/users/{userId}/comments',
+            uriVariables: ['userId' => new Link(fromClass: User::class, toProperty: 'author')],
+            security: "is_granted('IS_AUTHENTICATED_FULLY')",
+            normalizationContext: ['groups' => ['comments_user:read']],
+            denormalizationContext: ['groups' => ['comments_user:write']]
+        ),
+        new GetCollection(
+            uriTemplate: '/cars/{carId}/comments',
+            uriVariables: ['carId' => new Link(fromClass: Car::class, toProperty: 'car')],
+            normalizationContext: ['groups' => ['comments_car:read']]
+        ),
+        new GetCollection(
+            uriTemplate: '/users/{userId}/comments',
+            uriVariables: ['userId' => new Link(fromClass: User::class, toProperty: 'author')],
+            normalizationContext: ['groups' => ['comments_user:read']]
+        )
+    ]
 )]
 class Comment
 {

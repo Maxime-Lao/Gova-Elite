@@ -5,6 +5,7 @@ import useGetConnectedUser from '../hooks/useGetConnectedUser';
 const Account = () => {
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
+    const token = localStorage.getItem('token');
 
     const user = useGetConnectedUser();
 
@@ -54,6 +55,7 @@ const Account = () => {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/merge-patch+json', // Spécification du type de contenu attendu
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify(formData),
             });

@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Patch;
 use App\Repository\CompanieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -21,14 +22,22 @@ use ApiPlatform\Metadata\GetCollection;
 #[ApiResource(
     normalizationContext: ['groups' => ['companies:read']],
     operations: [
+        new GetCollection(),
         new Get(),
-        new Put(),
-        new Delete(),
+        new Put(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
+        new Patch(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
         new Post(
+            security: "is_granted('ROLE_PRO')",
             controller: CompanieController::class,
             deserialize: false
-        ),
-        new GetCollection()
+        )
     ]
 )]
 

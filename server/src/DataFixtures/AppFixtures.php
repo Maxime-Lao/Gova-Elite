@@ -15,7 +15,6 @@ use App\Entity\Model;
 use App\Entity\Energy;
 use App\Entity\Gear;
 use App\Entity\Category;
-use App\Entity\Notice;
 use App\Entity\Reason;
 use App\Entity\Rent;
 
@@ -137,16 +136,6 @@ class AppFixtures extends Fixture
             $media->setUser($faker->randomElement($users));
             $media->setCar($faker->randomElement($cars));
             $manager->persist($media);
-        }
-
-        for ($i = 0; $i < 15; $i++) {
-            $notice = new Notice();
-            $notice->setMessage($faker->sentence);
-            $notice->setNbStars($faker->numberBetween(1, 5));
-            $notice->setCreatedAt(\DateTimeImmutable::createFromMutable($faker->dateTime()));
-            $notice->setCompanie($faker->randomElement($companies));
-            $notice->setUser($faker->randomElement($users));
-            $manager->persist($notice);
         }
 
         $manager->flush();
