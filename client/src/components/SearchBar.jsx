@@ -4,6 +4,7 @@ import DatePicker from 'react-datepicker';
 import { Autocomplete, useJsApiLoader } from "@react-google-maps/api";
 //router
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 
 function SearchBar() {
     const [startDate, setStartDate] = useState(null);
@@ -14,6 +15,8 @@ function SearchBar() {
     const [ autocomplete, setAutocomplete ] = useState(null);
 
     const [ libraries ] = useState(['places']);
+
+    const { t } = useTranslation();
 
     const navigate = useNavigate();
 
@@ -39,7 +42,7 @@ function SearchBar() {
             clearErrors();
         } else {
             setError(true);
-            setErrorMessage("Lieu invalide.");
+            setErrorMessage(t("Lieu invalide."));
         }
     };
 
@@ -48,19 +51,19 @@ function SearchBar() {
 
     if (!startDate || !endDate || !location) {
         setError(true);
-        setErrorMessage("Veuillez remplir tous les champs.");
+        setErrorMessage(t("Veuillez remplir tous les champs."));
         return;
     }
 
     if (startDate >= endDate) {
         setError(true);
-        setErrorMessage("La date de début doit être antérieure à la date de fin.");
+        setErrorMessage(t("La date de début doit être antérieure à la date de fin."));
         return;
     }
   
     if (!location.geometry) {
         setError(true);
-        setErrorMessage("Lieu invalide.");
+        setErrorMessage(t("Lieu invalide."));
         return;
     }
 
@@ -100,7 +103,7 @@ function SearchBar() {
                     onChange={handleStartDateChange}
                     minDate={new Date()}
                     dateFormat="dd/MM/yyyy"
-                    placeholderText="Date de début"
+                    placeholderText={t("Date de début")}
                     className="date-picker"
                     />
                     </Grid>
@@ -111,7 +114,7 @@ function SearchBar() {
                     onChange={handleEndDateChange}
                     minDate={startDate || new Date()}
                     dateFormat="dd/MM/yyyy"
-                    placeholderText="Date de fin"
+                    placeholderText={t("Date de fin")}
                     className="date-picker"
                     />
                     </Grid>
@@ -126,7 +129,7 @@ function SearchBar() {
                             >
                                 <TextField
                                     sx={{ backgroundColor: 'white', borderRadius: '5px' }}
-                                    label="Lieu"
+                                    label={t("Lieu")}
                                     variant="filled"
                                     fullWidth
                                 />
@@ -136,7 +139,7 @@ function SearchBar() {
                 </Box>
                 <Grid item xs={12}>
                     <Button type="submit" variant="contained">
-                        Rechercher
+                        {t("Rechercher")}
                     </Button>
                 </Grid>
                 {error && (
