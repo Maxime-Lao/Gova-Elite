@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 
 function Bookings() {
   const { t } = useTranslation();
+  const token = localStorage.getItem('token');
   const [userData, setUserData] = useState(null);
   const [userCommentsData, setUserCommentsData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -78,7 +79,13 @@ function Bookings() {
 
   const refreshBookings = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}/rents`);
+      const response = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}/rents`, {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+          }
+      });
       const data = await response.json();
       setUserData(data);
     } catch (error) {
@@ -88,7 +95,13 @@ function Bookings() {
 
   const refreshPastBookings = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}/comments`);
+      const response = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}/comments`, {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+          }
+      });
       const data = await response.json();
       setUserCommentsData(data);
     } catch (error) {

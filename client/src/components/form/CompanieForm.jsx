@@ -4,6 +4,7 @@ import useGetConnectedUser from '../hooks/useGetConnectedUser';
 import { useNavigate } from 'react-router-dom';
 
 function CompanieForm() {
+    const token = localStorage.getItem('token');
     const user = useGetConnectedUser();
     const navigate = useNavigate(); 
 
@@ -43,6 +44,10 @@ function CompanieForm() {
         try {
             const response = await fetch('http://localhost:8000/api/companies', {
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json+ld',
+                    Authorization: `Bearer ${token}`
+                },
                 body: formData,
             });
 

@@ -3,6 +3,7 @@ import format from 'date-fns/format';
 import { fr } from 'date-fns/locale';
 
 export default function RentList({ companieId }) {
+    const token = localStorage.getItem('token');
     const [rents, setRents] = useState([]);
 
     useEffect(() => {
@@ -12,6 +13,7 @@ export default function RentList({ companieId }) {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
                     }
                 });
 

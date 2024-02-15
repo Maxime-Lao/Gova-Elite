@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 
 function Calendar({ carId, companieId }) {
   const { t } = useTranslation();
+  const token = localStorage.getItem('token');
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [carData, setCarData] = useState(0);
@@ -108,6 +109,7 @@ function Calendar({ carId, companieId }) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json+ld',
+            Authorization: `Bearer ${token}`
           },
           body: JSON.stringify(requestData),
         });
