@@ -50,7 +50,7 @@ const CarDetailsPro = () => {
             );
         });
 
-        const isCarUnavailableUnavailability = car.unavailability.some((unavailability) => {
+        const isCarUnavailableUnavailability = car.unavailabilities.some((unavailability) => {
             const unavailabilityStartDate = new Date(unavailability.date_start);
             const unavailabilityEndDate = new Date(unavailability.date_end);
 
@@ -75,6 +75,7 @@ const CarDetailsPro = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
                 body: JSON.stringify({
                     car: `/api/cars/${carId}`,
@@ -89,7 +90,7 @@ const CarDetailsPro = () => {
                 const responseData = await response.json();
                 setCar((prevCar) => ({
                     ...prevCar,
-                    unavailability: [...prevCar.unavailability, responseData],
+                    unavailabilities: [...prevCar.unavailabilities, responseData],
                 }));
             }
             setSuccess('Indisponibilité enregistrée');
