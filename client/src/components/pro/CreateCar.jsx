@@ -101,6 +101,8 @@ const CreateCar = ({companieId}) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        let carId = null;
+    
         try {
             const carResponse = await axios.post(`http://localhost:8000/api/cars`, carData, {
                 headers: {
@@ -108,35 +110,51 @@ const CreateCar = ({companieId}) => {
                     'Content-Type': 'application/json'
                 }
             });
-
-            const carId = carResponse.data.id;
-
-            for (const photo of photos) {
-                const formData = new FormData();
-                formData.append('file', photo);
-                formData.append('car_id', carId);
-                formData.append('user_id', user.connectedUser.id);
-
-                const mediaResponse = await axios.post('http://localhost:8000/api/media_objects', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-
+    
+            if (carResponse.status === 200 || carResponse.status === 201) {
+                carId = carResponse.data.id;
+    
+                for (const photo of photos) {
+                    const formData = new FormData();
+                    formData.append('file', photo);
+                    formData.append('car_id', carId);
+                    formData.append('user_id', user.connectedUser.id);
+    
+                    await axios.post('http://localhost:8000/api/media_objects', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+                }
+    
+                setSuccess('Voiture créée avec succès');
+                setError('');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            } else {
+                console.error('Erreur lors de la création de la voiture', carResponse.data['hydra:description']);
+                setError('Erreur lors de la création de la voiture. Veuillez réessayer.');
             }
-
-            console.log('Voiture créée avec succès', carResponse.data);
-            setSuccess('Voiture créée avec succès');
-            setError('');
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
         } catch (error) {
-            console.error('Erreur lors de la création de la voiture', error);
-            setSuccess('');
-            setError('Erreur lors de la création de la voiture');
+            console.error('Erreur lors de la création de la voiture ou du téléchargement des photos', error.response.data['hydra:description']);
+            setError(error.response.data['hydra:description']);
+    
+            if (carId) {
+                try {
+                    await axios.delete(`http://localhost:8000/api/cars/${carId}`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                } catch (deleteError) {
+                    console.error('Erreur lors de la suppression de la voiture', deleteError);
+                }
+            }
         }
     };
+    
 
     const handleBrandChange = (e) => {
         setSelectedBrandId(e.target.value)
@@ -159,9 +177,6 @@ const CreateCar = ({companieId}) => {
     return (
         <Grid container spacing={2} justifyContent="center">
             <Grid item xs={12} sm={6}>
-                <Box mt={2} textAlign="center">
-                    <h1>Ajouter une voiture</h1>
-                </Box>
                 {
                     (myGears && myEnergies && myCategories && myBrands) ? (
                         <form onSubmit={handleSubmit}>
@@ -312,12 +327,12 @@ const CreateCar = ({companieId}) => {
                                 margin="normal"
                                 required
                             />
-                            <h3>Ajouter des images(Taille maximle 5MO)</h3>
+                            <h3>Ajouter des images(Taille maximle 1MO)</h3>
                             <Button
                                 variant="contained"
                                 component="label"
                             >
-                                Upload File
+                                Ajouter une image
                                 <input
                                     type="file"
                                     onChange={() => handlePhoto(event)}

@@ -4,8 +4,10 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Delete;
 use App\Repository\CompanieRepository;
@@ -15,20 +17,25 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 use App\Controller\CompanieController;
 use Symfony\Component\Validator\Constraints as Assert;
-use ApiPlatform\Metadata\GetCollection;
 
 #[ORM\Entity(repositoryClass: CompanieRepository::class)]
 #[ApiResource(
-    normalizationContext: ['groups' => ['companies:read']],
     operations: [
+        new GetCollection(
+            //security: "is_granted('ROLE_ADMIN')",
+            normalizationContext: ['groups' => ['companies:read']],
+        ),
         new Get(),
         new Put(),
+        new Patch(
+            uriTemplate: '/companies/{id}',
+            normalizationContext: ['groups' => ['companies:update']],
+        ),
         new Delete(),
         new Post(
             controller: CompanieController::class,
             deserialize: false
         ),
-        new GetCollection()
     ]
 )]
 
@@ -47,10 +54,14 @@ class Companie
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'L\'adresse ne peut pas être vide')]
+    #[Assert\Regex(
+        pattern: '/^[0-9]{1,4}(, )?[a-zA-Z\s]{1,50}$/',
+        message: 'L\'adresse n\'est pas valide'
+    )]
     #[Groups(['companies:read', 'car_search:read', 'user:read'])]
     private ?string $address = null;
 
-    #[Groups(['companies:read'])]
+    #[Groups(['companies:read', 'car:read'])]
     #[ORM\OneToMany(mappedBy: 'companie', targetEntity: User::class, orphanRemoval: true)]
     private Collection $users;
 
@@ -67,6 +78,10 @@ class Companie
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: 'La ville ne peut pas être vide')]
+    #[Assert\Regex(
+        pattern: '/^[a-zA-Z\s]{1,50}$/',
+        message: 'La ville n\'est pas valide'
+    )]
     #[Groups(['companies:read', 'car_search:read', 'user:read'])]
     private ?string $city = null;
 
@@ -118,7 +133,7 @@ class Companie
 
     public function setName(string $name): static
     {
-        $this->name = $name;
+        $this->name = ucfirst(trim($name));
 
         return $this;
     }
@@ -130,7 +145,7 @@ class Companie
 
     public function setAddress(string $address): static
     {
-        $this->address = $address;
+        $this->address = ucfirst(trim($address));
 
         return $this;
     }
@@ -156,7 +171,7 @@ class Companie
 
     public function setCity(string $city): static
     {
-        $this->city = $city;
+        $this->city = ucfirst(trim($city));
 
         return $this;
     }

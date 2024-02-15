@@ -65,15 +65,16 @@ class MediaObject
     #[Vich\UploadableField(mapping: 'media_object', fileNameProperty: 'filePath')]
     #[Assert\NotNull(groups: ['media_object_create'])]
     #[Assert\File(
-        mimeTypes: ["image/jpeg", "image/png", "image/jpg"],
-        mimeTypesMessage : "Veuillez télécharger un fichier JPEG, JPG ou PNG valide."
+        mimeTypes: ["image/jpeg", "image/png", "image/jpg", "application/pdf"],
+        mimeTypesMessage: "Veuillez télécharger un fichier JPEG, JPG, PNG ou PDF valide.",
+        maxSize: "1M",
+        maxSizeMessage: "Le fichier est trop volumineux ({{ size }} {{ suffix }}). La taille maximale autorisée est de {{ limit }} {{ suffix }}."
     )]
     #[ApiProperty(types: ['https://schema.org/image'])]
-    public ?File $file = null;
-
+    public ?File $file = null;    
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['user:read', 'car:read', 'car_search:read'])]
+    #[Groups(['user:read', 'car:read', 'rents_user:read', 'car_search:read'])]
     public ?string $filePath = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]

@@ -10,13 +10,13 @@ import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Link from '@mui/material/Link';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import {MainListItems} from '../components/dashboard/ListItems.jsx';
+import {MainListItems} from '../../components/dashboard/ListItems.jsx';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
-import CardInfo from "../components/dashboard/CardInfo.jsx";
+import CardInfo from "../../components/dashboard/CardInfo.jsx";
 import {Grid} from "@mui/material";
 import { useMediaQuery } from '@mui/material';
-import NavPro from "../components/navbar/NavbarPro.jsx";
+import NavPro from "../../components/navbar/NavbarPro.jsx";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 

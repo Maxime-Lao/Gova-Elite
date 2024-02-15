@@ -23,6 +23,9 @@ import {
     Box,
     Input
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import format from 'date-fns/format';
+import { fr } from 'date-fns/locale';
 import EditIcon from "@mui/icons-material/Edit";
 import {createTheme, styled, ThemeProvider, useTheme} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -34,14 +37,14 @@ import Divider from '@mui/material/Divider';
 import Badge from '@mui/material/Badge';
 import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
-import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
-import CheckIcon from '@mui/icons-material/Check';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import {MainListItems, secondaryListItems} from '../components/dashboard/ListItems.jsx';
+import {MainListItems, secondaryListItems} from '../../components/dashboard/ListItems.jsx';
 import { useMediaQuery } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
-import NavbarPro from '../components/navbar/NavbarPro.jsx';
+import Rating from '@mui/material/Rating';
+import Stack from '@mui/material/Stack';
+import NavbarPro from "../../components/navbar/NavbarPro.jsx";
 
 export function Copyright() {
     return (
@@ -129,34 +132,32 @@ const defaultTheme = createTheme({
     },
 });
 
-export default function Providers() {
+export default function Comments() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [open, setOpen] = useState(!isMobile);
     const [isLoading, setIsLoading] = useState(true);
-    const [providers, setProviders] = useState([]);
-    const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
-    const [selectedProvider, setSelectedProvider] = useState(null);
+    const [comments, setComments] = useState([]);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [selectedComment, setSelectedComment] = useState(null);
     const token = localStorage.getItem('token');
-    const emailLoggedUser = localStorage.getItem('email');
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
 
     const toggleDrawer = () => {
         setOpen(!open);
     };
 
-    const [isVerified, setIsVerified] = useState('');
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
     useEffect(() => {
         setOpen(!isMobile);
     }, [isMobile]);
 
     useEffect(() => {
-        const getProviders = async () => {
+        const getComments = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://localhost:8000/api/companies', {
+                const response = await fetch('http://localhost:8000/api/comments', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -169,8 +170,7 @@ export default function Providers() {
                 }
 
                 const data = await response.json();
-                const filteredProviders = data.filter(provider => provider.users.length > 0);
-                setProviders(filteredProviders);
+                setComments(data);
                 setIsLoading(false);
             } catch (error) {
                 console.error(error);
@@ -178,54 +178,35 @@ export default function Providers() {
             }
         };
 
-        getProviders();
-    }, [token, emailLoggedUser]);
+        getComments();
+    }, [token]);
 
-
-    const handleConfirm = (provider) => {
-        setSelectedProvider(provider);
-        setOpenConfirmDialog(true);
+    const handleDelete = (comment) => {
+        setSelectedComment(comment);
+        setOpenDeleteDialog(true);
     };
 
-    useEffect(() => {
-        if (selectedProvider) {
-            setIsVerified(selectedProvider.isVerified ? 'true' : 'false');
-        }
-    }, [selectedProvider]);    
-
-    const handleConfirmAction = async () => {
+    const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/companies/${selectedProvider.id}`, {
-                method: 'PATCH',
+            const response = await fetch(`http://localhost:8000/api/comments/${selectedComment.id}`, {
+                method: 'DELETE',
                 headers: {
-                    'Content-Type': 'application/merge-patch+json',
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    isVerified: true
-                }),
+                }
             });
 
             if (!response.ok) {
                 throw new Error(`Erreur HTTP! Statut: ${response.status}`);
             }
 
-            const updatedProviders = providers.map(provider => {
-                if (provider.id === selectedProvider.id) {
-                    return {
-                        ...provider,
-                        isVerified: isVerified
-                    };
-                }
-                return provider;
-            });
-
+            const updatedComments = comments.filter(comment => comment.id !== selectedComment.id);
             setError('');
-            setProviders(updatedProviders);
-            setOpenConfirmDialog(false);
-            setSuccess('Prestataire confirmé !');
+            setComments(updatedComments);
+            setOpenDeleteDialog(false);
+            setSuccess('Commentaire supprimé avec succès !');
         } catch (error) {
-            setError('Une erreur s\'est produite lors de la confirmation du prestataire.');
+            setError('Une erreur s\'est produite lors de la suppression du commentaire.');
         }
     };
 
@@ -236,6 +217,7 @@ export default function Providers() {
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
                 <NavbarPro />
+
                 <Box
                     component="main"
                     sx={{
@@ -256,7 +238,7 @@ export default function Providers() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des prestataires
+                            Liste des commentaires
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
@@ -271,14 +253,15 @@ export default function Providers() {
         </ThemeProvider>
         );
     }
-
-    if (!providers.length) {
+    
+    if (!comments.length) {
         return (
 
             <ThemeProvider theme={defaultTheme}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
                 <NavbarPro />
+
                 <Box
                     component="main"
                     sx={{
@@ -301,47 +284,34 @@ export default function Providers() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des prestataires
+                            Liste des commentaires
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
-                        <Grid item xs={12}>
-                                {
-                                    success.length ? (
-                                        <Box mt={2} textAlign="center">
-                                            <p style={{color: 'green'}}>{success}</p>
-                                        </Box>
-                                    ) : null
-                                }
-                                {
-                                    error.length ? (
-                                        <Box mt={2} textAlign="center">
-                                            <p style={{color: 'red'}}>{error}</p>
-                                        </Box>
-                                    ) : null
-                                }
-
-                                <TableContainer component={Paper}>
-                                    <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                                        <TableHead>
-                                            <TableRow style={{background: '#556cd6'}}>
-                                                <TableCell style={{color: 'white'}}>Nom</TableCell>
-                                                <TableCell style={{color: 'white'}}>Prénom</TableCell>
-                                                <TableCell style={{color: 'white'}}>Email</TableCell>
-                                                <TableCell style={{color: 'white'}}>Téléphone</TableCell>
-                                                <TableCell style={{color: 'white'}}>Rôle</TableCell>
-                                                <TableCell style={{color: 'white'}} align="right">Action</TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
-                                            <TableRow
-                                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                            >
-                                                <TableCell component="th" scope="row" colSpan={8} align="center">
-                                                    Aucun prestataire trouvé
-                                                </TableCell>
-                                            </TableRow>
-                                        </TableBody>
-                                    </Table>
+                            <Grid item xs={12}>
+                            <TableContainer component={Paper}>
+                                <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                                    <TableHead>
+                                    <TableRow style={{background: '#556cd6'}}>
+                                        <TableCell style={{color: 'white'}}>Compagnie</TableCell>
+                                        <TableCell style={{color: 'white'}}>Modèle</TableCell>
+                                        <TableCell style={{color: 'white'}}>Marque</TableCell>
+                                        <TableCell style={{color: 'white'}}>Utilisateur</TableCell>
+                                        <TableCell style={{color: 'white'}}>Commentaire</TableCell>
+                                        <TableCell style={{color: 'white'}}>Note globale</TableCell>
+                                        <TableCell style={{color: 'white'}}>Créé à</TableCell>
+                                        <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
+                                    </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        <TableRow
+                                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                        >
+                                            <TableCell component="th" scope="row" colSpan={8} align="center">
+                                                Aucun commentaire trouvé
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
                                 </TableContainer>
                             </Grid>
                         </Grid>
@@ -357,6 +327,7 @@ export default function Providers() {
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
                 <NavbarPro />
+
                 <Box
                     component="main"
                     sx={{
@@ -364,9 +335,7 @@ export default function Providers() {
                             theme.palette.mode === 'light'
                                 ? theme.palette.grey[100]
                                 : theme.palette.grey[900],
-                        flexGrow: 1,
-                        height: '100vh',
-                        overflow: 'auto',
+                        flexGrow: 1
                     }}
                 >
                     <Toolbar />
@@ -379,11 +348,11 @@ export default function Providers() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des prestataires
+                            Liste des commentaires
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                             <Grid item xs={12}>
-                            {
+                                {
                                     success.length ? (
                                         <Box mt={2} textAlign="center" style={{marginBottom: '50px'}}>
                                             <p style={{color: 'green'}}>{success}</p>
@@ -397,60 +366,56 @@ export default function Providers() {
                                         </Box>
                                     ) : null
                                 }
-
+                                
                                 <TableContainer component={Paper}>
                                     <Table sx={{ minWidth: 650 }} aria-label="simple table">
                                         <TableHead>
                                             <TableRow style={{background: '#556cd6'}}>
-                                                <TableCell style={{color: 'white'}}>Nom de la compagnie</TableCell>
-                                                <TableCell style={{color: 'white'}}>Nom du préstataire</TableCell>
-                                                <TableCell style={{color: 'white'}}>Email</TableCell>
-                                                <TableCell style={{color: 'white'}}>Téléphone</TableCell>
-                                                <TableCell style={{color: 'white'}}>Activation du compte</TableCell>
-                                                <TableCell style={{color: 'white'}} align="right">Action</TableCell>
+                                                <TableCell style={{color: 'white'}}>Compagnie</TableCell>
+                                                <TableCell style={{color: 'white'}}>Modèle</TableCell>
+                                                <TableCell style={{color: 'white'}}>Marque</TableCell>
+                                                <TableCell style={{color: 'white'}}>Utilisateur</TableCell>
+                                                <TableCell style={{color: 'white'}}>Commentaire</TableCell>
+                                                <TableCell style={{color: 'white'}}>Notre globale</TableCell>
+                                                <TableCell style={{color: 'white'}}>Crée à</TableCell>
+                                                <TableCell style={{color: 'white'}} align="right">Actions</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {providers.map((provider) => (
+                                            {comments.map((comment) => (
                                                 <TableRow
-                                                    key={provider.id}
+                                                    key={comment.id}
                                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                 >
                                                     <TableCell component="th" scope="row">
-                                                        {provider.name}
+                                                        {comment.car.companie.name}
                                                     </TableCell>
-                                                    <TableCell>{provider.users[0].firstname} {provider.users[0].lastname}</TableCell>
-                                                    <TableCell>{provider.users[0].email}</TableCell>
-                                                    <TableCell>{provider.users[0].phone}</TableCell>
-                                                    <TableCell>{
-                                                        provider.isVerified === false ? 'Non' : 'Oui'
-                                                    }</TableCell>
+                                                    <TableCell>{comment.car.model.name}</TableCell>
+                                                    <TableCell>{comment.car.model.brand.name}</TableCell>
+                                                    <TableCell>{comment.author.firstname} {comment.author.lastname}</TableCell>
+                                                    <TableCell>{comment.comment}</TableCell>
+                                                    <TableCell><Rating name="half-rating-read" value={comment.globalRating} precision={0.5} readOnly /></TableCell>
+                                                    <TableCell>{comment.createdAt ? format(new Date(comment.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
                                                     <TableCell align="right">
-                                                        {provider.isVerified ? (
-                                                            <IconButton disabled>
-                                                                <ThumbUpAltIcon />
-                                                            </IconButton>
-                                                        ) : (
-                                                            <IconButton onClick={() => handleConfirm(provider)}>
-                                                                <CheckIcon />
-                                                            </IconButton>
-                                                        )}
+                                                        <IconButton onClick={() => handleDelete(comment)}>
+                                                            <DeleteIcon />
+                                                        </IconButton>
                                                     </TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>
 
                                         <Dialog
-                                            open={openConfirmDialog}
-                                            onClose={() => setOpenConfirmDialog(false)}
+                                            open={openDeleteDialog}
+                                            onClose={() => setOpenDeleteDialog(false)}
                                         >
                                             <DialogTitle>Confirmation</DialogTitle>
                                             <DialogContent>
-                                                Êtes-vous sûr de vouloir valdier ce prestataire ?
+                                                Êtes-vous sûr de vouloir supprimer ce commentaire ?
                                             </DialogContent>
                                             <DialogActions>
-                                                <Button onClick={() => setOpenConfirmDialog(false)}>Annuler</Button>
-                                                <Button onClick={handleConfirmAction} autoFocus>Confirmer</Button>
+                                                <Button onClick={() => setOpenDeleteDialog(false)}>Annuler</Button>
+                                                <Button onClick={handleConfirmDelete} autoFocus>Supprimer</Button>
                                             </DialogActions>
                                         </Dialog>
                                     </Table>

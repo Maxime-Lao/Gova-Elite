@@ -3,7 +3,7 @@ import Banner from "../components/Banner"
 import HomeSectionOne from "../components/HomeSectionOne"
 import useGetConnectedUser from "../components/hooks/useGetConnectedUser.jsx";
 import HomePro from "./HomePro.jsx";
-import Dashboard from "./Dashboard.jsx";
+import Dashboard from "./admin/Dashboard.jsx";
 import Loading from "../assets/img/loading.jpg"
 
 function Home() {

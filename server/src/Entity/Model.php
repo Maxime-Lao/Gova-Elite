@@ -34,7 +34,7 @@ class Model
 
     #[ORM\ManyToOne(inversedBy: 'models')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['car:read', 'car_search:read', 'user:read',  'model:read', 'rents:read', 'comments:read', 'rents_companie:read'])]
+    #[Groups(['car:read', 'car_search:read', 'user:read',  'model:read', 'rents:read', 'comments:read', 'rents_companie:read', 'rents_user:read'])]
     private ?Brand $brand = null;
 
     #[ORM\Column]
@@ -62,7 +62,7 @@ class Model
 
     public function setName(?string $name): static
     {
-        $this->name = $name;
+        $this->name = ucfirst(trim($name));
 
         return $this;
     }

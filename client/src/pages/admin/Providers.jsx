@@ -23,9 +23,6 @@ import {
     Box,
     Input
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import format from 'date-fns/format';
-import { fr } from 'date-fns/locale';
 import EditIcon from "@mui/icons-material/Edit";
 import {createTheme, styled, ThemeProvider, useTheme} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -37,13 +34,14 @@ import Divider from '@mui/material/Divider';
 import Badge from '@mui/material/Badge';
 import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
+import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
+import CheckIcon from '@mui/icons-material/Check';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import {MainListItems, secondaryListItems} from '../components/dashboard/ListItems.jsx';
+import {MainListItems, secondaryListItems} from '../../components/dashboard/ListItems.jsx';
 import { useMediaQuery } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
-import Navbar from "../components/navbar/Navbar.jsx";
-import NavbarPro from "../components/navbar/NavbarPro.jsx";
+import NavbarPro from '../../components/navbar/NavbarPro.jsx';
 
 export function Copyright() {
     return (
@@ -131,27 +129,34 @@ const defaultTheme = createTheme({
     },
 });
 
-export default function Rents() {
+export default function Providers() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [open, setOpen] = useState(!isMobile);
     const [isLoading, setIsLoading] = useState(true);
-    const [rents, setRents] = useState([]);
+    const [providers, setProviders] = useState([]);
+    const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+    const [selectedProvider, setSelectedProvider] = useState(null);
     const token = localStorage.getItem('token');
+    const emailLoggedUser = localStorage.getItem('email');
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
     const toggleDrawer = () => {
         setOpen(!open);
     };
+
+    const [isVerified, setIsVerified] = useState('');
 
     useEffect(() => {
         setOpen(!isMobile);
     }, [isMobile]);
 
     useEffect(() => {
-        const getRents = async () => {
+        const getProviders = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://localhost:8000/api/rents', {
+                const response = await fetch('http://localhost:8000/api/companies', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -164,7 +169,8 @@ export default function Rents() {
                 }
 
                 const data = await response.json();
-                setRents(data);
+                const filteredProviders = data.filter(provider => provider.users.length > 0);
+                setProviders(filteredProviders);
                 setIsLoading(false);
             } catch (error) {
                 console.error(error);
@@ -172,8 +178,56 @@ export default function Rents() {
             }
         };
 
-        getRents();
-    }, [token]);
+        getProviders();
+    }, [token, emailLoggedUser]);
+
+
+    const handleConfirm = (provider) => {
+        setSelectedProvider(provider);
+        setOpenConfirmDialog(true);
+    };
+
+    useEffect(() => {
+        if (selectedProvider) {
+            setIsVerified(selectedProvider.isVerified ? 'true' : 'false');
+        }
+    }, [selectedProvider]);    
+
+    const handleConfirmAction = async () => {
+        try {
+            const response = await fetch(`http://localhost:8000/api/companies/${selectedProvider.id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/merge-patch+json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    isVerified: true
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP! Statut: ${response.status}`);
+            }
+
+            const updatedProviders = providers.map(provider => {
+                if (provider.id === selectedProvider.id) {
+                    return {
+                        ...provider,
+                        isVerified: isVerified
+                    };
+                }
+                return provider;
+            });
+
+            setError('');
+            setProviders(updatedProviders);
+            setOpenConfirmDialog(false);
+            setSuccess('Prestataire confirmé !');
+        } catch (error) {
+            setError('Une erreur s\'est produite lors de la confirmation du prestataire.');
+        }
+    };
 
     if (isLoading) {
         return (
@@ -182,7 +236,49 @@ export default function Rents() {
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
                 <NavbarPro />
+                <Box
+                    component="main"
+                    sx={{
+                        backgroundColor: (theme) =>
+                            theme.palette.mode === 'light'
+                                ? theme.palette.grey[100]
+                                : theme.palette.grey[900],
+                        flexGrow: 1
+                    }}
+                >
+                    <Toolbar />
+                    <Box
+                        sx={{
+                            mt: 4,
+                            mb: 4,
+                            flexGrow: 1,
+                            paddingX: 5,
+                        }}
+                    >
+                        <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
+                            Liste des prestataires
+                        </Typography>
+                        <Grid container spacing={3} justifyContent="center">
+                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+                                <Box sx={{ display: 'flex' }}>
+                                    <CircularProgress />
+                                </Box>
+                            </div>
+                        </Grid>
+                    </Box>
+                </Box>
+            </Box>
+        </ThemeProvider>
+        );
+    }
 
+    if (!providers.length) {
+        return (
+
+            <ThemeProvider theme={defaultTheme}>
+            <Box sx={{ display: 'flex' }}>
+                <CssBaseline />
+                <NavbarPro />
                 <Box
                     component="main"
                     sx={{
@@ -205,67 +301,35 @@ export default function Rents() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des réservations
-                        </Typography>
-                        <Grid container spacing={3} justifyContent="center">
-                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
-                                <Box sx={{ display: 'flex' }}>
-                                    <CircularProgress />
-                                </Box>
-                            </div>
-                        </Grid>
-                    </Box>
-                </Box>
-            </Box>
-        </ThemeProvider>
-        );
-    }
-    
-    if (!rents.length) {
-        return (
-
-            <ThemeProvider theme={defaultTheme}>
-            <Box sx={{ display: 'flex' }}>
-                <CssBaseline />
-                <NavbarPro />
-
-                <Box
-                    component="main"
-                    sx={{
-                        backgroundColor: (theme) =>
-                            theme.palette.mode === 'light'
-                                ? theme.palette.grey[100]
-                                : theme.palette.grey[900],
-                        flexGrow: 1
-                    }}
-                >
-                    <Toolbar />
-                    <Box
-                        sx={{
-                            mt: 4,
-                            mb: 4,
-                            flexGrow: 1,
-                            paddingX: 5,
-                        }}
-                    >
-                        <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des réservations
+                            Liste des prestataires
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                         <Grid item xs={12}>
+                                {
+                                    success.length ? (
+                                        <Box mt={2} textAlign="center">
+                                            <p style={{color: 'green'}}>{success}</p>
+                                        </Box>
+                                    ) : null
+                                }
+                                {
+                                    error.length ? (
+                                        <Box mt={2} textAlign="center">
+                                            <p style={{color: 'red'}}>{error}</p>
+                                        </Box>
+                                    ) : null
+                                }
+
                                 <TableContainer component={Paper}>
                                     <Table sx={{ minWidth: 650 }} aria-label="simple table">
                                         <TableHead>
                                             <TableRow style={{background: '#556cd6'}}>
-                                                <TableCell style={{color: 'white'}}>Compagnie</TableCell>
-                                                <TableCell style={{color: 'white'}}>Modèle</TableCell>
-                                                <TableCell style={{color: 'white'}}>Marque</TableCell>
-                                                <TableCell style={{color: 'white'}}>Utilisateur</TableCell>
-                                                <TableCell style={{color: 'white'}}>Prix</TableCell>
-                                                <TableCell style={{color: 'white'}}>Date de départ</TableCell>
-                                                <TableCell style={{color: 'white'}}>Date de fin</TableCell>
-                                                <TableCell style={{color: 'white'}}>Crée à</TableCell>
-                                                <TableCell style={{color: 'white'}}>Modifié à</TableCell>
+                                                <TableCell style={{color: 'white'}}>Nom</TableCell>
+                                                <TableCell style={{color: 'white'}}>Prénom</TableCell>
+                                                <TableCell style={{color: 'white'}}>Email</TableCell>
+                                                <TableCell style={{color: 'white'}}>Téléphone</TableCell>
+                                                <TableCell style={{color: 'white'}}>Rôle</TableCell>
+                                                <TableCell style={{color: 'white'}} align="right">Action</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -273,7 +337,7 @@ export default function Rents() {
                                                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                             >
                                                 <TableCell component="th" scope="row" colSpan={8} align="center">
-                                                    Aucune réservation trouvée
+                                                    Aucun prestataire trouvé
                                                 </TableCell>
                                             </TableRow>
                                         </TableBody>
@@ -293,7 +357,6 @@ export default function Rents() {
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
                 <NavbarPro />
-
                 <Box
                     component="main"
                     sx={{
@@ -301,7 +364,9 @@ export default function Rents() {
                             theme.palette.mode === 'light'
                                 ? theme.palette.grey[100]
                                 : theme.palette.grey[900],
-                        flexGrow: 1
+                        flexGrow: 1,
+                        height: '100vh',
+                        overflow: 'auto',
                     }}
                 >
                     <Toolbar />
@@ -314,45 +379,80 @@ export default function Rents() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des réservations
+                            Liste des prestataires
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                             <Grid item xs={12}>
+                            {
+                                    success.length ? (
+                                        <Box mt={2} textAlign="center" style={{marginBottom: '50px'}}>
+                                            <p style={{color: 'green'}}>{success}</p>
+                                        </Box>
+                                    ) : null
+                                }
+                                {
+                                    error.length ? (
+                                        <Box mt={2} textAlign="center" style={{marginBottom: '50px'}}>
+                                            <p style={{color: 'red'}}>{error}</p>
+                                        </Box>
+                                    ) : null
+                                }
+
                                 <TableContainer component={Paper}>
                                     <Table sx={{ minWidth: 650 }} aria-label="simple table">
                                         <TableHead>
                                             <TableRow style={{background: '#556cd6'}}>
-                                                <TableCell style={{color: 'white'}}>Compagnie</TableCell>
-                                                <TableCell style={{color: 'white'}}>Modèle</TableCell>
-                                                <TableCell style={{color: 'white'}}>Marque</TableCell>
-                                                <TableCell style={{color: 'white'}}>Utilisateur</TableCell>
-                                                <TableCell style={{color: 'white'}}>Prix</TableCell>
-                                                <TableCell style={{color: 'white'}}>Date de départ</TableCell>
-                                                <TableCell style={{color: 'white'}}>Date de fin</TableCell>
-                                                <TableCell style={{color: 'white'}}>Crée à</TableCell>
-                                                <TableCell style={{color: 'white'}}>Modifié à</TableCell>
+                                                <TableCell style={{color: 'white'}}>Nom de la compagnie</TableCell>
+                                                <TableCell style={{color: 'white'}}>Nom du préstataire</TableCell>
+                                                <TableCell style={{color: 'white'}}>Email</TableCell>
+                                                <TableCell style={{color: 'white'}}>Téléphone</TableCell>
+                                                <TableCell style={{color: 'white'}}>Activation du compte</TableCell>
+                                                <TableCell style={{color: 'white'}} align="right">Action</TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
-                                            {rents.map((rent) => (
+                                            {providers.map((provider) => (
                                                 <TableRow
-                                                    key={rent.id}
+                                                    key={provider.id}
                                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                                                 >
                                                     <TableCell component="th" scope="row">
-                                                        {rent.car.companie.name}
+                                                        {provider.name}
                                                     </TableCell>
-                                                    <TableCell>{rent.car.model.name}</TableCell>
-                                                    <TableCell>{rent.car.model.brand.name}</TableCell>
-                                                    <TableCell>{rent.user.firstname} {rent.user.lastname}</TableCell>
-                                                    <TableCell>{rent.totalPrice}€</TableCell>
-                                                    <TableCell>{rent.dateStart ? format(new Date(rent.dateStart), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
-                                                    <TableCell>{rent.dateEnd ? format(new Date(rent.dateEnd), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
-                                                    <TableCell>{rent.createdAt ? format(new Date(rent.createdAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
-                                                    <TableCell>{rent.updatedAt ? format(new Date(rent.updatedAt), 'dd/MM/yyyy HH:mm:ss', { locale: fr }) : ''}</TableCell>
+                                                    <TableCell>{provider.users[0].firstname} {provider.users[0].lastname}</TableCell>
+                                                    <TableCell>{provider.users[0].email}</TableCell>
+                                                    <TableCell>{provider.users[0].phone}</TableCell>
+                                                    <TableCell>{
+                                                        provider.isVerified === false ? 'Non' : 'Oui'
+                                                    }</TableCell>
+                                                    <TableCell align="right">
+                                                        {provider.isVerified ? (
+                                                            <IconButton disabled>
+                                                                <ThumbUpAltIcon />
+                                                            </IconButton>
+                                                        ) : (
+                                                            <IconButton onClick={() => handleConfirm(provider)}>
+                                                                <CheckIcon />
+                                                            </IconButton>
+                                                        )}
+                                                    </TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>
+
+                                        <Dialog
+                                            open={openConfirmDialog}
+                                            onClose={() => setOpenConfirmDialog(false)}
+                                        >
+                                            <DialogTitle>Confirmation</DialogTitle>
+                                            <DialogContent>
+                                                Êtes-vous sûr de vouloir valdier ce prestataire ?
+                                            </DialogContent>
+                                            <DialogActions>
+                                                <Button onClick={() => setOpenConfirmDialog(false)}>Annuler</Button>
+                                                <Button onClick={handleConfirmAction} autoFocus>Confirmer</Button>
+                                            </DialogActions>
+                                        </Dialog>
                                     </Table>
                                 </TableContainer>
                             </Grid>
