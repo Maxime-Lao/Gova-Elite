@@ -12,6 +12,7 @@ use App\Repository\NotificationRepository;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]
 #[ApiResource(
@@ -49,6 +50,7 @@ class Notification
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Le message ne peut pas être vide')]
     private ?string $message = null;
 
     #[ORM\ManyToOne(inversedBy: 'notification')]
@@ -71,7 +73,7 @@ class Notification
 
     public function setMessage(string $message): static
     {
-        $this->message = $message;
+        $this->message = ucfirst(trim($message));
 
         return $this;
     }

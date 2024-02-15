@@ -4,9 +4,11 @@ import HomeSectionOne from "../components/HomeSectionOne"
 import useGetConnectedUser from "../components/hooks/useGetConnectedUser.jsx";
 import HomePro from "./HomePro.jsx";
 import Dashboard from "./admin/Dashboard.jsx";
+import { useTranslation } from 'react-i18next';
 import Loading from "../assets/img/loading.jpg"
 
 function Home() {
+    const { t } = useTranslation();
     const user = useGetConnectedUser();
 
     if (user.connectedUser === undefined) {
@@ -28,7 +30,7 @@ function Home() {
                 <Navbar/>
                 <div className="flex items-center justify-center h-screen">
                     <div className="text-center">
-                        <h1>Veuillez activer votre compte pour accéder à votre espace</h1>
+                        <h1>{t("Veuillez activer votre compte pour accéder à votre espace")}</h1>
                     </div>
                 </div>
             </>

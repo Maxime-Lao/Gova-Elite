@@ -16,22 +16,23 @@ export default function NotificationButton() {
 
   useEffect(() => {
     const fetchNotifications = async () => {
-      try {
-        const response = await fetch(`http://195.35.29.110:8000/api/users/${user.connectedUser.id}/notifications`, {
-          method: 'GET',
-          headers: {
-              Authorization: `Bearer ${token}`
-          }
-      })
-        const data = await response.json()
-        const filteredData = data.filter(notification => !notification.isRead)
-        setNotifications(filteredData)
-      }
-      catch (error) {
-        console.log(error)
+      if (user.connectedUser) {
+        try {
+          const response = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}/notifications`, {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+          const data = await response.json()
+          const filteredData = data.filter(notification => !notification.isRead)
+          setNotifications(filteredData)
+        }
+        catch (error) {
+          console.log(error)
+        }
       }
     }
-
     fetchNotifications();
   }, [user.connectedUser])
 

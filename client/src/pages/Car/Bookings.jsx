@@ -9,8 +9,11 @@ import useGetConnectedUser from "../../components/hooks/useGetConnectedUser.jsx"
 import Box from '@mui/material/Box';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
+import { useTranslation } from 'react-i18next';
 
 function Bookings() {
+  const { t } = useTranslation();
+  const token = localStorage.getItem('token');
   const [userData, setUserData] = useState(null);
   const [userCommentsData, setUserCommentsData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -76,7 +79,13 @@ function Bookings() {
 
   const refreshBookings = async () => {
     try {
-      const response = await fetch(`http://195.35.29.110:8000/api/users/${user.connectedUser.id}/rents`);
+      const response = await fetch(`http://195.35.29.110:8000/api/users/${user.connectedUser.id}/rents`, {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+          }
+      });
       const data = await response.json();
       setUserData(data);
     } catch (error) {
@@ -86,7 +95,13 @@ function Bookings() {
 
   const refreshPastBookings = async () => {
     try {
-      const response = await fetch(`http://195.35.29.110:8000/api/users/${user.connectedUser.id}/comments`);
+      const response = await fetch(`http://195.35.29.110:8000/api/users/${user.connectedUser.id}/comments`, {
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+          }
+      });
       const data = await response.json();
       setUserCommentsData(data);
     } catch (error) {
@@ -100,10 +115,10 @@ function Bookings() {
       {userData && (
         <Grid container spacing={2} justifyContent="center" sx={{marginTop: "2em"}}>
           <Grid item xs={12}>
-            <Typography variant="h4">Réservations de voiture pour {user.connectedUser.firstname} {user.connectedUser.lastname}</Typography>
+            <Typography variant="h4">{t("Réservations de voiture pour")} {user.connectedUser.firstname} {user.connectedUser.lastname}</Typography>
             <Tabs value={tabValue} onChange={handleTabChange} aria-label="Réservations tabs">
-              <Tab label="En cours" />
-              <Tab label="Historique" />
+              <Tab label={t("En cours")} />
+              <Tab label={t("Historique")} />
             </Tabs>
           </Grid>
 

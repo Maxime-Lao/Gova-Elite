@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
 import CarSchedule from "./CarSchedule.jsx";
 import DatePicker from 'react-datepicker';
@@ -8,6 +8,8 @@ import HorizontalTabs from "../others/HorizontalTabs.jsx";
 import CarHistoric from "./CarHistoric.jsx";
 import Slider from "react-slick";
 import {imageStyle} from "../../pages/Car/CarDetails.jsx";
+import useGetConnectedUser from "../hooks/useGetConnectedUser.jsx";
+import NotFoundPage from "../../pages/NotFoundPage.jsx";
 
 const getSliderSettings = (numberOfImages) => {
     return {
@@ -22,6 +24,8 @@ const getSliderSettings = (numberOfImages) => {
 
 const CarDetailsPro = () => {
     const {carId} = useParams();
+
+    const user = useGetConnectedUser();
 
     const [car, setCar] = useState(null);
     const [reason, setReason] = useState('');
@@ -46,7 +50,7 @@ const CarDetailsPro = () => {
             );
         });
 
-        const isCarUnavailableUnavailability = car.unavailability.some((unavailability) => {
+        const isCarUnavailableUnavailability = car.unavailabilities.some((unavailability) => {
             const unavailabilityStartDate = new Date(unavailability.date_start);
             const unavailabilityEndDate = new Date(unavailability.date_end);
 
@@ -71,6 +75,7 @@ const CarDetailsPro = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
                 body: JSON.stringify({
                     car: `/api/cars/${carId}`,
@@ -85,7 +90,7 @@ const CarDetailsPro = () => {
                 const responseData = await response.json();
                 setCar((prevCar) => ({
                     ...prevCar,
-                    unavailability: [...prevCar.unavailability, responseData],
+                    unavailabilities: [...prevCar.unavailabilities, responseData],
                 }));
             }
             setSuccess('Indisponibilité enregistrée');
@@ -117,6 +122,12 @@ const CarDetailsPro = () => {
         { label: 'Planning de la gova', content: <CarSchedule car={ car }/>},
         { label: 'Historique de la Gova', content: <CarHistoric car={ car }/>},
     ];
+
+    const carFound = user.connectedUser?.companie?.cars.some((car) => car.id.toString() === carId);
+
+    if ( user.connectedUser && !carFound) {
+        return <NotFoundPage/>
+    }
 
     return car ? (
         <>

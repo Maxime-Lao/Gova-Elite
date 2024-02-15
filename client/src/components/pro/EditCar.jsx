@@ -68,38 +68,39 @@ const EditCar = ({ carId }) => {
     }, [selectedBrandId]);
 
     useEffect(() => {
-        fetch(`http://195.35.29.110:8000/api/gears`)
-            .then(response => response.json())
-            .then(data => setMyGears(data))
-            .catch(error => console.error(error));
+        const fetchWithAuthorization = async (url, setStateFunction) => {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                });
 
-        fetch(`http://195.35.29.110:8000/api/models`)
-            .then(response => response.json())
-            .then(data => setAllModels(data))
-            .catch(error => console.error(error));
+                if (!response.ok) {
+                    throw new Error(`Erreur lors de la récupération des données de ${url}`);
+                }
 
-        fetch(`http://195.35.29.110:8000/api/brands`)
-            .then(response => response.json())
-            .then(data => setMyBrands(data))
-            .catch(error => console.error(error));
+                const data = await response.json();
+                setStateFunction(data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
 
-        fetch(`http://195.35.29.110:8000/api/energies`)
-            .then(response => response.json())
-            .then(data => setMyEnergies(data))
-            .catch(error => console.error(error));
-
-        fetch(`http://195.35.29.110:8000/api/categories`)
-            .then(response => response.json())
-            .then(data => setMyCategories(data))
-            .catch(error => console.error(error));
+        fetchWithAuthorization('http://localhost:8000/api/gears', setMyGears);
+        fetchWithAuthorization('http://localhost:8000/api/models', setAllModels);
+        fetchWithAuthorization('http://localhost:8000/api/brands', setMyBrands);
+        fetchWithAuthorization('http://localhost:8000/api/energies', setMyEnergies);
+        fetchWithAuthorization('http://localhost:8000/api/categories', setMyCategories);
     }, []);
+
 
     useEffect(() => {
         const fetchCarData = async () => {
             try {
                 const response = await axios.get(`http://195.35.29.110:8000/api/cars/${carId}`, {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
                 });
                 setCarData(response.data);
@@ -147,6 +148,7 @@ const EditCar = ({ carId }) => {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem('token')}`,
                             'Content-Type': 'multipart/form-data',
+                            Authorization: `Bearer ${localStorage.getItem('token')}`,
                         },
                     });
 

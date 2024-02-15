@@ -1,5 +1,6 @@
 import { AppBar, Button, Link, Toolbar, Typography } from "@mui/material";
 import { Box } from "@mui/system";
+import { useTranslation } from 'react-i18next';
 import { useCallback, useState } from "react";
 import AvatarDialog from "./AvatarDialog.jsx";
 import useGetConnectedUser from "../hooks/useGetConnectedUser.jsx";
@@ -9,6 +10,11 @@ import CarRentalIcon from '@mui/icons-material/CarRental';
 import logo from '../../assets/img/la-gova.png';
 
 const Navbar = () => {
+    const { t, i18n } = useTranslation();
+    const changeLanguage = (language) => {
+        i18n.changeLanguage(language);
+        localStorage.setItem('language', language);
+    };
     const localStorageToken = localStorage.getItem('token');
     const [myToken, setMyToken] = useState(localStorageToken);
     const user = useGetConnectedUser();
@@ -55,24 +61,26 @@ const Navbar = () => {
                 </Link>
                 <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: '1em' }}>
                     <ul style={{ listStyleType: 'none', display: 'flex', gap: '1em', alignItems: 'center' }}>
-                        <li><Button startIcon={<CarRentalIcon />}>Rent my vehicle</Button></li>
                         {!myToken || !user.connectedUser ? (
                             <>
-                                <li><Button onClick={redirectToLogin}>Log In</Button></li>
-                                <li><Button onClick={redirectToRegister}>Register</Button></li>
+                                <li><Button onClick={redirectToLogin}>{t('Connexion')}</Button></li>
+                                <li><Button onClick={redirectToRegister}>{t("S'inscrire")}</Button></li>
                             </>
                         ) : (
                             <>
                                 {(user.connectedUser?.roles[0] === 'ROLE_ADMIN' || user.connectedUser?.roles[0] === 'ROLE_PRO') && (
                                     <li><NotificationButton /></li>
                                 )}
-                                <li><Button onClick={redirectToBookings}>Réservations</Button></li>
+                                {(user.connectedUser?.roles[0] === 'ROLE_USER') && (
+                                    <li><Button onClick={redirectToBookings}>{t('Réservations')}</Button></li>
+                                )}
                                 <li>
                                     <AvatarDialog firstName={user.connectedUser?.firstname} lastName={user.connectedUser?.lastname} handleLogout={handleLogout} />
                                 </li>
                             </>
                         )}
-                        <li><a href="#"><Button>FR | EN</Button></a></li>
+                        <li><Button onClick={() => changeLanguage('en')}>EN</Button></li>
+                        <li><Button onClick={() => changeLanguage('fr')}>FR</Button></li>
                     </ul>
                 </Box>
             </Toolbar>

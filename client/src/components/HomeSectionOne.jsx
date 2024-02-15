@@ -2,11 +2,14 @@ import { Box, Grid, Typography, CardContent } from "@mui/material";
 import calendar from '../assets/img/calendar.png';
 import location from '../assets/img/location.png';
 import vehicle from '../assets/img/valet.jpg';
+import { useTranslation } from 'react-i18next';
 
 const HomeSectionOne = () => {
+    const { t } = useTranslation();
+
     return (
         <Box sx={{ padding: '2em' }}>
-            <Typography variant="h4" component="h4" sx={{ marginBottom: '2em', textAlign: 'center', fontWeight: "100" }}>Louez votre véhicule en seulement 3 étapes.</Typography>
+            <Typography variant="h4" component="h4" sx={{ marginBottom: '2em', textAlign: 'center', fontWeight: "100" }}>{t('Louez votre véhicule en seulement 3 étapes.')}</Typography>
             <Grid container spacing={2}>
                 <Grid item xs={12} sm={4}>
                         <Box sx={{ height: '140px' }}>
@@ -14,11 +17,10 @@ const HomeSectionOne = () => {
                         </Box>
                         <CardContent>
                             <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: "300" }} >
-                            L&apos;heure et la date.
+                                {t("L'heure et la date.")}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                            Lizards are a widespread group of squamate reptiles, with over 6,000
-                            species, ranging across all continents except Antarctica
+                                {t('Choisissez quand et où commence votre aventure.')}
                             </Typography>
                         </CardContent>
                 </Grid>
@@ -28,11 +30,10 @@ const HomeSectionOne = () => {
                     </Box>
                     <CardContent>
                         <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: "300" }} >
-                        L&apos;emplacement.
+                            {t("L'emplacement.")}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                        Lizards are a widespread group of squamate reptiles, with over 6,000
-                        species, ranging across all continents except Antarctica
+                            {t('Sélectionnez le point de départ idéal pour votre voyage.')}
                         </Typography>
                     </CardContent>
                 </Grid>
@@ -42,11 +43,10 @@ const HomeSectionOne = () => {
                         </Box>
                         <CardContent>
                             <Typography gutterBottom variant="h6" component="div" sx={{ fontWeight: "300" }} >
-                            Récupérer votre véhicule.
+                                {t("Récupérer votre véhicule.")}
                             </Typography>
                             <Typography variant="body2" color="text.secondary">
-                            Lizards are a widespread group of squamate reptiles, with over 6,000
-                            species, ranging across all continents except Antarctica
+                                {t('Prenez les clés et écrivez votre histoire sur la route.')}
                             </Typography>
                         </CardContent>
                 </Grid>

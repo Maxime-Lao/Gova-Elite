@@ -69,8 +69,14 @@ class Car
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Assert\NotBlank(message: 'Le nombre de chevaux ne peut pas être vide')]
-    #[Assert\Positive(message: 'Le nombre de chevaux doit être un nombre positif ou égal à zéro')]
+    #[Assert\NotBlank(message: 'L\'année ne peut pas être vide')]
+    #[Assert\Positive(message: 'L\'année doit être un nombre positif')]
+    #[Assert\Length(
+        min: 4,
+        max: 4,
+        minMessage: 'L\'année doit contenir 4 chiffres',
+        maxMessage: 'L\'année doit contenir 4 chiffres'
+    )]
     #[Groups(['car:read', 'car:write', 'comments_car:read', 'user:read', 'rents_user:read', 'car_search:read'])]
     private ?int $year = null;
 
@@ -87,20 +93,20 @@ class Car
     private ?int $nbSeats = null;
 
     #[ORM\Column]
-    #[Assert\NotBlank(message: 'Le kilométrage ne peut pas être vide')]
-    #[Assert\Positive(message: 'Le kilométrage doit être un nombre positif ou égal à zéro')]
+    #[Assert\NotBlank(message: 'Le nombre de portes ne peut pas être vide')]
+    #[Assert\Positive(message: 'Le nombre de portes doit être un nombre positif ou égal à zéro')]
     #[Groups(['car:read', 'car:write', 'user:read', 'rents_user:read', 'car_search:read'])]
     private ?int $nbDoors = null;
 
     #[ORM\Column]
-    #[Assert\NotBlank]
-    #[Assert\Positive]
+    #[Assert\NotBlank(message: 'Le prix ne peut pas être vide')]
+    #[Assert\Positive(message: 'Le prix doit être un nombre positif ou égal à zéro')]
     #[Groups(['car:read', 'car:write', 'car_search:read', 'user:read', 'rents_user:read'])]
     private ?float $price = null;
 
     #[ORM\Column]
-    #[Assert\NotBlank]
-    #[Assert\Positive]
+    #[Assert\NotBlank(message: 'Le kilométrage ne peut pas être vide')]
+    #[Assert\Positive(message: 'Le kilométrage doit être un nombre positif ou égal à zéro')]
     #[Groups(['car:read', 'car:write', 'user:read', 'rents_user:read', 'car_search:read'])]
     private ?int $mileage = null;
 
@@ -156,7 +162,7 @@ class Car
     {
         $this->media = new ArrayCollection();
         $this->rents = new ArrayCollection();
-        $this->unavailability = new ArrayCollection();
+        $this->unavailabilities = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -171,7 +177,7 @@ class Car
 
     public function setDescription(string $description): static
     {
-        $this->description = $description;
+        $this->description = ucfirst(trim($description));
 
         return $this;
     }
@@ -366,15 +372,15 @@ class Car
     /**
      * @return Collection<int, Unavailability>
      */
-    public function getUnavailability(): Collection
+    public function getUnavailabilities(): Collection
     {
-        return $this->unavailability;
+        return $this->unavailabilities;
     }
 
     public function addUnavailability(Unavailability $unavailability): static
     {
-        if (!$this->unavailability->contains($unavailability)) {
-            $this->unavailability->add($unavailability);
+        if (!$this->unavailabilities->contains($unavailability)) {
+            $this->unavailabilities->add($unavailability);
             $unavailability->setCar($this);
         }
         return $this;
@@ -382,7 +388,7 @@ class Car
 
     public function removeUnavailability(Unavailability $unavailability): static
     {
-        if ($this->unavailability->removeElement($unavailability)) {
+        if ($this->unavailabilities->removeElement($unavailability)) {
             // set the owning side to null (unless already changed)
             if ($unavailability->getCar() === $this) {
                 $unavailability->setCar(null);

@@ -1,8 +1,11 @@
 import bannerImage from '../assets/img/banner.jpg';
 import SearchBar from './SearchBar';
 import { Typography, Grid, Box } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 const Banner = () => {
+    const { t } = useTranslation();
+
     const bannerStyle = {
         backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3) ), url(${bannerImage})`,
         backgroundSize: 'cover',
@@ -30,8 +33,8 @@ const Banner = () => {
     return (
         <Grid container sx={bannerStyle}>
             <Typography variant="h4" component="h1" sx={{ color: 'white', textAlign: 'center', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -250%)', fontWeight: "300" }}>
-                Réservez Votre Rêve,<br></br>
-                Conduisez l&apos;Exception.
+                {t("Réservez Votre Rêve,")}<br></br>
+                {t("Conduisez l'Exception.")}
             </Typography>
             <Box sx={searchBarStyle}>
                 <SearchBar />

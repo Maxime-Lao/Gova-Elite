@@ -66,7 +66,7 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
-    #[Groups(['user:read', 'companies:read'])]
+    #[Groups(['user:read', 'companies:read', 'car:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'users')]
@@ -121,6 +121,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: 'Le numéro de téléphone ne peut pas être vide')]
+    #[Assert\Regex(
+        pattern: '/^\d+$/',
+        message: 'Le numéro de téléphone doit contenir uniquement des chiffres'
+    )]
     #[Groups(['user:read', 'user:create', 'user:update', 'companies:read'])]
     private ?string $phone = null;
 
@@ -160,7 +164,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setPhone(?string $phone): static
     {
-        $this->phone = $phone;
+        $this->phone = trim($phone);
 
         return $this;
     }
@@ -211,7 +215,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setEmail(string $email): static
     {
-        $this->email = strtolower($email);
+        $this->email = strtolower(trim($email));
 
         return $this;
     }
@@ -286,7 +290,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setFirstname(?string $firstname): static
     {
-        $this->firstname = $firstname;
+        $this->firstname = ucfirst(trim($firstname));
 
         return $this;
     }
@@ -394,7 +398,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setLastname(?string $lastname): static
     {
-        $this->lastname = $lastname;
+        $this->lastname = ucfirst(trim($lastname));
 
         return $this;
     }

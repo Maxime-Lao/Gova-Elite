@@ -203,7 +203,7 @@ class Comment
 
     public function setComment(string $comment): static
     {
-        $this->comment = $comment;
+        $this->comment = ucfirst(trim($comment));
 
         return $this;
     }

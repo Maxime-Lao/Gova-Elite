@@ -4,19 +4,19 @@ import useGetConnectedUser from "../hooks/useGetConnectedUser.jsx";
 import Navbar from "../navbar/Navbar.jsx";
 import Loading from "../../assets/img/loading.jpg";
 
-const ProtectedRoute = ({ children, allowedRoles }) => {
+const ProtectedRoute = ({ children, allowedRoles, redirectIfCompanyExists }) => {
   const user = useGetConnectedUser();
 
   if (user.connectedUser === undefined) {
     return (
-        <>
-          <Navbar/>
-          <div className="flex items-center justify-center h-screen">
-            <div className="text-center">
-              <img className='animate-spin w-20' src={Loading} alt="Loading"/>
-            </div>
+      <>
+        <Navbar/>
+        <div className="flex items-center justify-center h-screen">
+          <div className="text-center">
+            <img className='animate-spin w-20' src={Loading} alt="Loading"/>
           </div>
-        </>
+        </div>
+      </>
     );
   }
 
@@ -24,13 +24,11 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     return <Navigate to="/login" replace />;
   }
 
-
-  if (user.connectedUser.roles.includes('ROLE_PRO') && user.connectedUser.companie) {
+  if (redirectIfCompanyExists && user.connectedUser.roles.includes('ROLE_PRO') && user.connectedUser.companie) {
     return <Navigate to="/" replace />;
   }
 
   const userRoles = user.connectedUser && user.connectedUser.roles ? user.connectedUser.roles : [];
-
   const hasPermission = userRoles.some(role => allowedRoles.includes(role));
 
   if (!hasPermission) {

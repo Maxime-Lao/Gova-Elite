@@ -8,7 +8,7 @@ import {
     Grid,
     Paper,
 } from '@mui/material';
-import sendRequest from "../../services/axiosRequestFunction.js";
+import send from "../../services/axiosRequest.js";
 import {useNavigate, useParams} from 'react-router-dom';
 
 const ResetPassword = () => {
@@ -22,7 +22,7 @@ const ResetPassword = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if(password === confirmPassword) {
-            sendRequest(
+            send(
                 '/reset_password',
                 'post',
                 {

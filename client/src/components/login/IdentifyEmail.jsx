@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Typography, TextField, Button, Box, Alert } from '@mui/material';
-import sendRequest from "../../services/axiosRequestFunction.js";
+import send from "../../services/axiosRequest.js";
 
 const IdentifyEmail = () => {
     const [email, setEmail] = useState('');
@@ -15,7 +15,7 @@ const IdentifyEmail = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await sendRequest(
+            const response = await send(
                 '/forgot_password_send_email',
                 'post',
                 {

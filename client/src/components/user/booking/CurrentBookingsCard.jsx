@@ -26,6 +26,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import { useNavigate } from "react-router-dom";
 import StripePaymentFormUpdate from '../../stripe/StripePaymentFormUpdate';
+import { useTranslation } from 'react-i18next';
 
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
@@ -39,6 +40,8 @@ const ExpandMore = styled((props) => {
 }));
 
 export default function BookingsCard({ rent, user, onDelete, onBookingChange }) {
+  const { t } = useTranslation();
+  const token = localStorage.getItem('token');
   const [expanded, setExpanded] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [startDate, setStartDate] = useState(null);
@@ -83,7 +86,13 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
   useEffect(() => {
     const fetchRentedTimes = async () => {
       try {
-        const response = await fetch(`http://195.35.29.110:8000/api/cars/${rent.car.id}/rents`);
+        const response = await fetch(`http://195.35.29.110:8000/api/cars/${rent.car.id}/rents`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            }
+        });
         if (response.ok) {
           const carRentsData = await response.json();
           setRentedTimes(carRentsData);
@@ -98,7 +107,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
     if (rent.car.id && typeof rent.car.id === 'number') {
       fetchRentedTimes();
     }
-  }, [rent.car.id]);
+  }, [rent.car.id, token]);
 
   useEffect(() => {
     if (startDate && endDate && rent && rent.car.price) {
@@ -112,7 +121,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
   }, [startDate, endDate, rent]);
 
   useEffect(() => {
-    const unavailability = rent.car.unavailability || [];
+    const unavailability = rent.car.unavailabilities || [];
     setUnavailabilityDates(unavailability.map(({ date_start, date_end }) => ({
       startDate: new Date(date_start),
       endDate: new Date(date_end),
@@ -133,7 +142,13 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
   
   const fetchUpdatedRentedTimes = async (carId) => {
     try {
-      const response = await fetch(`http://195.35.29.110:8000/api/cars/${carId}/rents`);
+      const response = await fetch(`http://195.35.29.110:8000/api/cars/${carId}/rents`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            }
+        });
       if (response.ok) {
         const carRentsData = await response.json();
         setRentedTimes(carRentsData);
@@ -155,7 +170,11 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
   const handleCancel = async (id) => {
     try {
       const response = await fetch(`http://195.35.29.110:8000/api/rents/${id}`, {
-        method: 'DELETE',
+          method: 'DELETE',
+          headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+          }
       });
       if (response.ok) {
         onDelete(id);
@@ -188,13 +207,14 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/merge-patch+json',
+            Authorization: `Bearer ${token}`
           },
           body: JSON.stringify(requestData),
         });
 
         if (response.ok) {
           onBookingChange();
-          setRentalSuccessMessage('La location a été décalée !');
+          setRentalSuccessMessage(t('La location a été décalée !'));
         } else {
           console.error('Erreur lors de la décale');
         }
@@ -204,51 +224,32 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
     }
   };
 
+  const isDateOverlap = (dateStart, dateEnd) => {
+    const selectedStart = startDate.getTime();
+    const selectedEnd = endDate.getTime();
+  
+    return (
+      (selectedStart >= dateStart && selectedStart <= dateEnd) ||
+      (selectedEnd >= dateStart && selectedEnd <= dateEnd) ||
+      (selectedStart <= dateStart && selectedEnd >= dateEnd)
+    );
+  };
+
   const handleOpenStripeModal = () => {
-    const currentRentId = rent.id;
-  
-    const isDatesValid = rentedTimes.every(rent => {
-      if (rent.id === currentRentId) {
-        return true;
-      }
-  
-      const selectedStart = startDate.getTime();
-      const selectedEnd = endDate.getTime();
+    const isDatesOverlapRented = rentedTimes.some(rent => {
+      if (rent.id === rentId) return false;
       const rentStart = new Date(rent.dateStart).getTime();
       const rentEnd = new Date(rent.dateEnd).getTime();
-  
-      if (
-        (selectedStart >= rentStart && selectedStart <= rentEnd) ||
-        (selectedEnd >= rentStart && selectedEnd <= rentEnd) ||
-        (selectedStart <= rentStart && selectedEnd >= rentEnd)
-      ) {
-        return false;
-      }
-      return true;
+      return isDateOverlap(rentStart, rentEnd);
     });
-
-    const isUnavailable = unavailabilityDates.some(unavailable => {
-      const selectedStart = startDate.getTime();
-      const selectedEnd = endDate.getTime();
-      const unavailableStart = new Date(unavailable.startDate).getTime();
-      const unavailableEnd = new Date(unavailable.endDate).getTime();
-
-      if (
-        (selectedStart >= unavailableStart && selectedStart <= unavailableEnd) ||
-        (selectedEnd >= unavailableStart && selectedEnd <= unavailableEnd) ||
-        (selectedStart <= unavailableStart && selectedEnd >= unavailableEnd)
-      ) {
-        return false;
-      }
-      return true;
-    });
-
-    if (!isUnavailable) {
-      setError('La voiture n\'est pas disponible pour les dates sélectionnées.');
-      return;
-    }
   
-    if (!isDatesValid) {
+    const isDatesOverlapUnavailable = unavailabilityDates.some(({ startDate, endDate }) => {
+      const unavailableStart = new Date(startDate).getTime();
+      const unavailableEnd = new Date(endDate).getTime();
+      return isDateOverlap(unavailableStart, unavailableEnd);
+    });
+  
+    if (isDatesOverlapRented || isDatesOverlapUnavailable) {
       setError('La voiture n\'est pas disponible pour les dates sélectionnées.');
       return;
     }
@@ -259,7 +260,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
 
   const handleStartDateChange = (date) => {
     if (endDate && date > endDate) {
-      setError('La date de début ne peut pas être après la date de fin.');
+      setError(t('La date de début ne peut pas être après la date de fin.'));
     } else {
       setStartDate(date);
       setError('');
@@ -268,7 +269,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
   
   const handleEndDateChange = (date) => {
     if (startDate && date < startDate) {
-      setError('La date de fin ne peut pas être avant la date de début.');
+      setError(t('La date de fin ne peut pas être avant la date de début.'));
     } else {
       setEndDate(date);
       setError('');
@@ -335,7 +336,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
       </CardActions>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
-          <Typography paragraph>Description:</Typography>
+          <Typography paragraph>{t('Description:')}</Typography>
           <Typography paragraph>
            {rent.car.description}
           </Typography>
@@ -343,7 +344,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
       </Collapse>
       <CardActions>
         <Button variant="contained" color="error" onClick={handleClickOpen}>
-          Annuler
+          {t('Annuler')}
         </Button>
         <Dialog
           open={open}
@@ -353,21 +354,21 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
         >
           <DialogContent>
             <DialogContentText id="alert-dialog-description">
-              Voulez-vous vraiment annuler votre réservation ?
+              {t('Voulez-vous vraiment annuler votre réservation ?')}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose}>Retour</Button>
+            <Button onClick={handleClose}>{t('Retour')}</Button>
             <Button onClick={() => handleCancel(rent.id)} autoFocus>
-              Oui
+              {t('Oui')}
             </Button>
           </DialogActions>
         </Dialog>
         <Button variant="contained" color="primary" onClick={() => handleOpenModal(rent.car.id)}>
-          Décaler le RDV
+          {t('Décaler le RDV')}
         </Button>
         <Button variant="contained" color="success" onClick={() => handleRedirectCarsPage (rent.car.id)}>
-          Reprendre RDV
+          {t('Reprendre RDV')}
         </Button>
       </CardActions>
 
@@ -379,7 +380,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
       >
         <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', boxShadow: 24, p: 4, minWidth: '300px' }}>
           <Typography variant="h6" id="modal-title" align="center" gutterBottom>
-            Planification de la location
+            {t('Planification de la location')}
           </Typography>
           {rentalSuccessMessage && (
             <Typography color="green" align="center" gutterBottom>
@@ -394,10 +395,10 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
                 showTimeSelect
                 timeFormat="HH:mm"
                 timeIntervals={60}
-                timeCaption="Heure de début"
+                timeCaption={t('Heure de début')}
                 minDate={new Date()}
                 dateFormat="MMMM d, yyyy h:mm aa"
-                placeholderText="Date et heure de début"
+                placeholderText={t('Date et heure de début')}
                 filterDate={(date) => {
                   const selectedRentId = rent.id;
                   const rentedTimesFiltered = rentedTimes.filter(rent => rent.id !== selectedRentId);
@@ -422,10 +423,10 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
                 showTimeSelect
                 timeFormat="HH:mm"
                 timeIntervals={60}
-                timeCaption="Heure de fin"
+                timeCaption={t('Heure de fin')}
                 minDate={startDate || new Date()}
                 dateFormat="MMMM d, yyyy h:mm aa"
-                placeholderText="Date et heure de fin"
+                placeholderText={t('Date et heure de fin')}
                 filterDate={(date) => {
                   const selectedRentId = rent.id;
                   const rentedTimesFiltered = rentedTimes.filter(rent => rent.id !== selectedRentId);
@@ -446,14 +447,14 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
             <Grid item xs={12}>
               {startDate && endDate && (
                 <Typography variant="h6" gutterBottom>
-                  Prix total : {totalPrice} €
+                  {t('Prix total :')} {totalPrice} €
                 </Typography>
               )}
               <Button variant="contained" onClick={handleCloseModal} sx={{ marginRight: '1em' }}>
-                Fermer
+                {t('Fermer')}
               </Button>
               <Button variant="contained" onClick={handleOpenStripeModal} disabled={isRentButtonDisabled}>
-                Louer la voiture
+                {t('Louer la voiture')}
               </Button>
             </Grid>
           </Grid>

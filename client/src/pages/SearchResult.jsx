@@ -4,10 +4,11 @@ import Stack from '@mui/joy/Stack';
 import RentCard from '../components/RentCard';
 import FilterButton from '../components/button/FilterButton';
 import { useLocation } from 'react-router-dom';
-
 import Maps from '../components/api/Maps';
+import { useTranslation } from 'react-i18next';
 
 const SearchResult = (props) => {
+    const { t } = useTranslation();
     const location = useLocation();
     const params = new URLSearchParams(location.search);
 
@@ -53,7 +54,7 @@ const SearchResult = (props) => {
         try {
             const response = await fetch(`http://195.35.29.110:8000/api/cars/search?${searchParams.toString()}`);
             if (!response.ok && response.status === 404) {
-                throw new Error('Aucun résultat n\'a été trouvé.');
+                throw new Error(t('Aucun résultat n\'a été trouvé.'));
             } else if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error);
@@ -139,7 +140,7 @@ const SearchResult = (props) => {
                 )}
                 {!isLoading && !error && (
                     <Stack spacing={2}>
-                        <Alert severity="success">{data.length} résultat(s) trouvé(s)</Alert>
+                        <Alert severity="success">{data.length} {t('résultat(s) trouvé(s)')}</Alert>
                         <Stack spacing={2} ref={containerRef}>
                             {data.map((car, index) => (
                                 <RentCard key={index} car={car} query={{ startDate: encodeURIComponent(startDate), 

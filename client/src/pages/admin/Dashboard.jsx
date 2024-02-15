@@ -190,9 +190,9 @@ export default function Dashboard() {
                         <Grid container spacing={3} justifyContent="center">
                             <Grid item xs={12} md={6}>
                                 <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                    <div style={{ height: '400px', width: '100%', maxWidth: '600px' }}>
+                                    <Box sx={{ width: '300px', height: '300px' }}>
                                     <Pie data={data} options={{ maintainAspectRatio: true }} />
-                                    </div>
+                                    </Box>
                                 </div>
                             </Grid>
                         </Grid>

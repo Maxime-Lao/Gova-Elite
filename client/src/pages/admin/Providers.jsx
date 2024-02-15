@@ -9,36 +9,22 @@ import {
     TableRow,
     TableCell,
     Paper,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
     IconButton,
     Dialog,
     DialogTitle,
     DialogContent,
     DialogActions,
     Button,
-    TextField,
     Box,
-    Input
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
 import {createTheme, styled, ThemeProvider, useTheme} from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
-import Badge from '@mui/material/Badge';
 import Link from '@mui/material/Link';
-import MenuIcon from '@mui/icons-material/Menu';
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import CheckIcon from '@mui/icons-material/Check';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import {MainListItems, secondaryListItems} from '../../components/dashboard/ListItems.jsx';
 import { useMediaQuery } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import NavbarPro from '../../components/navbar/NavbarPro.jsx';
@@ -379,7 +365,7 @@ export default function Providers() {
                         }}
                     >
                         <Typography variant="h2" gutterBottom sx={{ mt: 5, mb: 5 }}>
-                            Liste des prestataires
+                            Liste des prestataireszzz
                         </Typography>
                         <Grid container spacing={3} justifyContent="center">
                             <Grid item xs={12}>
@@ -407,6 +393,7 @@ export default function Providers() {
                                                 <TableCell style={{color: 'white'}}>Email</TableCell>
                                                 <TableCell style={{color: 'white'}}>Téléphone</TableCell>
                                                 <TableCell style={{color: 'white'}}>Activation du compte</TableCell>
+                                                <TableCell style={{color: 'white'}}>PDF</TableCell>
                                                 <TableCell style={{color: 'white'}} align="right">Action</TableCell>
                                             </TableRow>
                                         </TableHead>
@@ -425,6 +412,13 @@ export default function Providers() {
                                                     <TableCell>{
                                                         provider.isVerified === false ? 'Non' : 'Oui'
                                                     }</TableCell>
+                                                    {provider.kbis ? (
+                                                            <TableCell><a href={`http://localhost:8000/uploads/kbis/${provider.kbis}`} target="_blank" rel="noopener noreferrer">
+                                                                Voir le KBIS
+                                                            </a></TableCell>
+                                                    ) : (
+                                                        'Aucun KBIS'
+                                                    )}
                                                     <TableCell align="right">
                                                         {provider.isVerified ? (
                                                             <IconButton disabled>
