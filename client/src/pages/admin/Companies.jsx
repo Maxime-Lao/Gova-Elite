@@ -200,7 +200,6 @@ export default function Companies() {
         }
     }, [selectedCompany]);    
 
-<<<<<<< HEAD:client/src/pages/Companies.jsx
     const handleCreate = async () => {
         event.preventDefault();
         
@@ -255,8 +254,6 @@ export default function Companies() {
         setCity('');
         setOpenCreateDialog(true);
     };
-=======
->>>>>>> develop:client/src/pages/admin/Companies.jsx
     
     const handleConfirmDelete = async () => {
         try {

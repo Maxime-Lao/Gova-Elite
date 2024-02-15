@@ -142,10 +142,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups('user:read', 'companies:read')]
     private Collection $media;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Notice::class, orphanRemoval: true)]
-    #[Groups('user:read')]
-    private Collection $notices;
-
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Notification::class, orphanRemoval: true)]
     private Collection $notifications;
 
@@ -324,14 +320,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->media;
     }
 
-    /**
-     * @return Collection<int, Notice[]>
-     */
-    public function getNotices(): Collection
-    {
-        return $this->notices;
-    }
-
     public function getCompanie(): ?Companie
     {
         return $this->companie;
@@ -382,25 +370,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             }
         }
 
-        return $this;
-    }
-
-    public function addNotice(Notice $notice): static
-    {
-        if (!$this->notices->contains($notice)) {
-            $this->notices->add($notice);
-            $notice->setUser($this);
-        }
-        return $this;
-    }
-
-    public function removeNotice(Notice $notice): static
-    {
-        if ($this->notices->removeElement($notice)) {
-            if ($notice->getUser() === $this) {
-                $notice->setUser(null);
-            }
-        }
         return $this;
     }
 

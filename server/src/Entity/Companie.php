@@ -93,10 +93,6 @@ class Companie
     #[Groups(['companies:read', 'user:read'])]
     private Collection $cars;
 
-    #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Notice::class, orphanRemoval: true)]
-    #[Groups(['companies:read', 'user:read'])]
-    private Collection $notices;
-
     #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Rent::class, orphanRemoval: true)]
     #[Groups(['companies:read', 'user:read'])]
     private Collection $rents;
@@ -113,7 +109,6 @@ class Companie
     public function __construct()
     {
         $this->cars = new ArrayCollection();
-        $this->notices = new ArrayCollection();
         $this->users = new ArrayCollection();
         $this->rents = new ArrayCollection();
     }
@@ -221,35 +216,6 @@ class Companie
             // set the owning side to null (unless already changed)
             if ($car->getCompanie() === $this) {
                 $car->setCompanie(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Notice>
-     */
-    public function getNotices(): Collection
-    {
-        return $this->notices;
-    }
-
-    public function addNotice(Notice $notice): static
-    {
-        if (!$this->notices->contains($notice)) {
-            $this->notices->add($notice);
-            $notice->setCompanie($this);
-        }
-
-        return $this;
-    }
-
-    public function removeNotice(Notice $notice): static
-    {
-        if ($this->notices->removeElement($notice)) {
-            if ($notice->getCompanie() === $this) {
-                $notice->setCompanie(null);
             }
         }
 

@@ -6,7 +6,6 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use App\Entity\User;
-use App\Entity\Role;
 use App\Entity\MediaObject;
 use App\Entity\Companie;
 use App\Entity\Car;
@@ -24,21 +23,13 @@ class AppFixtures extends Fixture
     {
         $faker = Factory::create();
 
-        $roles = [];
-        $roleNames = ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_PRO'];
-        foreach ($roleNames as $name) {
-            $role = new Role();
-            $role->setName($name);
-            $manager->persist($role);
-            $roles[] = $role;
-        }
-
         $users = [];
+        $roleNames = ['ROLE_USER', 'ROLE_PRO'];
         for ($i = 0; $i < 20; $i++) {
             $user = new User();
             $user->setEmail($faker->email);
-            $randomRole = $roles[array_rand($roles)];
-            $user->setRoles([$randomRole->getName()]);
+            $randomRole = $roleNames[array_rand($roleNames)];
+            $user->setRoles([$randomRole]);
             $user->setPassword($faker->password);
             $user->setIsVerified($faker->boolean);
             $user->setFirstname($faker->firstName);
