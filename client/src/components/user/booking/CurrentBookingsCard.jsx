@@ -121,7 +121,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
   }, [startDate, endDate, rent]);
 
   useEffect(() => {
-    const unavailability = rent.car.unavailability || [];
+    const unavailability = rent.car.unavailabilities || [];
     setUnavailabilityDates(unavailability.map(({ date_start, date_end }) => ({
       startDate: new Date(date_start),
       endDate: new Date(date_end),

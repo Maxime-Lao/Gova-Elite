@@ -33,7 +33,7 @@ function Calendar({ carId, companieId }) {
         if (!response.ok) throw new Error('Erreur lors de la récupération des données');
         const carData = await response.json();
         const rents = carData.rents || [];
-        const unavailability = carData.unavailability || [];
+        const unavailability = carData.unavailabilities || [];
 
         setCarData(carData);
         setRentedTimes(rents.map(({ dateStart, dateEnd }) => ({

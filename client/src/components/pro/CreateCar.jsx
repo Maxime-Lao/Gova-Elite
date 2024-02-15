@@ -35,46 +35,33 @@ const CreateCar = ({companieId}) => {
     const user = useGetConnectedUser();
 
     useEffect(() => {
-        fetch(`http://localhost:8000/api/gears`)
-            .then(response => response.json())
-            .then(data => {
-                setMyGears(data);
-                setGear(data[0].id);
-            })
-            .catch(error => console.error(error));
+        const fetchWithAuthorization = async (url, setStateFunction, setDefaultIdFunction) => {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                });
 
-        fetch(`http://localhost:8000/api/models`)
-            .then(response => response.json())
-            .then(data => {
-                setAllModels(data);
-                setModel(data[0].id);
-            })
-            .catch(error => console.error(error));
+                if (!response.ok) {
+                    throw new Error(`Erreur lors de la récupération des données de ${url}`);
+                }
 
-        fetch(`http://localhost:8000/api/brands`)
-            .then(response => response.json())
-            .then(data => {
-                setMyBrands(data);
-                setSelectedBrandId(data[0].id);
-            })
-            .catch(error => console.error(error));
+                const data = await response.json();
+                setStateFunction(data);
+                setDefaultIdFunction(data[0].id);
+            } catch (error) {
+                console.error(error);
+            }
+        };
 
-        fetch(`http://localhost:8000/api/energies`)
-            .then(response => response.json())
-            .then(data => {
-                setMyEnergies(data);
-                setEnergy(data[0].id);
-            })
-            .catch(error => console.error(error));
-
-        fetch(`http://localhost:8000/api/categories`)
-            .then(response => response.json())
-            .then(data => {
-                setMyCategories(data);
-                setCategory(data[0].id);setMyCategories(data)
-            })
-            .catch(error => console.error(error));
+        fetchWithAuthorization('http://localhost:8000/api/gears', setMyGears, setGear);
+        fetchWithAuthorization('http://localhost:8000/api/models', setAllModels, setModel);
+        fetchWithAuthorization('http://localhost:8000/api/brands', setMyBrands, setSelectedBrandId);
+        fetchWithAuthorization('http://localhost:8000/api/energies', setMyEnergies, setEnergy);
+        fetchWithAuthorization('http://localhost:8000/api/categories', setMyCategories, setCategory);
     }, []);
+
 
     useEffect(() => {
         if (selectedBrandId && allModels) {
