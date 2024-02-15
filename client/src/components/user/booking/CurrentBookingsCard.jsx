@@ -41,6 +41,7 @@ const ExpandMore = styled((props) => {
 
 export default function BookingsCard({ rent, user, onDelete, onBookingChange }) {
   const { t } = useTranslation();
+  const token = localStorage.getItem('token');
   const [expanded, setExpanded] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [startDate, setStartDate] = useState(null);
@@ -85,7 +86,13 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
   useEffect(() => {
     const fetchRentedTimes = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/cars/${rent.car.id}/rents`);
+        const response = await fetch(`http://localhost:8000/api/cars/${rent.car.id}/rents`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            }
+        });
         if (response.ok) {
           const carRentsData = await response.json();
           setRentedTimes(carRentsData);
@@ -100,7 +107,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
     if (rent.car.id && typeof rent.car.id === 'number') {
       fetchRentedTimes();
     }
-  }, [rent.car.id]);
+  }, [rent.car.id, token]);
 
   useEffect(() => {
     if (startDate && endDate && rent && rent.car.price) {
@@ -135,7 +142,13 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
   
   const fetchUpdatedRentedTimes = async (carId) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/cars/${carId}/rents`);
+      const response = await fetch(`http://localhost:8000/api/cars/${carId}/rents`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+            }
+        });
       if (response.ok) {
         const carRentsData = await response.json();
         setRentedTimes(carRentsData);
@@ -157,7 +170,11 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
   const handleCancel = async (id) => {
     try {
       const response = await fetch(`http://localhost:8000/api/rents/${id}`, {
-        method: 'DELETE',
+          method: 'DELETE',
+          headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+          }
       });
       if (response.ok) {
         onDelete(id);
@@ -190,6 +207,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/merge-patch+json',
+            Authorization: `Bearer ${token}`
           },
           body: JSON.stringify(requestData),
         });

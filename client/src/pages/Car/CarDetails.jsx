@@ -75,45 +75,58 @@ function PrevArrow(props) {
 
 function CarDetails() {
   const { t } = useTranslation();
+  const token = localStorage.getItem('token');
   const { id } = useParams();
   const navigate = useNavigate();
   const [car, setCar] = useState(null);
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:8000/api/cars/${id}/comments`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`An error occurred: ${response.statusText}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        if (Array.isArray(data)) {
-          setComments(data);
-        } else {
-          console.error('Unexpected response structure for comments:', data);
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching comments:', error);
-      });
-  }, [id]);
+    fetch(`http://localhost:8000/api/cars/${id}/comments`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`An error occurred: ${response.statusText}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (Array.isArray(data)) {
+        setComments(data);
+      } else {
+        console.error('Unexpected response structure for comments:', data);
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching comments:', error);
+    });
+  }, [id]);  
 
   useEffect(() => {
-    fetch(`http://localhost:8000/api/cars/${id}`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Car not found');
-        }
-        return response.json();
-      })
-      .then(data => setCar(data))
-      .catch(error => {
-        console.error(error);
-        navigate('/not-found');
-      });
-  }, [id, navigate]);
+    fetch(`http://localhost:8000/api/cars/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Car not found');
+      }
+      return response.json();
+    })
+    .then(data => setCar(data))
+    .catch(error => {
+      console.error(error);
+      navigate('/not-found');
+    });
+  }, [id, navigate]);  
 
   const calculateAverageRating = () => {
     if (!comments) {

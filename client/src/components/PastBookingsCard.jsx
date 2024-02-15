@@ -36,6 +36,7 @@ const ExpandMore = styled((props) => {
 
 function PastBookings({ rent, user, onPastBookingChange }) {
   const { t } = useTranslation();
+  const token = localStorage.getItem('token');
   const [expanded, setExpanded] = React.useState(false);
   const formattedStartDate = format(new Date(rent.dateStart), "dd/MM/yyyy HH'h'", { locale: fr });
   const formattedEndDate = format(new Date(rent.dateEnd), "dd/MM/yyyy HH'h'", { locale: fr });
@@ -166,6 +167,7 @@ function PastBookings({ rent, user, onPastBookingChange }) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json+ld',
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify(commentData),
       });

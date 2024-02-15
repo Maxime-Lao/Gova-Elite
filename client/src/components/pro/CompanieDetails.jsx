@@ -6,6 +6,7 @@ import { Chart, registerables } from 'chart.js';
 Chart.register(...registerables);
 
 const CompanieDetails = ({ companie }) => {
+    const token = localStorage.getItem('token');
     const { name, address, city, zipCode, cars } = companie;
     const [rents, setRents] = useState([]);
     const [monthlyIncome, setMonthlyIncome] = useState(0);
@@ -13,7 +14,13 @@ const CompanieDetails = ({ companie }) => {
 
     const fetchRentData = useCallback(async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/companies/${companie.id}/rents`);
+            const response = await fetch(`http://localhost:8000/api/companies/${companie.id}/rents`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                }
+            });
             const data = await response.json();
             setRents(data);
         } catch (error) {

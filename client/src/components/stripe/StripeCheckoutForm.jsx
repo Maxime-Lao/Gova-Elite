@@ -6,6 +6,7 @@ import PaymentIcon from '@mui/icons-material/Payment';
 
 const StripeCheckoutForm = ({ onPaymentSuccess, carPrice }) => {
   const stripe = useStripe();
+  const token = localStorage.getItem('token');
   const elements = useElements();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -36,6 +37,7 @@ const StripeCheckoutForm = ({ onPaymentSuccess, carPrice }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({paymentMethodId: paymentMethod.id, amount: carPrice}),
       })
