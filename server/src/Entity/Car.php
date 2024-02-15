@@ -109,7 +109,7 @@ class Car
 
     #[ORM\OneToMany(mappedBy: 'car', targetEntity: Unavailability::class, orphanRemoval: true)]
     #[Groups(['car:read'])]
-    private Collection $unavailability;
+    private Collection $unavailabilities;
 
     #[ORM\OneToMany(mappedBy: 'car', targetEntity: Comment::class, orphanRemoval: true)]
     #[Groups(['user:read'])]
@@ -127,7 +127,7 @@ class Car
     {
         $this->media = new ArrayCollection();
         $this->rents = new ArrayCollection();
-        $this->unavailability = new ArrayCollection();
+        $this->unavailabilities = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -337,15 +337,15 @@ class Car
     /**
      * @return Collection<int, Unavailability>
      */
-    public function getUnavailability(): Collection
+    public function getUnavailabilities(): Collection
     {
-        return $this->unavailability;
+        return $this->unavailabilities;
     }
 
     public function addUnavailability(Unavailability $unavailability): static
     {
-        if (!$this->unavailability->contains($unavailability)) {
-            $this->unavailability->add($unavailability);
+        if (!$this->unavailabilities->contains($unavailability)) {
+            $this->unavailabilities->add($unavailability);
             $unavailability->setCar($this);
         }
         return $this;
@@ -353,7 +353,7 @@ class Car
 
     public function removeUnavailability(Unavailability $unavailability): static
     {
-        if ($this->unavailability->removeElement($unavailability)) {
+        if ($this->unavailabilities->removeElement($unavailability)) {
             // set the owning side to null (unless already changed)
             if ($unavailability->getCar() === $this) {
                 $unavailability->setCar(null);

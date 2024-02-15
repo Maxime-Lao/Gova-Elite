@@ -6,9 +6,19 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\UnavailabilityRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 
 #[ORM\Entity(repositoryClass: UnavailabilityRepository::class)]
 #[ApiResource]
+#[ApiResource(
+    uriTemplate: '/cars/{carId}/unavailabilities',
+    uriVariables: [
+        'carId' => new Link(fromClass: Car::class, toProperty: 'car'),
+    ],
+    operations: [new GetCollection()],
+    normalizationContext: ['groups' => ['car:read']],
+)]
 class Unavailability
 {
     #[ORM\Id]
@@ -33,7 +43,7 @@ class Unavailability
     #[Groups(['car:read'])]
     private ?int $price = null;
 
-    #[ORM\ManyToOne(inversedBy: 'unavailability')]
+    #[ORM\ManyToOne(inversedBy: 'unavailabilities')]
     #[Groups(['rents:read', 'rents_car:read', 'rents_user:read', 'rents_companie:read'])]
     private ?Car $car = null;
 
