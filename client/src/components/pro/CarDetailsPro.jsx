@@ -8,6 +8,8 @@ import HorizontalTabs from "../others/HorizontalTabs.jsx";
 import CarHistoric from "./CarHistoric.jsx";
 import Slider from "react-slick";
 import {imageStyle} from "../../pages/Car/CarDetails.jsx";
+import useGetConnectedUser from "../hooks/useGetConnectedUser.jsx";
+import NotFoundPage from "../../pages/NotFoundPage.jsx";
 
 const getSliderSettings = (numberOfImages) => {
     return {
@@ -22,6 +24,8 @@ const getSliderSettings = (numberOfImages) => {
 
 const CarDetailsPro = () => {
     const {carId} = useParams();
+
+    const user = useGetConnectedUser();
 
     const [car, setCar] = useState(null);
     const [reason, setReason] = useState('');
@@ -117,6 +121,12 @@ const CarDetailsPro = () => {
         { label: 'Planning de la gova', content: <CarSchedule car={ car }/>},
         { label: 'Historique de la Gova', content: <CarHistoric car={ car }/>},
     ];
+
+    const carFound = user.connectedUser?.companie?.cars.some((car) => car.id.toString() === carId);
+
+    if ( user.connectedUser && !carFound) {
+        return <NotFoundPage/>
+    }
 
     return car ? (
         <>
