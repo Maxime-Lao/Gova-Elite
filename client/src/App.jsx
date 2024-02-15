@@ -11,6 +11,7 @@ import { ThemeProvider } from '@mui/material';
 import myTheme from './theme';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import RegisterPage from "./pages/Register.jsx";
+import i18n from './i18n.jsx';
 import Login from "./pages/Login.jsx";
 import Dashboard from "./pages/admin/Dashboard.jsx";
 import Users from "./pages/admin/Users.jsx";
