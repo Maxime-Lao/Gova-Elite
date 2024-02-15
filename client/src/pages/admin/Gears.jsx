@@ -159,7 +159,7 @@ export default function Gears() {
         const getGears = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://195.35.29.110:8000/api/gears', {
+                const response = await fetch('http://localhost:8000/api/gears', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -199,7 +199,7 @@ export default function Gears() {
         event.preventDefault();
         
         try {
-            const response = await fetch('http://195.35.29.110:8000/api/gears', {
+            const response = await fetch('http://localhost:8000/api/gears', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -250,7 +250,7 @@ export default function Gears() {
 
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(`http://195.35.29.110:8000/api/gears/${selectedGear.id}`, {
+            const response = await fetch(`http://localhost:8000/api/gears/${selectedGear.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -280,7 +280,7 @@ export default function Gears() {
 
     const handleUpdate = async () => {
         try {
-            const response = await fetch(`http://195.35.29.110:8000/api/gears/${selectedGear.id}`, {
+            const response = await fetch(`http://localhost:8000/api/gears/${selectedGear.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/merge-patch+json',

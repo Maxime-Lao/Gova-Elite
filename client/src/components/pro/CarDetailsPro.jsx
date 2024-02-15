@@ -36,6 +36,8 @@ const CarDetailsPro = () => {
     const [success, setSuccess] = useState('');
     const [errorUnavailability, setErrorUnavailability] = useState('');
 
+    console.log(car)
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -71,7 +73,7 @@ const CarDetailsPro = () => {
             return;
         }
         try {
-            const response = await fetch('http://195.35.29.110:8000/api/unavailabilities', {
+            const response = await fetch('http://localhost:8000/api/unavailabilities', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -105,7 +107,7 @@ const CarDetailsPro = () => {
     useEffect(() => {
         const fetchCar = async () => {
             try {
-                const response = await fetch(`http://195.35.29.110:8000/api/cars/${carId}`, {
+                const response = await fetch(`http://localhost:8000/api/cars/${carId}`, {
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -146,7 +148,7 @@ const CarDetailsPro = () => {
                         <Slider {...getSliderSettings(car.media.length)}>
                             {car.media.length > 0 ? car.media.map((media, index) => (
                                 <div key={index}>
-                                    <img src={`http://195.35.29.110:8000/media/${media.filePath}`} alt={`Image de voiture ${index + 1}`} style={imageStyle} />
+                                    <img src={`http://localhost:8000/media/${media.filePath}`} alt={`Image de voiture ${index + 1}`} style={imageStyle} />
                                 </div>
                             )) : (
                                 <div>

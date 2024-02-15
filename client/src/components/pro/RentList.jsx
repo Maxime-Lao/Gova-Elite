@@ -9,7 +9,7 @@ export default function RentList({ companieId }) {
     useEffect(() => {
         const getRents = async () => {
             try {
-                const response = await fetch(`http://195.35.29.110:8000/api/companies/${companieId}/rents`, {
+                const response = await fetch(`http://localhost:8000/api/companies/${companieId}/rents`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

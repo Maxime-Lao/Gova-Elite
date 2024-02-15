@@ -52,7 +52,7 @@ const SearchResult = (props) => {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await fetch(`http://195.35.29.110:8000/api/cars/search?${searchParams.toString()}`);
+            const response = await fetch(`http://localhost:8000/api/cars/search?${searchParams.toString()}`);
             if (!response.ok && response.status === 404) {
                 throw new Error(t('Aucun résultat n\'a été trouvé.'));
             } else if (!response.ok) {
@@ -82,7 +82,7 @@ const SearchResult = (props) => {
         const fetchData = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch(`http://195.35.29.110:8000/api/cars/search?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&location=${encodeURIComponent(locationParam)}`);
+                const response = await fetch(`http://localhost:8000/api/cars/search?startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}&location=${encodeURIComponent(locationParam)}`);
                 if (!response.ok && response.status === 404) {
                     throw new Error('Aucun résultat n\'a été trouvé.');
                 } else if (!response.ok) {

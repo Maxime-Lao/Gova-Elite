@@ -82,7 +82,7 @@ function CarDetails() {
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
-    fetch(`http://195.35.29.110:8000/api/cars/${id}/comments`, {
+    fetch(`http://localhost:8000/api/cars/${id}/comments`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ function CarDetails() {
   }, [id]);  
 
   useEffect(() => {
-    fetch(`http://195.35.29.110:8000/api/cars/${id}`, {
+    fetch(`http://localhost:8000/api/cars/${id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -159,7 +159,7 @@ function CarDetails() {
             <Slider {...getSliderSettings(car.media.length)}>
               {car.media.length > 0 ? car.media.map((media, index) => (
                 <div key={index}>
-                  <img src={`http://195.35.29.110:8000/media/${media.filePath}`} alt={`Image de voiture ${index + 1}`} style={imageStyle} />
+                  <img src={`http://localhost:8000/media/${media.filePath}`} alt={`Image de voiture ${index + 1}`} style={imageStyle} />
                 </div>
               )) : (
                 <div>

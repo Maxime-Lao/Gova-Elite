@@ -87,18 +87,18 @@ const EditCar = ({ carId }) => {
             }
         };
 
-        fetchWithAuthorization('http://195.35.29.110:8000/api/gears', setMyGears);
-        fetchWithAuthorization('http://195.35.29.110:8000/api/models', setAllModels);
-        fetchWithAuthorization('http://195.35.29.110:8000/api/brands', setMyBrands);
-        fetchWithAuthorization('http://195.35.29.110:8000/api/energies', setMyEnergies);
-        fetchWithAuthorization('http://195.35.29.110:8000/api/categories', setMyCategories);
+        fetchWithAuthorization('http://localhost:8000/api/gears', setMyGears);
+        fetchWithAuthorization('http://localhost:8000/api/models', setAllModels);
+        fetchWithAuthorization('http://localhost:8000/api/brands', setMyBrands);
+        fetchWithAuthorization('http://localhost:8000/api/energies', setMyEnergies);
+        fetchWithAuthorization('http://localhost:8000/api/categories', setMyCategories);
     }, []);
 
 
     useEffect(() => {
         const fetchCarData = async () => {
             try {
-                const response = await axios.get(`http://195.35.29.110:8000/api/cars/${carId}`, {
+                const response = await axios.get(`http://localhost:8000/api/cars/${carId}`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
@@ -130,7 +130,7 @@ const EditCar = ({ carId }) => {
         };
 
         try {
-            const response = await axios.patch(`http://195.35.29.110:8000/api/cars/${carId}`, carDataPayload, {
+            const response = await axios.patch(`http://localhost:8000/api/cars/${carId}`, carDataPayload, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                     'Content-Type': 'application/merge-patch+json',
@@ -144,7 +144,7 @@ const EditCar = ({ carId }) => {
                     formData.append('car_id', carId);
                     formData.append('user_id', user.connectedUser.id);
 
-                    const mediaResponse = await axios.post('http://195.35.29.110:8000/api/media_objects', formData, {
+                    const mediaResponse = await axios.post('http://localhost:8000/api/media_objects', formData, {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem('token')}`,
                             'Content-Type': 'multipart/form-data',
@@ -158,7 +158,7 @@ const EditCar = ({ carId }) => {
             const carMediaIds = carData.media?.map(media => media.id) || [];
             for (const photo of carMediaIds) {
                 if (!files.some(file => file.id === photo)) {
-                    const response = await axios.delete(`http://195.35.29.110:8000/api/media_objects/${photo}`, {
+                    const response = await axios.delete(`http://localhost:8000/api/media_objects/${photo}`, {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem('token')}`,
                         },
@@ -389,7 +389,7 @@ const EditCar = ({ carId }) => {
                                     <div key={`photo-container-${index}`} className="border-2">
                                         <CardMedia
                                             component="img"
-                                            src={`http://195.35.29.110:8000/media/${path.filePath}`}
+                                            src={`http://localhost:8000/media/${path.filePath}`}
                                             style={{width: '70px'}}
                                         />
                                         <div className="flex justify-end">
