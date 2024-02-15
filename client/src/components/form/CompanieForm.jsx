@@ -71,6 +71,7 @@ function CompanieForm() {
                         label="Nom de l'entreprise"
                         fullWidth
                         margin="normal"
+                        required
                     />
                     <TextField
                         name="address"
@@ -79,6 +80,7 @@ function CompanieForm() {
                         label="Adresse"
                         fullWidth
                         margin="normal"
+                        required
                     />
                     <TextField
                         name="zipCode"
@@ -88,6 +90,7 @@ function CompanieForm() {
                         label="Code Postal"
                         fullWidth
                         margin="normal"
+                        required
                     />
                     <TextField
                         name="city"
@@ -96,12 +99,14 @@ function CompanieForm() {
                         label="Ville"
                         fullWidth
                         margin="normal"
+                        required
                     />
                     <div style={{ marginBottom: '1rem', marginTop: '1rem' }}>
                         <input
                             type="file"
                             name="kbis"
                             onChange={handleFileChange}
+                            required
                         />
                     </div>
                     <Button
