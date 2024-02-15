@@ -6,8 +6,10 @@ import { Grid, Typography, Button, TextField, Modal, Box } from '@mui/material';
 import StripePaymentForm from '../../stripe/StripePaymentForm.jsx';
 import { useNavigate } from "react-router-dom";
 import { is } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 
 function Calendar({ carId, companieId }) {
+  const { t } = useTranslation();
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [carData, setCarData] = useState(0);
@@ -117,7 +119,7 @@ function Calendar({ carId, companieId }) {
           };
           setRentedTimes([...rentedTimes, newReservation]);
 
-          setSuccessMessage('Votre réservation a été effectuée avec succès!');
+          setSuccessMessage(t('Votre réservation a été effectuée avec succès!'));
           setError('');
           setStartDate(null);
           setEndDate(null);
@@ -162,7 +164,7 @@ function Calendar({ carId, companieId }) {
     });
   
     if (isDatesOverlapRented || isDatesOverlapUnavailable) {
-      setError('La voiture n\'est pas disponible pour les dates sélectionnées.');
+      setError(t('La voiture n\'est pas disponible pour les dates sélectionnées.'));
       setSuccessMessage('');
       return;
     }
@@ -173,7 +175,7 @@ function Calendar({ carId, companieId }) {
 
   const handleStartDateChange = (date) => {
     if (endDate && date > endDate) {
-      setError('La date de début ne peut pas être après la date de fin.');
+      setError(t('La date de début ne peut pas être après la date de fin.'));
     } else {
       setStartDate(date);
       setError('');
@@ -182,7 +184,7 @@ function Calendar({ carId, companieId }) {
   
   const handleEndDateChange = (date) => {
     if (startDate && date < startDate) {
-      setError('La date de fin ne peut pas être avant la date de début.');
+      setError(t('La date de fin ne peut pas être avant la date de début.'));
     } else {
       setEndDate(date);
       setError('');
@@ -202,7 +204,7 @@ function Calendar({ carId, companieId }) {
     <Grid container spacing={2} justifyContent="center">
       <Grid item xs={10}>
         <Typography variant="h4" component="h2">
-          Planification de la location
+         {t("Planification de la location")}
         </Typography>
         {error && <p style={{ color: 'red' }}>{error}</p>}
         {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
@@ -217,7 +219,7 @@ function Calendar({ carId, companieId }) {
               timeCaption="Heure de début"
               minDate={new Date()}
               dateFormat="MMMM d, yyyy h:mm aa"
-              placeholderText="Date et heure de début"
+              placeholderText={t('Date et heure de début')}
               excludeDates={excludeDates}
               dayClassName={date => isUnavailable(date) ? 'bg-red-500' : undefined}
             />
@@ -232,7 +234,7 @@ function Calendar({ carId, companieId }) {
               timeCaption="Heure de fin"
               minDate={startDate || new Date()}
               dateFormat="MMMM d, yyyy h:mm aa"
-              placeholderText="Date et heure de fin"
+              placeholderText={t('Date et heure de fin')}
               excludeDates={excludeDates}
               dayClassName={date => isUnavailable(date) ? 'bg-red-500' : undefined}
             />
@@ -245,7 +247,7 @@ function Calendar({ carId, companieId }) {
             )}
 
             <Button variant="contained" onClick={handleOpenModal} disabled={isRentButtonDisabled}>
-              Louer la voiture
+              {t("Louer la voiture")}
             </Button>
           </Grid>
         </Grid>

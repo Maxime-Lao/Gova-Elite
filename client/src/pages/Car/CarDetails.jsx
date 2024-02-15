@@ -20,6 +20,7 @@ import EuroIcon from '@mui/icons-material/Euro';
 import CarCrashIcon from '@mui/icons-material/CarCrash';
 import BusinessIcon from '@mui/icons-material/Business';
 import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
+import { useTranslation } from 'react-i18next';
 
 const cardStyle = {
   marginBottom: "2em",
@@ -73,6 +74,7 @@ function PrevArrow(props) {
 
 
 function CarDetails() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [car, setCar] = useState(null);
@@ -161,7 +163,7 @@ function CarDetails() {
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <Rating name="half-rating-read" value={calculateAverageRating()} precision={0.5} readOnly />
                     <Typography variant="body1">
-                      ({comments ? comments.length : 0} avis)
+                      ({comments ? comments.length : 0} {t("avis")})
                     </Typography>
                   </Stack>
                 </Typography>
@@ -174,7 +176,7 @@ function CarDetails() {
                       <ListItemIcon>
                         <BedroomBabyIcon />
                       </ListItemIcon>
-                      <ListItemText primary={`${car.horses} chevaux`} />
+                      <ListItemText primary={`${car.horses} ${t("chevaux")}`} />
                     </ListItem>
                   </List>
                 </Grid>
@@ -196,7 +198,7 @@ function CarDetails() {
                       <ListItemIcon>
                         <AirlineSeatReclineExtraIcon />
                       </ListItemIcon>
-                      <ListItemText primary={`${car.nbSeats} sièges`} />
+                      <ListItemText primary={`${car.nbSeats} ${t("sièges")}`} />
                     </ListItem>
                   </List>
                 </Grid>
@@ -206,7 +208,7 @@ function CarDetails() {
                       <ListItemIcon>
                         <CarRental />
                       </ListItemIcon>
-                      <ListItemText primary={`${car.nbDoors} portes`} />
+                      <ListItemText primary={`${car.nbDoors} ${t("portes")}`} />
                     </ListItem>
                   </List>
                 </Grid>
@@ -262,10 +264,10 @@ function CarDetails() {
           </Grid>
           <CardContent>
             <Typography variant="h6" gutterBottom>
-              Commentaires:
+              {t("Commentaires:")}
             </Typography>
             {comments.length === 0 ? (
-              <Typography variant="subtitle1">Pas de commentaire pour l'instant</Typography>
+              <Typography variant="subtitle1">{t("Pas de commentaire pour l'instant")}</Typography>
             ) : (
               <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
                 {comments.map(comment => (

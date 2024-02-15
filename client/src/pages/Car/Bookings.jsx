@@ -9,8 +9,10 @@ import useGetConnectedUser from "../../components/hooks/useGetConnectedUser.jsx"
 import Box from '@mui/material/Box';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
+import { useTranslation } from 'react-i18next';
 
 function Bookings() {
+  const { t } = useTranslation();
   const [userData, setUserData] = useState(null);
   const [userCommentsData, setUserCommentsData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -100,10 +102,10 @@ function Bookings() {
       {userData && (
         <Grid container spacing={2} justifyContent="center" sx={{marginTop: "2em"}}>
           <Grid item xs={12}>
-            <Typography variant="h4">Réservations de voiture pour {user.connectedUser.firstname} {user.connectedUser.lastname}</Typography>
+            <Typography variant="h4">{t("Réservations de voiture pour")} {user.connectedUser.firstname} {user.connectedUser.lastname}</Typography>
             <Tabs value={tabValue} onChange={handleTabChange} aria-label="Réservations tabs">
-              <Tab label="En cours" />
-              <Tab label="Historique" />
+              <Tab label={t("En cours")} />
+              <Tab label={t("Historique")} />
             </Tabs>
           </Grid>
 
