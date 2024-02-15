@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
 import CarSchedule from "./CarSchedule.jsx";
 import DatePicker from 'react-datepicker';
