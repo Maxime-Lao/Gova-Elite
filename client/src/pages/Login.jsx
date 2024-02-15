@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { TextField, Button, Grid ,Box, Typography } from "@mui/material";
-import sendRequest from "../services/axiosRequestFunction";
+import send from "../services/axiosRequest.js";
 import { useNavigate } from 'react-router-dom';
 
 export default function Login() {
@@ -12,7 +12,7 @@ export default function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await sendRequest(
+            const response = await send(
                 '/auth',
                 'post',
                 {

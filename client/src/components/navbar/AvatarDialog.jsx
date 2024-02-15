@@ -21,7 +21,7 @@ const AvatarDialog = ({ firstName, lastName, handleLogout }) => {
 
     return (
         <div>
-            <Avatar sx={{ width: 40, height: 40, backgroundColor: '#3f51b5', cursor: 'pointer' }} onClick={handleClick}>
+            <Avatar sx={{ width: 40, height: 40, backgroundColor: '#55b53f', cursor: 'pointer' }} onClick={handleClick}>
                 {initials}
             </Avatar>
             <Popover

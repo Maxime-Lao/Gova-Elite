@@ -8,7 +8,6 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\Delete;
 use App\Repository\CompanieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -90,6 +89,7 @@ class Companie
     private bool $isVerified = false;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    #[Groups(['companies:read'])]
     private ?string $kbis = null;
 
     #[ORM\OneToMany(mappedBy: 'companie', targetEntity: Car::class, orphanRemoval: true)]
@@ -339,5 +339,10 @@ class Companie
         $this->updatedAt = $updatedAt;
 
         return $this;
+    }
+
+    public function getKbisUrl(): ?string
+    {
+        return $this->kbis ? sprintf('/uploads/kbis/%s', $this->kbis) : null;
     }
 }

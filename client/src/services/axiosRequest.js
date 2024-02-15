@@ -10,7 +10,7 @@ const axiosInstance = axios.create({
     },
 });
 
-const sendRequest = async (endpoint, method = 'GET', data = {}, requireAuth = true) => {
+const send = async (endpoint, method = 'GET', data = {}, requireAuth = true) => {
     if (requireAuth) {
         const token = localStorage.getItem('token');
         if (token) {
@@ -68,11 +68,11 @@ function isTokenExpired(token) {
 async function refreshToken() {
     try {
         const refresh_token = localStorage.getItem('refresh_token');
-        const response = await sendRequest('/api/token/refresh ','post', { refresh_token });
+        const response = await send('/api/token/refresh ','post', { refresh_token });
         localStorage.setItem('token', response.data.token);
         return response.data.token;
     } catch (error) {
     }
 }
 
-export default sendRequest;
+export default send;
