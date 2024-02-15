@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {useCallback, useState} from 'react';
 import { Badge, Box, IconButton, Toolbar, Typography } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -11,6 +11,9 @@ import List from '@mui/material/List';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import {MainListItems, secondaryListItems} from '../dashboard/ListItems.jsx';
 import NotificationButton from '../button/NotificationButton.jsx';
+import useGetConnectedUser from "../hooks/useGetConnectedUser.jsx";
+import {useNavigate} from "react-router-dom";
+import AvatarDialog from "./AvatarDialog.jsx";
 
 
 const drawerWidth = 240;
@@ -62,6 +65,30 @@ const NavbarPro = () => {
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [open, setOpen] = useState(!isMobile);
 
+    const localStorageToken = localStorage.getItem('token');
+    const [myToken, setMyToken] = useState(localStorageToken);
+    const user = useGetConnectedUser();
+    const navigate = useNavigate();
+
+    const handleLogout = useCallback(async () => {
+        try {
+            const response = await fetch('http://localhost:8000/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${myToken}`,
+                },
+            });
+        } catch (error) {
+            console.error('Error logging out: ' + error.message);
+        }
+        localStorage.removeItem('token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('email');
+        setMyToken(null);
+        location.reload();
+    }, [myToken]);
+
     const toggleDrawer = () => {
         setOpen(!open);
     };
@@ -92,6 +119,7 @@ const NavbarPro = () => {
                 Dashboard
             </Typography>
             <NotificationButton />
+            <AvatarDialog firstName={user.connectedUser?.firstname} lastName={user.connectedUser?.lastname} handleLogout={handleLogout} />
         </Toolbar>
     </AppBar>
 

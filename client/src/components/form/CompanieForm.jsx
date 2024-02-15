@@ -36,7 +36,6 @@ function CompanieForm() {
             formData.append('kbis', kbisFile);
         }
 
-        console.log(user);
         if (user && user.connectedUser.id) {
             formData.append('userId', user.connectedUser.id);
         }        
