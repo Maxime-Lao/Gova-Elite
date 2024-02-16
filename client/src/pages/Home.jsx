@@ -5,7 +5,8 @@ import useGetConnectedUser from "../components/hooks/useGetConnectedUser.jsx";
 import HomePro from "./HomePro.jsx";
 import Dashboard from "./admin/Dashboard.jsx";
 import { useTranslation } from 'react-i18next';
-import Loading from "../assets/img/loading.jpg"
+import Loading from "../assets/img/loading.jpg";
+import Footer from "../components/others/Footer.jsx";
 
 function Home() {
     const { t } = useTranslation();
@@ -43,6 +44,7 @@ function Home() {
                 <Navbar/>
                 <Banner/>
                 <HomeSectionOne/>
+                <Footer />
             </>
         )
     }
@@ -57,6 +59,7 @@ function Home() {
                             <>
                                 <Banner/>
                                 <HomeSectionOne/>
+                                <Footer />
                             </>
                         ) : null
             }
