@@ -24,6 +24,7 @@ jobs:
         echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> server/.env
         echo "APP_ENV=${{ secrets.APP_ENV }}" >> server/.env
         echo "DATABASE_VERSION=${{ secrets.DATABASE_VERSION }}" >> server/.env
+        echo "MAILER2_DSN=${{ secrets.MAILER2_DSN }}" >> server/.env
 
     - name: Docker Compose Install
       run: |
@@ -40,7 +41,7 @@ jobs:
     
     - name: Create migrations folder
       run: cd server && mkdir -p migrations
-      
+
     - name: Make migrations
       run: cd server && php bin/console make:migration
 
