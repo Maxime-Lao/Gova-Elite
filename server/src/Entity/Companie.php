@@ -137,6 +137,7 @@ class Companie
 
     public function setAddress(string $address): static
     {
+        $this->address = $address;
         return $this;
     }
 
