@@ -148,7 +148,6 @@ const EditCar = ({ carId }) => {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem('token')}`,
                             'Content-Type': 'multipart/form-data',
-                            Authorization: `Bearer ${localStorage.getItem('token')}`,
                         },
                     });
 
@@ -167,9 +166,6 @@ const EditCar = ({ carId }) => {
             }
 
             setSuccess('Voiture modifiée avec succès');
-            setTimeout(() => {
-                window.location.reload();
-            }, 2000);
         } catch (error) {
             setError('Erreur lors de la modification de la voiture');
         }

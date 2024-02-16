@@ -116,9 +116,6 @@ const CreateCar = ({companieId}) => {
     
                 setSuccess('Voiture créée avec succès');
                 setError('');
-                setTimeout(() => {
-                    window.location.reload();
-                }, 2000);
             } else {
                 console.error('Erreur lors de la création de la voiture', carResponse.data['hydra:description']);
                 setError('Erreur lors de la création de la voiture. Veuillez réessayer.');
