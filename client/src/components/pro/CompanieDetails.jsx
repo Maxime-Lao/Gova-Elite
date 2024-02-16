@@ -14,7 +14,7 @@ const CompanieDetails = ({ companie }) => {
 
     const fetchRentData = useCallback(async () => {
         try {
-            const response = await fetch(`http://195.35.29.110:8000/api/companies/${companie.id}/rents`, {
+            const response = await fetch(`https://kame-os.fr/api/companies/${companie.id}/rents`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -26,7 +26,7 @@ const CompanieDetails = ({ companie }) => {
         } catch (error) {
             console.error('Erreur lors de la récupération des données de location : ', error);
         }
-    }, [companie.id]);
+    }, [companie.id, token]);
 
     useEffect(() => {
         fetchRentData();
@@ -35,7 +35,7 @@ const CompanieDetails = ({ companie }) => {
     const calculateMonthlyIncome = (rentsData, month, year) => {
         let totalIncome = 0;
         rentsData.forEach(rent => {
-            const rentDate = new Date(rent.dateStart);
+            const rentDate = new Date(rent.createdAt);
             if (rentDate.getMonth() === month && rentDate.getFullYear() === year) {
                 totalIncome += rent.totalPrice;
             }

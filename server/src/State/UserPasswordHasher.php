@@ -95,7 +95,7 @@ final class UserPasswordHasher implements ProcessorInterface
             ->to($user->getEmail())
             ->subject('Modification de mot de passe')
             ->text('')
-            ->html("<p>Cliquez ici pour changer votre mot de passe <a href=\"http://195.35.29.110:3000/resetpswd/" . $user->getPasswordResetToken() . "\">ici</a>.</p>");
+            ->html("<p>Cliquez ici pour changer votre mot de passe <a href=\"https://gova-elite.vercel.app/resetpswd/" . $user->getPasswordResetToken() . "\">ici</a>.</p>");
 
         $this->mailer->send($currentEmail);
     }

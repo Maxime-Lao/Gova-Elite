@@ -29,7 +29,7 @@ function Calendar({ carId, companieId }) {
     const fetchRentedTimes = async () => {
       if (!carId) return;
       try {
-        const response = await fetch(`http://195.35.29.110:8000/api/cars/${carId}`, {
+        const response = await fetch(`https://kame-os.fr/api/cars/${carId}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -109,7 +109,7 @@ function Calendar({ carId, companieId }) {
       };
 
       try {
-        const response = await fetch('http://195.35.29.110:8000/api/rents', {
+        const response = await fetch('https://kame-os.fr/api/rents', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json+ld',

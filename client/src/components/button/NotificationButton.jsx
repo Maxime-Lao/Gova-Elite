@@ -18,7 +18,7 @@ export default function NotificationButton() {
     const fetchNotifications = async () => {
       if (user.connectedUser) {
         try {
-          const response = await fetch(`http://195.35.29.110:8000/api/users/${user.connectedUser.id}/notifications`, {
+          const response = await fetch(`https://kame-os.fr/api/users/${user.connectedUser.id}/notifications`, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${token}`
@@ -50,7 +50,7 @@ export default function NotificationButton() {
 
   const handleRead = async (id) => {
     try {
-      await fetch(`http://195.35.29.110:8000/api/notifications/${id}`, {
+      await fetch(`https://kame-os.fr/api/notifications/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/merge-patch+json',

@@ -141,7 +141,7 @@ export default function Brands() {
         const getBrands = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://195.35.29.110:8000/api/brands', {
+                const response = await fetch('https://kame-os.fr/api/brands', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -180,7 +180,7 @@ export default function Brands() {
         event.preventDefault();
         
         try {
-            const response = await fetch('http://195.35.29.110:8000/api/brands', {
+            const response = await fetch('https://kame-os.fr/api/brands', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -231,7 +231,7 @@ export default function Brands() {
 
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(`http://195.35.29.110:8000/api/brands/${selectedBrand.id}`, {
+            const response = await fetch(`https://kame-os.fr/api/brands/${selectedBrand.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -261,7 +261,7 @@ export default function Brands() {
 
     const handleUpdate = async () => {
         try {
-            const response = await fetch(`http://195.35.29.110:8000/api/brands/${selectedBrand.id}`, {
+            const response = await fetch(`https://kame-os.fr/api/brands/${selectedBrand.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/merge-patch+json',

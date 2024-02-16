@@ -19,7 +19,7 @@ const RentCard = (data) => {
         }}>
             {data.car.media.length > 0 && data.car.media[0].filePath !== null ? (
                 <CardMedia
-                image={data.car.media[0].filePath}
+                image={`https://kame-os.fr/media/${data.car.media[0].filePath}`}
                 title="Car Image"
                 sx={{ width: '40%' }}
                 /> ) : (
@@ -67,7 +67,7 @@ const RentCard = (data) => {
                     <Typography variant="h6" color="textPrimary" component="p">
                         {data.car.price} € <span style={{ fontSize: '0.8em', fontWeight: "normal" }}>/ jour</span>
                     </Typography>
-                    <Link href={`/cars/${data.car.id}?startDate=${data.query.startDate}&endDate=${data.query.endDate}&location=${data.query.location}`}>
+                    <Link href={`/cars/${data.car.id}`}>
                         <Button variant="contained" sx={{ backgroundColor: 'var(--joy-palette-neutral-700, #32383E)', color: 'var(--joy-palette-primary-contrastText, #FFFFFF)' }}>
                             Je loue
                         </Button>

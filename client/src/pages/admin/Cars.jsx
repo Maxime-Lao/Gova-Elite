@@ -192,11 +192,11 @@ export default function Cars() {
                 }
             };
     
-            fetchData('http://195.35.29.110:8000/api/gears', setGears);
-            fetchData('http://195.35.29.110:8000/api/models', setModels);
-            fetchData('http://195.35.29.110:8000/api/energies', setEnergies);
-            fetchData('http://195.35.29.110:8000/api/categories', setCategories);
-            fetchData('http://195.35.29.110:8000/api/companies', setCompanies);
+            fetchData('https://kame-os.fr/api/gears', setGears);
+            fetchData('https://kame-os.fr/api/models', setModels);
+            fetchData('https://kame-os.fr/api/energies', setEnergies);
+            fetchData('https://kame-os.fr/api/categories', setCategories);
+            fetchData('https://kame-os.fr/api/companies', setCompanies);
         };
     
         loadData();
@@ -206,7 +206,7 @@ export default function Cars() {
         const getCars = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://195.35.29.110:8000/api/cars', {
+                const response = await fetch('https://kame-os.fr/api/cars', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -257,7 +257,7 @@ export default function Cars() {
         event.preventDefault();
         
         try {
-            const response = await fetch('http://195.35.29.110:8000/api/cars', {
+            const response = await fetch('https://kame-os.fr/api/cars', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -332,7 +332,7 @@ export default function Cars() {
 
     const handleConfirmDelete = async () => {
         try {
-            const response = await fetch(`http://195.35.29.110:8000/api/cars/${selectedCar.id}`, {
+            const response = await fetch(`https://kame-os.fr/api/cars/${selectedCar.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -362,7 +362,7 @@ export default function Cars() {
 
     const handleUpdate = async () => {
         try {
-            const response = await fetch(`http://195.35.29.110:8000/api/cars/${selectedCar.id}`, {
+            const response = await fetch(`https://kame-os.fr/api/cars/${selectedCar.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/merge-patch+json',
