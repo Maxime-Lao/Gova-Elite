@@ -6,6 +6,7 @@ import Navbar from "../navbar/Navbar.jsx";
 const Account = () => {
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
+    const token = localStorage.getItem('token');
 
     const user = useGetConnectedUser();
 
@@ -52,10 +53,11 @@ const Account = () => {
 
     const handleSaveClick = async () => {
         try {
-            const response = await fetch(`http://localhost:8000/api/users/${user.connectedUser.id}`, {
+            const response = await fetch(`http://195.35.29.110:8000/api/users/${user.connectedUser.id}`, {
                 method: 'PATCH',
                 headers: {
-                    'Content-Type': 'application/merge-patch+json',
+                    'Content-Type': 'application/merge-patch+json', // Spécification du type de contenu attendu
+                    Authorization: `Bearer ${token}`
                 },
                 body: JSON.stringify(formData),
             });

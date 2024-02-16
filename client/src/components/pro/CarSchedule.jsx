@@ -1,16 +1,17 @@
 import React from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { format } from 'date-fns';
 
 const CarSchedule = ({ car }) => {
     const dayClassName = (date) => {
-        const formattedDate = date.toISOString().split('T')[0];
+        const formattedDate = format(date, 'yyyy-MM-dd');
 
-        if (car.rents?.some((rent) => formattedDate >= rent.dateStart && formattedDate <= rent.dateEnd)) {
+        if (car.rents?.some((rent) => formattedDate >= format(new Date(rent.dateStart), 'yyyy-MM-dd') && formattedDate <= format(new Date(rent.dateEnd), 'yyyy-MM-dd'))) {
             return 'bg-yellow-500';
         }
 
-        if (car.unavailability?.some((unavailability) => formattedDate >= unavailability.date_start && formattedDate <= unavailability.date_end)) {
+        if (car.unavailabilities?.some((unavailability) => formattedDate >= format(new Date(unavailability.date_start), 'yyyy-MM-dd') && formattedDate <= format(new Date(unavailability.date_end), 'yyyy-MM-dd'))) {
             return 'bg-red-500';
         }
 
@@ -18,7 +19,7 @@ const CarSchedule = ({ car }) => {
     };
 
     return (
-        car.unavailability && car.rents && (
+        car.unavailabilities && car.rents && (
             <div>
                 <DatePicker
                     inline

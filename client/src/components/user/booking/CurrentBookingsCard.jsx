@@ -86,7 +86,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
   useEffect(() => {
     const fetchRentedTimes = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/cars/${rent.car.id}/rents`, {
+        const response = await fetch(`http://195.35.29.110:8000/api/cars/${rent.car.id}/rents`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -121,7 +121,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
   }, [startDate, endDate, rent]);
 
   useEffect(() => {
-    const unavailability = rent.car.unavailability || [];
+    const unavailability = rent.car.unavailabilities || [];
     setUnavailabilityDates(unavailability.map(({ date_start, date_end }) => ({
       startDate: new Date(date_start),
       endDate: new Date(date_end),
@@ -142,7 +142,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
   
   const fetchUpdatedRentedTimes = async (carId) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/cars/${carId}/rents`, {
+      const response = await fetch(`http://195.35.29.110:8000/api/cars/${carId}/rents`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -169,7 +169,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
 
   const handleCancel = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/rents/${id}`, {
+      const response = await fetch(`http://195.35.29.110:8000/api/rents/${id}`, {
           method: 'DELETE',
           headers: {
               'Content-Type': 'application/json',
@@ -203,7 +203,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
       };
 
       try {
-        const response = await fetch(`http://localhost:8000/api/rents/${rentId}`, {
+        const response = await fetch(`http://195.35.29.110:8000/api/rents/${rentId}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/merge-patch+json',
@@ -298,7 +298,7 @@ export default function BookingsCard({ rent, user, onDelete, onBookingChange }) 
       <CardMedia
         component="img"
         height="194"
-        image={rent.car.media.length &&  rent.car.media[0].filePath ? `http://localhost:8000/media/${rent.car.media[0].filePath}` : "https://source.unsplash.com/random"}
+        image={rent.car.media.length &&  rent.car.media[0].filePath ? `http://195.35.29.110:8000/media/${rent.car.media[0].filePath}` : "https://source.unsplash.com/random"}
         alt={`${rent.car.model.name} image`}
         sx={{
           width: '100%',

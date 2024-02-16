@@ -68,36 +68,41 @@ const EditCar = ({ carId }) => {
     }, [selectedBrandId]);
 
     useEffect(() => {
-        fetch(`http://localhost:8000/api/gears`)
-            .then(response => response.json())
-            .then(data => setMyGears(data))
-            .catch(error => console.error(error));
+        const fetchWithAuthorization = async (url, setStateFunction) => {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                });
 
-        fetch(`http://localhost:8000/api/models`)
-            .then(response => response.json())
-            .then(data => setAllModels(data))
-            .catch(error => console.error(error));
+                if (!response.ok) {
+                    throw new Error(`Erreur lors de la récupération des données de ${url}`);
+                }
 
-        fetch(`http://localhost:8000/api/brands`)
-            .then(response => response.json())
-            .then(data => setMyBrands(data))
-            .catch(error => console.error(error));
+                const data = await response.json();
+                setStateFunction(data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
 
-        fetch(`http://localhost:8000/api/energies`)
-            .then(response => response.json())
-            .then(data => setMyEnergies(data))
-            .catch(error => console.error(error));
-
-        fetch(`http://localhost:8000/api/categories`)
-            .then(response => response.json())
-            .then(data => setMyCategories(data))
-            .catch(error => console.error(error));
+        fetchWithAuthorization('http://195.35.29.110:8000/api/gears', setMyGears);
+        fetchWithAuthorization('http://195.35.29.110:8000/api/models', setAllModels);
+        fetchWithAuthorization('http://195.35.29.110:8000/api/brands', setMyBrands);
+        fetchWithAuthorization('http://195.35.29.110:8000/api/energies', setMyEnergies);
+        fetchWithAuthorization('http://195.35.29.110:8000/api/categories', setMyCategories);
     }, []);
+
 
     useEffect(() => {
         const fetchCarData = async () => {
             try {
-                const response = await axios.get(`http://localhost:8000/api/cars/${carId}`);
+                const response = await axios.get(`http://195.35.29.110:8000/api/cars/${carId}`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                });
                 setCarData(response.data);
             } catch (error) {
                 console.error("Error fetching car data", error);
@@ -125,7 +130,7 @@ const EditCar = ({ carId }) => {
         };
 
         try {
-            const response = await axios.patch(`http://localhost:8000/api/cars/${carId}`, carDataPayload, {
+            const response = await axios.patch(`http://195.35.29.110:8000/api/cars/${carId}`, carDataPayload, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                     'Content-Type': 'application/merge-patch+json',
@@ -139,9 +144,11 @@ const EditCar = ({ carId }) => {
                     formData.append('car_id', carId);
                     formData.append('user_id', user.connectedUser.id);
 
-                    const mediaResponse = await axios.post('http://localhost:8000/api/media_objects', formData, {
+                    const mediaResponse = await axios.post('http://195.35.29.110:8000/api/media_objects', formData, {
                         headers: {
+                            Authorization: `Bearer ${localStorage.getItem('token')}`,
                             'Content-Type': 'multipart/form-data',
+                            Authorization: `Bearer ${localStorage.getItem('token')}`,
                         },
                     });
 
@@ -151,7 +158,7 @@ const EditCar = ({ carId }) => {
             const carMediaIds = carData.media?.map(media => media.id) || [];
             for (const photo of carMediaIds) {
                 if (!files.some(file => file.id === photo)) {
-                    const response = await axios.delete(`http://localhost:8000/api/media_objects/${photo}`, {
+                    const response = await axios.delete(`http://195.35.29.110:8000/api/media_objects/${photo}`, {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem('token')}`,
                         },
@@ -382,7 +389,7 @@ const EditCar = ({ carId }) => {
                                     <div key={`photo-container-${index}`} className="border-2">
                                         <CardMedia
                                             component="img"
-                                            src={`http://localhost:8000/media/${path.filePath}`}
+                                            src={`http://195.35.29.110:8000/media/${path.filePath}`}
                                             style={{width: '70px'}}
                                         />
                                         <div className="flex justify-end">

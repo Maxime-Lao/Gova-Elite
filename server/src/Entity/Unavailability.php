@@ -3,22 +3,28 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
 use App\Repository\UnavailabilityRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 
 #[ORM\Entity(repositoryClass: UnavailabilityRepository::class)]
-#[ApiResource]
 #[ApiResource(
-    uriTemplate: '/cars/{carId}/unavailabilities',
-    uriVariables: [
-        'carId' => new Link(fromClass: Car::class, toProperty: 'car'),
-    ],
-    operations: [new GetCollection()],
-    normalizationContext: ['groups' => ['car:read']],
+    operations: [
+        new GetCollection(),
+        new Get(),
+        new Post(security: "is_granted('ROLE_PRO')", securityMessage: "Only Muthu can create categories."),
+        new Put(security: "is_granted('ROLE_PRO')", securityMessage: "Only Muthu can update categories."),
+        new Patch(security: "is_granted('ROLE_PRO')", securityMessage: "Only Muthu can modify categories."),
+        new Delete(security: "is_granted('ROLE_PRO')", securityMessage: "Only Muthu can delete categories.")
+    ]
 )]
 class Unavailability
 {

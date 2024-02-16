@@ -35,46 +35,33 @@ const CreateCar = ({companieId}) => {
     const user = useGetConnectedUser();
 
     useEffect(() => {
-        fetch(`http://localhost:8000/api/gears`)
-            .then(response => response.json())
-            .then(data => {
-                setMyGears(data);
-                setGear(data[0].id);
-            })
-            .catch(error => console.error(error));
+        const fetchWithAuthorization = async (url, setStateFunction, setDefaultIdFunction) => {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                });
 
-        fetch(`http://localhost:8000/api/models`)
-            .then(response => response.json())
-            .then(data => {
-                setAllModels(data);
-                setModel(data[0].id);
-            })
-            .catch(error => console.error(error));
+                if (!response.ok) {
+                    throw new Error(`Erreur lors de la récupération des données de ${url}`);
+                }
 
-        fetch(`http://localhost:8000/api/brands`)
-            .then(response => response.json())
-            .then(data => {
-                setMyBrands(data);
-                setSelectedBrandId(data[0].id);
-            })
-            .catch(error => console.error(error));
+                const data = await response.json();
+                setStateFunction(data);
+                setDefaultIdFunction(data[0].id);
+            } catch (error) {
+                console.error(error);
+            }
+        };
 
-        fetch(`http://localhost:8000/api/energies`)
-            .then(response => response.json())
-            .then(data => {
-                setMyEnergies(data);
-                setEnergy(data[0].id);
-            })
-            .catch(error => console.error(error));
-
-        fetch(`http://localhost:8000/api/categories`)
-            .then(response => response.json())
-            .then(data => {
-                setMyCategories(data);
-                setCategory(data[0].id);setMyCategories(data)
-            })
-            .catch(error => console.error(error));
+        fetchWithAuthorization('http://195.35.29.110:8000/api/gears', setMyGears, setGear);
+        fetchWithAuthorization('http://195.35.29.110:8000/api/models', setAllModels, setModel);
+        fetchWithAuthorization('http://195.35.29.110:8000/api/brands', setMyBrands, setSelectedBrandId);
+        fetchWithAuthorization('http://195.35.29.110:8000/api/energies', setMyEnergies, setEnergy);
+        fetchWithAuthorization('http://195.35.29.110:8000/api/categories', setMyCategories, setCategory);
     }, []);
+
 
     useEffect(() => {
         if (selectedBrandId && allModels) {
@@ -104,7 +91,7 @@ const CreateCar = ({companieId}) => {
         let carId = null;
     
         try {
-            const carResponse = await axios.post(`http://localhost:8000/api/cars`, carData, {
+            const carResponse = await axios.post(`http://195.35.29.110:8000/api/cars`, carData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -120,7 +107,7 @@ const CreateCar = ({companieId}) => {
                     formData.append('car_id', carId);
                     formData.append('user_id', user.connectedUser.id);
     
-                    await axios.post('http://localhost:8000/api/media_objects', formData, {
+                    await axios.post('http://195.35.29.110:8000/api/media_objects', formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
@@ -142,7 +129,7 @@ const CreateCar = ({companieId}) => {
     
             if (carId) {
                 try {
-                    await axios.delete(`http://localhost:8000/api/cars/${carId}`, {
+                    await axios.delete(`http://195.35.29.110:8000/api/cars/${carId}`, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                             'Content-Type': 'application/json'
