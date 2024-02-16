@@ -29,7 +29,7 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 #[ApiResource(
     operations: [
         new GetCollection(
-            //security: "is_granted('ROLE_ADMIN')",
+            security: "is_granted('ROLE_ADMIN')",
             normalizationContext: ['groups' => ['user:read']],
         ),
         new Post(

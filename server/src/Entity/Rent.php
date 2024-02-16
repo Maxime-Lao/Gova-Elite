@@ -27,7 +27,12 @@ use Symfony\Component\Validator\Constraints as Assert;
     uriVariables: [
         'userId' => new Link(fromClass: User::class, toProperty: 'user'),
     ],
-    operations: [new GetCollection()],
+    operations: [
+        new GetCollection(
+            security: "is_granted('ROLE_ADMIN') or (is_granted('ROLE_USER') and user.getId() == userId)",
+            securityMessage: "Vous n'avez pas le droit de voir les locations d'autres utilisateurs."
+        )
+    ],
     normalizationContext: ['groups' => ['rents_user:read']],
 )]
 #[ApiResource(
