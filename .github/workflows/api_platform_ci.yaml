@@ -35,7 +35,7 @@ jobs:
       run: cd server && docker-compose up -d
 
     - name: Install dependencies
-      run: cd server && composer install
+      run: cd server && composer update
 
     - name: Make migrations
       run: cd server && php bin/console make:migration
