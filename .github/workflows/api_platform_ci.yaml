@@ -32,7 +32,7 @@ jobs:
         sudo mv docker-compose /usr/local/bin/docker-compose
         
     - name: Build the Docker Compose stack
-      run: docker-compose up -d
+      run: cd server && docker-compose up -d
 
     - name: Install dependencies
       run: cd server && composer install
