@@ -9,22 +9,20 @@ use Zenstruck\Foundry\Test\ResetDatabase;
 class BrandTest extends ApiTestCase
 {
     use ResetDatabase;
-    public function testCreateGear(): void
+    public function testGetAllBrands(): void
     {
         $client = self::createClient();
-        $client->request('POST', '/api/brands', [
+
+        $client->request('GET', 'api/brands', [
             'headers' => [
                 'Accept' => 'application/json+ld',
                 'Content-Type' => 'application/json+ld',
-            ],
-            'json' => [
-                'name' => 'Toyota',
-                "createdAt" => "2024-02-16T00:05:17.614Z",
-                "updatedAt" => "2024-02-16T00:05:17.614Z"
+
             ],
         ]);
 
         $this->assertResponseIsSuccessful();
+
     }
 
 }

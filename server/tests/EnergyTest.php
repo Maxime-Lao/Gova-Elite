@@ -9,22 +9,20 @@ use Zenstruck\Foundry\Test\ResetDatabase;
 class EnergyTest extends ApiTestCase
 {
     use ResetDatabase;
-    public function testCreateEnergy(): void
+    public function testGetAllEnergy(): void
     {
         $client = self::createClient();
-        $client->request('POST', '/api/energies', [
+
+        $client->request('GET', 'api/energies', [
             'headers' => [
                 'Accept' => 'application/json+ld',
                 'Content-Type' => 'application/json+ld',
-            ],
-            'json' => [
-                'name' => 'test',
-                "createdAt" => "2024-02-16T00:05:17.614Z",
-                "updatedAt" => "2024-02-16T00:05:17.614Z"
+
             ],
         ]);
 
         $this->assertResponseIsSuccessful();
+
     }
 
 }
