@@ -55,11 +55,11 @@ const CreateCar = ({companieId}) => {
             }
         };
 
-        fetchWithAuthorization('http://195.35.29.110:8000/api/gears', setMyGears, setGear);
-        fetchWithAuthorization('http://195.35.29.110:8000/api/models', setAllModels, setModel);
-        fetchWithAuthorization('http://195.35.29.110:8000/api/brands', setMyBrands, setSelectedBrandId);
-        fetchWithAuthorization('http://195.35.29.110:8000/api/energies', setMyEnergies, setEnergy);
-        fetchWithAuthorization('http://195.35.29.110:8000/api/categories', setMyCategories, setCategory);
+        fetchWithAuthorization('https://kame-os.fr/api/gears', setMyGears, setGear);
+        fetchWithAuthorization('https://kame-os.fr/api/models', setAllModels, setModel);
+        fetchWithAuthorization('https://kame-os.fr/api/brands', setMyBrands, setSelectedBrandId);
+        fetchWithAuthorization('https://kame-os.fr/api/energies', setMyEnergies, setEnergy);
+        fetchWithAuthorization('https://kame-os.fr/api/categories', setMyCategories, setCategory);
     }, []);
 
 
@@ -91,7 +91,7 @@ const CreateCar = ({companieId}) => {
         let carId = null;
     
         try {
-            const carResponse = await axios.post(`http://195.35.29.110:8000/api/cars`, carData, {
+            const carResponse = await axios.post(`https://kame-os.fr/api/cars`, carData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -107,7 +107,7 @@ const CreateCar = ({companieId}) => {
                     formData.append('car_id', carId);
                     formData.append('user_id', user.connectedUser.id);
     
-                    await axios.post('http://195.35.29.110:8000/api/media_objects', formData, {
+                    await axios.post('https://kame-os.fr/api/media_objects', formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data',
                         },
@@ -129,7 +129,7 @@ const CreateCar = ({companieId}) => {
     
             if (carId) {
                 try {
-                    await axios.delete(`http://195.35.29.110:8000/api/cars/${carId}`, {
+                    await axios.delete(`https://kame-os.fr/api/cars/${carId}`, {
                         headers: {
                             Authorization: `Bearer ${token}`,
                             'Content-Type': 'application/json'

@@ -73,7 +73,7 @@ const NavbarPro = () => {
 
     const handleLogout = useCallback(async () => {
         try {
-            const response = await fetch('http://195.35.29.110:8000/logout', {
+            const response = await fetch('https://kame-os.fr/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
