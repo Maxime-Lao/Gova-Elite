@@ -13,7 +13,8 @@ const useGetConnectedUser = () => {
         if (email) {
             const fetchUsers = async () => {
                 try {
-                    const response = await fetch(`https://kame-os.fr/api/users?email=${email}`, {
+                    const encodedEmail = encodeURIComponent(email);
+                    const response = await fetch(`https://kame-os.fr/api/users?email=${encodedEmail}`, {
 
                         headers: {
                             'Content-Type': 'application/json',
