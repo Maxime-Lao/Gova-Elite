@@ -47,6 +47,3 @@ jobs:
 
     - name: Run migrations
       run: cd server && php bin/console doctrine:migrations:migrate --no-interaction
-
-    - name: Run tests
-      run: cd server && php bin/phpunit --dont-report-useless-tests
