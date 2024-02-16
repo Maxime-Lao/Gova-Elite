@@ -19,16 +19,7 @@ const logoStyle = {
 
 export default function Footer() {
     return (
-        <Container
-            sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: { xs: 4, sm: 8 },
-                py: { xs: 8, sm: 10 },
-                textAlign: { sm: 'center', md: 'left' },
-            }}
-        >
+        <div className="flex flex-col items-center gap-4 xs:gap-8 py-8 sm:py-10 sm:text-center md:text-left fixed bottom-0 left-0 bg-white w-[80rem] ml-[18rem]">
             <Box
                 sx={{
                     display: 'flex',
@@ -195,6 +186,6 @@ export default function Footer() {
                     </IconButton>
                 </Stack>
             </Box>
-        </Container>
+        </div>
     );
 }
