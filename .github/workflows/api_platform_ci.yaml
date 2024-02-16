@@ -37,7 +37,10 @@ jobs:
     
     - name: Install dependencies
       run: cd server && composer update
-
+    
+    - name: Create migrations folder
+      run: cd server && mkdir -p migrations
+      
     - name: Make migrations
       run: cd server && php bin/console make:migration
 
