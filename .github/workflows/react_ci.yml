@@ -21,3 +21,12 @@ jobs:
 
     - name: Install dependencies
       run: cd client && npm install
+
+    - name: Install Snyk
+      run: npm install -g snyk
+
+    - name: Auth Snyk
+      run: snyk auth ${{ secrets.SNYK_TOKEN }}
+
+    - name: Run Snyk to check for vulnerabilities
+      run: cd client && snyk test --severity-threshold=high
